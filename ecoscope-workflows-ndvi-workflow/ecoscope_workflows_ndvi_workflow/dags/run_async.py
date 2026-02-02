@@ -3,19 +3,28 @@ import json
 import os
 
 from ecoscope_workflows_core.graph import DependsOn, Graph, Node
-
-from ecoscope_workflows_core.tasks.config import set_workflow_details
-from ecoscope_workflows_core.tasks.io import set_gee_connection
-from ecoscope_workflows_core.tasks.filter import set_time_range
-from ecoscope_workflows_core.tasks.groupby import set_groupers
-from ecoscope_workflows_ext_ecoscope.tasks.io import download_roi
-from ecoscope_workflows_core.tasks.groupby import split_groups
-from ecoscope_workflows_ext_ecoscope.tasks.io import calculate_ndvi_range
-from ecoscope_workflows_ext_ecoscope.tasks.results import draw_historic_timeseries
-from ecoscope_workflows_core.tasks.io import persist_text
-from ecoscope_workflows_core.tasks.results import create_plot_widget_single_view
-from ecoscope_workflows_core.tasks.results import merge_widget_views
-from ecoscope_workflows_core.tasks.results import gather_dashboard
+from ecoscope_workflows_core.tasks.config import (
+    set_workflow_details as set_workflow_details,
+)
+from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
+from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
+from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
+from ecoscope_workflows_core.tasks.io import persist_text as persist_text
+from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
+from ecoscope_workflows_core.tasks.results import (
+    create_plot_widget_single_view as create_plot_widget_single_view,
+)
+from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_dashboard
+from ecoscope_workflows_core.tasks.results import (
+    merge_widget_views as merge_widget_views,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.io import (
+    calculate_ndvi_range as calculate_ndvi_range,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.io import download_roi as download_roi
+from ecoscope_workflows_ext_ecoscope.tasks.results import (
+    draw_historic_timeseries as draw_historic_timeseries,
+)
 
 from ..params import Params
 
@@ -46,21 +55,27 @@ def main(params: Params):
     nodes = {
         "workflow_details": Node(
             async_task=set_workflow_details.validate()
-            .handle_errors(task_instance_id="workflow_details")
+            .set_task_instance_id("workflow_details")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial=(params_dict.get("workflow_details") or {}),
             method="call",
         ),
         "gee_client": Node(
             async_task=set_gee_connection.validate()
-            .handle_errors(task_instance_id="gee_client")
+            .set_task_instance_id("gee_client")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial=(params_dict.get("gee_client") or {}),
             method="call",
         ),
         "time_range": Node(
             async_task=set_time_range.validate()
-            .handle_errors(task_instance_id="time_range")
+            .set_task_instance_id("time_range")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "time_format": "%d %b %Y %H:%M:%S %Z",
@@ -70,21 +85,27 @@ def main(params: Params):
         ),
         "groupers": Node(
             async_task=set_groupers.validate()
-            .handle_errors(task_instance_id="groupers")
+            .set_task_instance_id("groupers")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial=(params_dict.get("groupers") or {}),
             method="call",
         ),
         "roi": Node(
             async_task=download_roi.validate()
-            .handle_errors(task_instance_id="roi")
+            .set_task_instance_id("roi")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial=(params_dict.get("roi") or {}),
             method="call",
         ),
         "split_roi_groups": Node(
             async_task=split_groups.validate()
-            .handle_errors(task_instance_id="split_roi_groups")
+            .set_task_instance_id("split_roi_groups")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "df": DependsOn("roi"),
@@ -95,7 +116,9 @@ def main(params: Params):
         ),
         "calculate_ndvi": Node(
             async_task=calculate_ndvi_range.validate()
-            .handle_errors(task_instance_id="calculate_ndvi")
+            .set_task_instance_id("calculate_ndvi")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "client": DependsOn("gee_client"),
@@ -111,7 +134,9 @@ def main(params: Params):
         ),
         "draw_ndvi": Node(
             async_task=draw_historic_timeseries.validate()
-            .handle_errors(task_instance_id="draw_ndvi")
+            .set_task_instance_id("draw_ndvi")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "current_value_column": "NDVI",
@@ -129,7 +154,9 @@ def main(params: Params):
         ),
         "persist_ndvi": Node(
             async_task=persist_text.validate()
-            .handle_errors(task_instance_id="persist_ndvi")
+            .set_task_instance_id("persist_ndvi")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
@@ -143,7 +170,9 @@ def main(params: Params):
         ),
         "ndvi_chart_widget": Node(
             async_task=create_plot_widget_single_view.validate()
-            .handle_errors(task_instance_id="ndvi_chart_widget")
+            .set_task_instance_id("ndvi_chart_widget")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "title": "NDVI Trends",
@@ -157,7 +186,9 @@ def main(params: Params):
         ),
         "grouped_ndvi_widget": Node(
             async_task=merge_widget_views.validate()
-            .handle_errors(task_instance_id="grouped_ndvi_widget")
+            .set_task_instance_id("grouped_ndvi_widget")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "widgets": DependsOn("ndvi_chart_widget"),
@@ -167,11 +198,15 @@ def main(params: Params):
         ),
         "ndvi_dashboard": Node(
             async_task=gather_dashboard.validate()
-            .handle_errors(task_instance_id="ndvi_dashboard")
+            .set_task_instance_id("ndvi_dashboard")
+            .handle_errors()
+            .with_tracing()
             .set_executor("lithops"),
             partial={
                 "details": DependsOn("workflow_details"),
-                "widgets": DependsOn("grouped_ndvi_widget"),
+                "widgets": [
+                    DependsOn("grouped_ndvi_widget"),
+                ],
                 "time_range": DependsOn("time_range"),
                 "groupers": DependsOn("groupers"),
             }

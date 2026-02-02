@@ -49,6 +49,15 @@
           "title": "Until",
           "type": "string",
           "description": "The end time"
+        },
+        "timezone": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TimezoneInfo"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
         }
       },
       "required": [
@@ -226,7 +235,8 @@
         "time_column": {
           "default": "img_date",
           "title": "Time Column",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the dataframe column to pull historic max values from"
         }
       },
       "required": [],
@@ -246,6 +256,34 @@
         "name"
       ],
       "title": "GoogleEarthEngineConnection",
+      "type": "object"
+    },
+    "TimezoneInfo": {
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "tzCode": {
+          "title": "Tzcode",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "utc": {
+          "title": "Utc",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "tzCode",
+        "name",
+        "utc"
+      ],
+      "title": "TimezoneInfo",
       "type": "object"
     },
     "TemporalGrouper": {
@@ -514,7 +552,8 @@
     "time_range": {
       "ui:order": [
         "since",
-        "until"
+        "until",
+        "timezone"
       ]
     },
     "roi": {

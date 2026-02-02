@@ -11,18 +11,29 @@
 # ## Imports
 
 import os
-from ecoscope_workflows_core.tasks.config import set_workflow_details
-from ecoscope_workflows_core.tasks.io import set_gee_connection
-from ecoscope_workflows_core.tasks.filter import set_time_range
-from ecoscope_workflows_core.tasks.groupby import set_groupers
-from ecoscope_workflows_ext_ecoscope.tasks.io import download_roi
-from ecoscope_workflows_core.tasks.groupby import split_groups
-from ecoscope_workflows_ext_ecoscope.tasks.io import calculate_ndvi_range
-from ecoscope_workflows_ext_ecoscope.tasks.results import draw_historic_timeseries
-from ecoscope_workflows_core.tasks.io import persist_text
-from ecoscope_workflows_core.tasks.results import create_plot_widget_single_view
-from ecoscope_workflows_core.tasks.results import merge_widget_views
-from ecoscope_workflows_core.tasks.results import gather_dashboard
+
+from ecoscope_workflows_core.tasks.config import (
+    set_workflow_details as set_workflow_details,
+)
+from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
+from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
+from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
+from ecoscope_workflows_core.tasks.io import persist_text as persist_text
+from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
+from ecoscope_workflows_core.tasks.results import (
+    create_plot_widget_single_view as create_plot_widget_single_view,
+)
+from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_dashboard
+from ecoscope_workflows_core.tasks.results import (
+    merge_widget_views as merge_widget_views,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.io import (
+    calculate_ndvi_range as calculate_ndvi_range,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.io import download_roi as download_roi
+from ecoscope_workflows_ext_ecoscope.tasks.results import (
+    draw_historic_timeseries as draw_historic_timeseries,
+)
 
 # %% [markdown]
 # ## Set Workflow Details
@@ -41,7 +52,9 @@ workflow_details_params = dict(
 
 
 workflow_details = (
-    set_workflow_details.handle_errors(task_instance_id="workflow_details")
+    set_workflow_details.set_task_instance_id("workflow_details")
+    .handle_errors()
+    .with_tracing()
     .partial(**workflow_details_params)
     .call()
 )
@@ -62,7 +75,9 @@ gee_client_params = dict(
 
 
 gee_client = (
-    set_gee_connection.handle_errors(task_instance_id="gee_client")
+    set_gee_connection.set_task_instance_id("gee_client")
+    .handle_errors()
+    .with_tracing()
     .partial(**gee_client_params)
     .call()
 )
@@ -77,6 +92,7 @@ gee_client = (
 time_range_params = dict(
     since=...,
     until=...,
+    timezone=...,
 )
 
 # %%
@@ -84,7 +100,9 @@ time_range_params = dict(
 
 
 time_range = (
-    set_time_range.handle_errors(task_instance_id="time_range")
+    set_time_range.set_task_instance_id("time_range")
+    .handle_errors()
+    .with_tracing()
     .partial(time_format="%d %b %Y %H:%M:%S %Z", **time_range_params)
     .call()
 )
@@ -105,7 +123,9 @@ groupers_params = dict(
 
 
 groupers = (
-    set_groupers.handle_errors(task_instance_id="groupers")
+    set_groupers.set_task_instance_id("groupers")
+    .handle_errors()
+    .with_tracing()
     .partial(**groupers_params)
     .call()
 )
@@ -128,7 +148,13 @@ roi_params = dict(
 # call the task
 
 
-roi = download_roi.handle_errors(task_instance_id="roi").partial(**roi_params).call()
+roi = (
+    download_roi.set_task_instance_id("roi")
+    .handle_errors()
+    .with_tracing()
+    .partial(**roi_params)
+    .call()
+)
 
 
 # %% [markdown]
@@ -144,7 +170,9 @@ split_roi_groups_params = dict()
 
 
 split_roi_groups = (
-    split_groups.handle_errors(task_instance_id="split_roi_groups")
+    split_groups.set_task_instance_id("split_roi_groups")
+    .handle_errors()
+    .with_tracing()
     .partial(df=roi, groupers=groupers, **split_roi_groups_params)
     .call()
 )
@@ -167,7 +195,9 @@ calculate_ndvi_params = dict(
 
 
 calculate_ndvi = (
-    calculate_ndvi_range.handle_errors(task_instance_id="calculate_ndvi")
+    calculate_ndvi_range.set_task_instance_id("calculate_ndvi")
+    .handle_errors()
+    .with_tracing()
     .partial(
         client=gee_client,
         time_range=time_range,
@@ -192,6 +222,7 @@ draw_ndvi_params = dict(
     historic_mean_style=...,
     current_value_style=...,
     time_column=...,
+    widget_id=...,
 )
 
 # %%
@@ -199,7 +230,9 @@ draw_ndvi_params = dict(
 
 
 draw_ndvi = (
-    draw_historic_timeseries.handle_errors(task_instance_id="draw_ndvi")
+    draw_historic_timeseries.set_task_instance_id("draw_ndvi")
+    .handle_errors()
+    .with_tracing()
     .partial(
         current_value_column="NDVI",
         current_value_title="NDVI",
@@ -220,6 +253,7 @@ draw_ndvi = (
 
 persist_ndvi_params = dict(
     filename=...,
+    filename_suffix=...,
 )
 
 # %%
@@ -227,7 +261,9 @@ persist_ndvi_params = dict(
 
 
 persist_ndvi = (
-    persist_text.handle_errors(task_instance_id="persist_ndvi")
+    persist_text.set_task_instance_id("persist_ndvi")
+    .handle_errors()
+    .with_tracing()
     .partial(root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"], **persist_ndvi_params)
     .mapvalues(argnames=["text"], argvalues=draw_ndvi)
 )
@@ -246,7 +282,9 @@ ndvi_chart_widget_params = dict()
 
 
 ndvi_chart_widget = (
-    create_plot_widget_single_view.handle_errors(task_instance_id="ndvi_chart_widget")
+    create_plot_widget_single_view.set_task_instance_id("ndvi_chart_widget")
+    .handle_errors()
+    .with_tracing()
     .partial(title="NDVI Trends", **ndvi_chart_widget_params)
     .map(argnames=["view", "data"], argvalues=persist_ndvi)
 )
@@ -265,7 +303,9 @@ grouped_ndvi_widget_params = dict()
 
 
 grouped_ndvi_widget = (
-    merge_widget_views.handle_errors(task_instance_id="grouped_ndvi_widget")
+    merge_widget_views.set_task_instance_id("grouped_ndvi_widget")
+    .handle_errors()
+    .with_tracing()
     .partial(widgets=ndvi_chart_widget, **grouped_ndvi_widget_params)
     .call()
 )
@@ -277,17 +317,21 @@ grouped_ndvi_widget = (
 # %%
 # parameters
 
-ndvi_dashboard_params = dict()
+ndvi_dashboard_params = dict(
+    warning=...,
+)
 
 # %%
 # call the task
 
 
 ndvi_dashboard = (
-    gather_dashboard.handle_errors(task_instance_id="ndvi_dashboard")
+    gather_dashboard.set_task_instance_id("ndvi_dashboard")
+    .handle_errors()
+    .with_tracing()
     .partial(
         details=workflow_details,
-        widgets=grouped_ndvi_widget,
+        widgets=[grouped_ndvi_widget],
         time_range=time_range,
         groupers=groupers,
         **ndvi_dashboard_params,
