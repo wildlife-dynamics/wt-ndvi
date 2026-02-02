@@ -43,6 +43,27 @@ class CalculateNdvi(BaseModel):
     )
 
 
+class DrawNdvi(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    historic_band_title: str | None = Field(
+        "Historic Min-Max",
+        description="The title shown in the plot legend for historic band",
+        title="Historic Band Title",
+    )
+    historic_mean_title: str | None = Field(
+        "Historic Mean",
+        description="The title shown in the plot legend for historic mean values",
+        title="Historic Mean Title",
+    )
+    time_column: str | None = Field(
+        "img_date",
+        description="The name of the dataframe column to pull historic max values from",
+        title="Time Column",
+    )
+
+
 class GoogleEarthEngineConnection(BaseModel):
     name: str = Field(..., title="Data Source")
 
@@ -67,44 +88,6 @@ class TemporalGrouper(str, Enum):
 
 class ValueGrouper(str, Enum):
     name = "name"
-
-
-class AxisStyle(BaseModel):
-    title: str | None = Field(None, title="Title")
-    range: list[float] | None = Field(None, title="Range")
-
-
-class LayoutStyle(BaseModel):
-    font_size: float | None = Field(None, title="Font Size")
-    font_color: str | None = Field(None, title="Font Color")
-    font_style: str | None = Field(None, title="Font Style")
-    plot_bgcolor: str | None = Field(None, title="Plot Bgcolor")
-    showlegend: bool | None = Field(None, title="Showlegend")
-    hovermode: str | None = Field(None, title="Hovermode")
-    legend_title: str | None = Field(None, title="Legend Title")
-    title: str | None = Field(None, title="Title")
-    title_x: float | None = Field(None, title="Title X")
-    title_y: float | None = Field(None, title="Title Y")
-    xaxis: AxisStyle | None = Field(None, title="Xaxis")
-    yaxis: AxisStyle | None = Field(None, title="Yaxis")
-
-
-class LineStyle(BaseModel):
-    color: str | None = Field(None, title="Color")
-    dash: str | None = Field(None, title="Dash")
-    shape: str | None = Field(None, title="Shape")
-
-
-class PlotStyle(BaseModel):
-    xperiodalignment: str | None = Field(None, title="Xperiodalignment")
-    marker_colors: list[str] | None = Field(None, title="Marker Colors")
-    textinfo: str | None = Field(None, title="Textinfo")
-    line: LineStyle | None = Field(None, title="Line")
-    fillcolor: str | None = Field(None, title="Fillcolor")
-    mode: str | None = Field(None, title="Mode")
-    name: str | None = Field(None, title="Name")
-    width: int | list[int] | None = Field(None, title="Width")
-    xperiod: str | None = Field(None, title="Xperiod")
 
 
 class GeeClient(BaseModel):
@@ -133,47 +116,6 @@ class Groupers(BaseModel):
         None,
         description="            Specify how the data should be grouped to create the views for your dashboard.\n            This field is optional; if left blank, all the data will appear in a single view.\n            ",
         title=" ",
-    )
-
-
-class DrawNdvi(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    historic_band_title: str | None = Field(
-        "Historic Min-Max",
-        description="The title shown in the plot legend for historic band",
-        title="Historic Band Title",
-    )
-    historic_mean_title: str | None = Field(
-        "Historic Mean",
-        description="The title shown in the plot legend for historic mean values",
-        title="Historic Mean Title",
-    )
-    layout_style: LayoutStyle | None = Field(
-        None,
-        description="Additional kwargs passed to plotly.go.Figure(layout).",
-        title="Layout Style",
-    )
-    upper_lower_band_style: PlotStyle | None = Field(
-        None,
-        description="Additional kwargs for upper_lower_band passed to plotly.graph_objects.Scatter.",
-        title="Upper Lower Band Style",
-    )
-    historic_mean_style: PlotStyle | None = Field(
-        None,
-        description="Additional kwargs passed for historic_mean to plotly.graph_objects.Scatter.",
-        title="Historic Mean Style",
-    )
-    current_value_style: PlotStyle | None = Field(
-        None,
-        description="Additional kwargs for current_value passed to plotly.graph_objects.Scatter.",
-        title="Current Value Style",
-    )
-    time_column: str | None = Field(
-        "img_date",
-        description="The name of the dataframe column to pull historic max values from",
-        title="Time Column",
     )
 
 

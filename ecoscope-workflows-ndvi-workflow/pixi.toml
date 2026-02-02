@@ -70,7 +70,7 @@ channel = "https://conda.anaconda.org/microsoft/"
 
 [feature.test.tasks]
 test-all = "python -m pytest -v tests"
-playwright-install = "playwright install chromium"
+playwright-install = "playwright install --with-deps chromium"
 
 [feature.test.tasks.test-app-metadata]
 cmd = "python -m pytest -v tests/test_metadata.py"

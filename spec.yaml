@@ -55,6 +55,10 @@ workflow:
       historic_min_column: "min"
       historic_max_column: "max"
       historic_mean_column: "mean"
+      layout_style: null
+      upper_lower_band_style: null
+      historic_mean_style: null
+      current_value_style: null
     mapvalues:
       argnames: dataframe
       argvalues: ${{ workflow.calculate_ndvi.return}}

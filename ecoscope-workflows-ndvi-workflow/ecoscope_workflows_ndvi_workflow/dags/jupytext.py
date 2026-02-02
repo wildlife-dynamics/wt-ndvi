@@ -217,10 +217,6 @@ calculate_ndvi = (
 draw_ndvi_params = dict(
     historic_band_title=...,
     historic_mean_title=...,
-    layout_style=...,
-    upper_lower_band_style=...,
-    historic_mean_style=...,
-    current_value_style=...,
     time_column=...,
     widget_id=...,
 )
@@ -239,6 +235,10 @@ draw_ndvi = (
         historic_min_column="min",
         historic_max_column="max",
         historic_mean_column="mean",
+        layout_style=None,
+        upper_lower_band_style=None,
+        historic_mean_style=None,
+        current_value_style=None,
         **draw_ndvi_params,
     )
     .mapvalues(argnames=["dataframe"], argvalues=calculate_ndvi)

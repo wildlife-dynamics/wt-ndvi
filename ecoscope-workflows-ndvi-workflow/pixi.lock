@@ -4672,6 +4672,7 @@ packages:
   depends:
   - python >=3.10
   license: BSD-3-Clause
+  license_family: BSD
   size: 1224589
   timestamp: 1770011256652
 - conda: https://conda.anaconda.org/conda-forge/noarch/asttokens-3.0.1-pyhd8ed1ab_0.conda
@@ -10640,6 +10641,7 @@ packages:
   - typing_extensions >=4.6
   - python
   license: BSD-3-Clause
+  license_family: BSD
   size: 647436
   timestamp: 1770040907512
 - conda: https://conda.anaconda.org/conda-forge/noarch/ipython-9.10.0-pyhe2676ad_0.conda
@@ -10660,6 +10662,7 @@ packages:
   - typing_extensions >=4.6
   - python
   license: BSD-3-Clause
+  license_family: BSD
   size: 646337
   timestamp: 1770040952821
 - conda: https://conda.anaconda.org/conda-forge/noarch/ipython_pygments_lexers-1.1.1-pyhd8ed1ab_0.conda
@@ -17164,6 +17167,7 @@ packages:
   - python >=3.10
   - python
   license: MIT
+  license_family: MIT
   size: 279863
   timestamp: 1770040381392
 - conda: https://conda.anaconda.org/conda-forge/linux-64/ncurses-6.5-h2d0b736_3.conda
@@ -17402,6 +17406,7 @@ packages:
   constrains:
   - numpy-base <0a0
   license: BSD-3-Clause
+  license_family: BSD
   size: 8857170
   timestamp: 1770020129094
 - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/numpy-2.0.2-py312h2eb110b_1.conda
@@ -17437,6 +17442,7 @@ packages:
   constrains:
   - numpy-base <0a0
   license: BSD-3-Clause
+  license_family: BSD
   size: 7931684
   timestamp: 1770020157109
 - conda: https://conda.anaconda.org/conda-forge/osx-64/numpy-2.0.2-py312hfc93d17_1.conda
@@ -17470,6 +17476,7 @@ packages:
   constrains:
   - numpy-base <0a0
   license: BSD-3-Clause
+  license_family: BSD
   size: 8061353
   timestamp: 1770020052975
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.0.2-py312h94ee1e1_1.conda
@@ -17505,6 +17512,7 @@ packages:
   constrains:
   - numpy-base <0a0
   license: BSD-3-Clause
+  license_family: BSD
   size: 6926620
   timestamp: 1770020041507
 - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.0.2-py312h49bc9c5_1.conda
@@ -17540,6 +17548,7 @@ packages:
   constrains:
   - numpy-base <0a0
   license: BSD-3-Clause
+  license_family: BSD
   size: 7250995
   timestamp: 1770020038871
 - conda: https://conda.anaconda.org/conda-forge/linux-64/obstore-0.6.0-py312h12e396e_1.conda
@@ -22146,6 +22155,7 @@ packages:
   - typing_extensions >=4.0.0,<5.0.0
   - python
   license: MIT
+  license_family: MIT
   size: 208269
   timestamp: 1769971520792
 - conda: https://conda.anaconda.org/conda-forge/noarch/rich-toolkit-0.18.1-pyhcf101f3_0.conda
@@ -22158,6 +22168,7 @@ packages:
   - typing_extensions >=4.12.2
   - python
   license: MIT
+  license_family: MIT
   size: 32174
   timestamp: 1769953324402
 - conda: https://conda.anaconda.org/conda-forge/noarch/rsa-4.9.1-pyhd8ed1ab_0.conda
@@ -24175,6 +24186,7 @@ packages:
   - python >=3.12,<3.13.0a0
   - python_abi 3.12.* *_cp312
   license: BSD-2-Clause
+  license_family: BSD
   size: 87945
   timestamp: 1769985925610
 - conda: https://conda.anaconda.org/conda-forge/linux-64/wrapt-2.1.0-py313h07c4f96_0.conda
@@ -24186,6 +24198,7 @@ packages:
   - python >=3.13,<3.14.0a0
   - python_abi 3.13.* *_cp313
   license: BSD-2-Clause
+  license_family: BSD
   size: 87989
   timestamp: 1769985905774
 - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/wrapt-2.1.0-py312hcd1a082_0.conda
@@ -24197,6 +24210,7 @@ packages:
   - python >=3.12,<3.13.0a0 *_cpython
   - python_abi 3.12.* *_cp312
   license: BSD-2-Clause
+  license_family: BSD
   size: 87850
   timestamp: 1769985941115
 - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/wrapt-2.1.0-py313h6194ac5_0.conda
@@ -24208,6 +24222,7 @@ packages:
   - python >=3.13,<3.14.0a0 *_cp313
   - python_abi 3.13.* *_cp313
   license: BSD-2-Clause
+  license_family: BSD
   size: 88747
   timestamp: 1769985937342
 - conda: https://conda.anaconda.org/conda-forge/osx-64/wrapt-2.1.0-py312h1a1c95f_0.conda
@@ -24218,6 +24233,7 @@ packages:
   - python >=3.12,<3.13.0a0
   - python_abi 3.12.* *_cp312
   license: BSD-2-Clause
+  license_family: BSD
   size: 82606
   timestamp: 1769986080989
 - conda: https://conda.anaconda.org/conda-forge/osx-64/wrapt-2.1.0-py313h36bb7f5_0.conda
@@ -24228,6 +24244,7 @@ packages:
   - python >=3.13,<3.14.0a0
   - python_abi 3.13.* *_cp313
   license: BSD-2-Clause
+  license_family: BSD
   size: 83882
   timestamp: 1769986257754
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/wrapt-2.1.0-py312h2bbb03f_0.conda
@@ -24239,6 +24256,7 @@ packages:
   - python >=3.12,<3.13.0a0 *_cpython
   - python_abi 3.12.* *_cp312
   license: BSD-2-Clause
+  license_family: BSD
   size: 83523
   timestamp: 1769986217946
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/wrapt-2.1.0-py313h0997733_0.conda
@@ -24250,6 +24268,7 @@ packages:
   - python >=3.13,<3.14.0a0 *_cp313
   - python_abi 3.13.* *_cp313
   license: BSD-2-Clause
+  license_family: BSD
   size: 84655
   timestamp: 1769986527386
 - conda: https://conda.anaconda.org/conda-forge/win-64/wrapt-2.1.0-py312he06e257_0.conda
@@ -24262,6 +24281,7 @@ packages:
   - vc >=14.3,<15
   - vc14_runtime >=14.44.35208
   license: BSD-2-Clause
+  license_family: BSD
   size: 85110
   timestamp: 1769985965372
 - conda: https://conda.anaconda.org/conda-forge/win-64/wrapt-2.1.0-py313h5ea7bf4_0.conda
@@ -24274,6 +24294,7 @@ packages:
   - vc >=14.3,<15
   - vc14_runtime >=14.44.35208
   license: BSD-2-Clause
+  license_family: BSD
   size: 84984
   timestamp: 1769985970175
 - conda: https://conda.anaconda.org/conda-forge/linux-64/xerces-c-3.3.0-hd9031aa_1.conda

@@ -162,6 +162,10 @@ def main(params: Params):
                 "historic_min_column": "min",
                 "historic_max_column": "max",
                 "historic_mean_column": "mean",
+                "layout_style": None,
+                "upper_lower_band_style": None,
+                "historic_mean_style": None,
+                "current_value_style": None,
             }
             | (params_dict.get("draw_ndvi") or {}),
             method="mapvalues",
