@@ -110,7 +110,6 @@ def main(params: Params):
             client=gee_client,
             time_range=time_range,
             historical_time_range=historical_time_range,
-            analysis_scale=500,
             **(params_dict.get("calculate_ndvi") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
@@ -127,10 +126,13 @@ def main(params: Params):
             historic_min_column="min",
             historic_max_column="max",
             historic_mean_column="mean",
+            historic_band_title="Historic Min-Max",
+            historic_mean_title="Historic Mean",
             layout_style=None,
             upper_lower_band_style=None,
             historic_mean_style=None,
             current_value_style=None,
+            time_column="img_date",
             **(params_dict.get("draw_ndvi") or {}),
         )
         .mapvalues(argnames=["dataframe"], argvalues=calculate_ndvi)

@@ -48,7 +48,6 @@ workflow:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
       historical_time_range: ${{ workflow.historical_time_range.return }}
-      analysis_scale: 500
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return}}
@@ -61,10 +60,13 @@ workflow:
       historic_min_column: "min"
       historic_max_column: "max"
       historic_mean_column: "mean"
+      historic_band_title: "Historic Min-Max"
+      historic_mean_title: "Historic Mean"
       layout_style: null
       upper_lower_band_style: null
       historic_mean_style: null
       current_value_style: null
+      time_column: img_date
     mapvalues:
       argnames: dataframe
       argvalues: ${{ workflow.calculate_ndvi.return}}

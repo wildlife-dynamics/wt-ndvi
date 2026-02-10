@@ -226,7 +226,6 @@ calculate_ndvi = (
         client=gee_client,
         time_range=time_range,
         historical_time_range=historical_time_range,
-        analysis_scale=500,
         **calculate_ndvi_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
@@ -240,9 +239,6 @@ calculate_ndvi = (
 # parameters
 
 draw_ndvi_params = dict(
-    historic_band_title=...,
-    historic_mean_title=...,
-    time_column=...,
     widget_id=...,
 )
 
@@ -260,10 +256,13 @@ draw_ndvi = (
         historic_min_column="min",
         historic_max_column="max",
         historic_mean_column="mean",
+        historic_band_title="Historic Min-Max",
+        historic_mean_title="Historic Mean",
         layout_style=None,
         upper_lower_band_style=None,
         historic_mean_style=None,
         current_value_style=None,
+        time_column="img_date",
         **draw_ndvi_params,
     )
     .mapvalues(argnames=["dataframe"], argvalues=calculate_ndvi)

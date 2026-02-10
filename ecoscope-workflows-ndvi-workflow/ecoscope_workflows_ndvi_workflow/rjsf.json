@@ -211,32 +211,6 @@
       "required": [],
       "type": "object",
       "title": "Calculate NDVI"
-    },
-    "draw_ndvi": {
-      "additionalProperties": false,
-      "properties": {
-        "historic_band_title": {
-          "default": "Historic Min-Max",
-          "title": "Historic Band Title",
-          "type": "string",
-          "description": "The title shown in the plot legend for historic band"
-        },
-        "historic_mean_title": {
-          "default": "Historic Mean",
-          "title": "Historic Mean Title",
-          "type": "string",
-          "description": "The title shown in the plot legend for historic mean values"
-        },
-        "time_column": {
-          "default": "img_date",
-          "title": "Time Column",
-          "type": "string",
-          "description": "The name of the dataframe column to pull historic max values from"
-        }
-      },
-      "required": [],
-      "type": "object",
-      "title": "Draw NDVI"
     }
   },
   "$defs": {
@@ -369,13 +343,6 @@
         "grouping_unit"
       ]
     },
-    "draw_ndvi": {
-      "ui:order": [
-        "historic_band_title",
-        "historic_mean_title",
-        "time_column"
-      ]
-    },
     "ui:order": [
       "workflow_details",
       "gee_client",
@@ -383,8 +350,7 @@
       "historical_time_range",
       "groupers",
       "roi",
-      "calculate_ndvi",
-      "draw_ndvi"
+      "calculate_ndvi"
     ]
   },
   "additionalProperties": false

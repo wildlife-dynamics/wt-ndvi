@@ -59,27 +59,6 @@ class CalculateNdvi(BaseModel):
     )
 
 
-class DrawNdvi(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    historic_band_title: Optional[str] = Field(
-        "Historic Min-Max",
-        description="The title shown in the plot legend for historic band",
-        title="Historic Band Title",
-    )
-    historic_mean_title: Optional[str] = Field(
-        "Historic Mean",
-        description="The title shown in the plot legend for historic mean values",
-        title="Historic Mean Title",
-    )
-    time_column: Optional[str] = Field(
-        "img_date",
-        description="The name of the dataframe column to pull historic max values from",
-        title="Time Column",
-    )
-
-
 class GoogleEarthEngineConnection(BaseModel):
     name: str = Field(..., title="Data Source")
 
@@ -166,4 +145,3 @@ class FormData(BaseModel):
     groupers: Optional[Groupers] = Field(None, title="Set Groupers")
     roi: Optional[Roi] = Field(None, title="Load ROI")
     calculate_ndvi: Optional[CalculateNdvi] = Field(None, title="Calculate NDVI")
-    draw_ndvi: Optional[DrawNdvi] = Field(None, title="Draw NDVI")
