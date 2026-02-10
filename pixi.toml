@@ -1,29 +1,31 @@
-[dependencies]
-curl = '*'
-yq = '*'
-
-[dependencies.ecoscope-workflows-core]
-channel = 'https://repo.prefix.dev/ecoscope-workflows/'
-version = '0.21.4.*'
-
-[dependencies.ecoscope-workflows-ext-ecoscope]
-channel = 'https://repo.prefix.dev/ecoscope-workflows/'
-version = '0.21.4.*'
-
 [project]
-channels = ['https://repo.prefix.dev/ecoscope-workflows/', 'conda-forge']
-name = 'ndvi'
+name = "wt-download-patrols"
+channels = [
+    # Uncomment the following lines to use local channels for development.
+    # "file:///tmp/ecoscope-workflows/release/artifacts/",
+    #  "file:///tmp/ecoscope-workflows-custom/release/artifacts/",
+    'https://repo.prefix.dev/ecoscope-workflows/',
+    'https://repo.prefix.dev/ecoscope-workflows-custom/',
+    'conda-forge',
+]
 platforms = ['linux-64', 'osx-arm64', 'win-64']
 
-[tasks]
-[tasks.compile]
-cmd = './dev/recompile.sh --install'
+[dependencies]
+curl = "*"
+rattler-build = "*"
+yq = "*"
+hatch = "*"
 
-[tasks.recompile]
-cmd = './dev/recompile.sh --update'
+[feature.compile.dependencies]
+ecoscope-workflows-core = ">=0.20.6,<0.21"
+ecoscope-workflows-ext-ecoscope = ">=0.20.6,<0.21"
+ecoscope-workflows-ext-custom = ">=0.0.19, <0.1.0"
+# Here we don't specify the channel on purpose, as we want to use the local channel if it exists,
+# otherwise we fall back to the remote channel.
+# If you want to ensure a specific channel to incorporate your local changes, you can uncomment the line below.
+# ecoscope-workflows-core = { version = "*", channel = "file:///tmp/ecoscope-workflows/release/artifacts/" }
 
-[tasks.pytest-cli]
-cmd = "./dev/pytest.sh ndvi 'cli' sequential"
-
-[tasks.pytest-snapshot-update]
-cmd = "./dev/rmrf-snapshots.sh && ./dev/pytest.sh ndvi 'app' 'sequential' --snapshot-update"
+[environments]
+compile = { features = [
+    "compile",
+], solve-group = "compile", no-default-feature = true }
