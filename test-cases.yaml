@@ -1,6 +1,6 @@
-value-grouper:
+base:
   name: Value Grouper
-  description: Value Grouper Test Case
+  mock_io: true
   params:
     workflow_details:
       name: "NDVI Workflow"
@@ -11,6 +11,9 @@ value-grouper:
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
+    historical_time_range:
+      since: "2020-01-01T00:00:00Z"
+      until: "2022-12-31T23:59:59Z"
     groupers:
       groupers: 
         - "name"

@@ -109,6 +109,31 @@ time_range = (
 
 
 # %% [markdown]
+# ## Historical Time Range
+
+# %%
+# parameters
+
+historical_time_range_params = dict(
+    since=...,
+    until=...,
+    timezone=...,
+)
+
+# %%
+# call the task
+
+
+historical_time_range = (
+    set_time_range.set_task_instance_id("historical_time_range")
+    .handle_errors()
+    .with_tracing()
+    .partial(time_format="%d %b %Y %H:%M:%S %Z", **historical_time_range_params)
+    .call()
+)
+
+
+# %% [markdown]
 # ## Set Groupers
 
 # %%
@@ -185,9 +210,8 @@ split_roi_groups = (
 # parameters
 
 calculate_ndvi_params = dict(
-    band=...,
-    scale_factor=...,
-    analysis_scale=...,
+    ndvi_method=...,
+    grouping_unit=...,
 )
 
 # %%
@@ -201,7 +225,8 @@ calculate_ndvi = (
     .partial(
         client=gee_client,
         time_range=time_range,
-        img_coll_name="MODIS/061/MYD13A1",
+        historical_time_range=historical_time_range,
+        analysis_scale=500,
         **calculate_ndvi_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

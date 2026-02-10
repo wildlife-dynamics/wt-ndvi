@@ -78,6 +78,18 @@ def main(params: Params):
         .call()
     )
 
+    historical_time_range = (
+        set_time_range.validate()
+        .set_task_instance_id("historical_time_range")
+        .handle_errors()
+        .with_tracing()
+        .partial(
+            time_format="%d %b %Y %H:%M:%S %Z",
+            **(params_dict.get("historical_time_range") or {}),
+        )
+        .call()
+    )
+
     groupers = (
         set_groupers.validate()
         .set_task_instance_id("groupers")
@@ -115,7 +127,8 @@ def main(params: Params):
         .partial(
             client=gee_client,
             time_range=time_range,
-            img_coll_name="MODIS/061/MYD13A1",
+            historical_time_range=historical_time_range,
+            analysis_scale=500,
             **(params_dict.get("calculate_ndvi") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

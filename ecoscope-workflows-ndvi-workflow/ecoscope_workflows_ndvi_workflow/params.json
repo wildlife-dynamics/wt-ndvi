@@ -68,6 +68,39 @@
       "description": "Choose the period of time to analyze.",
       "title": "Time Range"
     },
+    "historical_time_range": {
+      "additionalProperties": false,
+      "properties": {
+        "since": {
+          "format": "date-time",
+          "title": "Since",
+          "type": "string",
+          "description": "The start time"
+        },
+        "until": {
+          "format": "date-time",
+          "title": "Until",
+          "type": "string",
+          "description": "The end time"
+        },
+        "timezone": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/TimezoneInfo"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        }
+      },
+      "required": [
+        "since",
+        "until"
+      ],
+      "type": "object",
+      "description": "Choose the period of time to analyze.",
+      "title": "Historical Time Range"
+    },
     "groupers": {
       "additionalProperties": false,
       "properties": {
@@ -80,6 +113,9 @@
               },
               {
                 "$ref": "#/$defs/TemporalGrouper"
+              },
+              {
+                "$ref": "#/$defs/SpatialGrouper"
               }
             ],
             "title": "Group by"
@@ -150,23 +186,26 @@
     "calculate_ndvi": {
       "additionalProperties": false,
       "properties": {
-        "band": {
-          "default": "NDVI",
-          "title": "Band",
+        "ndvi_method": {
+          "default": "precomputed",
+          "enum": [
+            "precomputed",
+            "calculated"
+          ],
+          "title": "Ndvi Method",
           "type": "string",
-          "description": "The band name"
+          "description": "Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'calculated': Uses MODIS MCD43A4 daily NBAR (nadir BRDF-adjusted reflectance). Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
         },
-        "scale_factor": {
-          "default": 0.0001,
-          "title": "Scale Factor",
-          "type": "number",
-          "description": "The scale factor"
-        },
-        "analysis_scale": {
-          "default": 500.0,
-          "title": "Analysis Scale",
-          "type": "number",
-          "description": "The analysis scale"
+        "grouping_unit": {
+          "default": "month",
+          "enum": [
+            "month",
+            "week",
+            "day_of_year"
+          ],
+          "title": "Grouping Unit",
+          "type": "string",
+          "description": "Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366)."
         }
       },
       "required": [],
@@ -242,6 +281,10 @@
       "title": "TimezoneInfo",
       "type": "object"
     },
+    "SpatialGrouper": {
+      "title": "Spatial Regions",
+      "type": "string"
+    },
     "TemporalGrouper": {
       "oneOf": [
         {
@@ -300,6 +343,13 @@
         "timezone"
       ]
     },
+    "historical_time_range": {
+      "ui:order": [
+        "since",
+        "until",
+        "timezone"
+      ]
+    },
     "roi": {
       "ui:order": [
         "url",
@@ -310,9 +360,8 @@
     },
     "calculate_ndvi": {
       "ui:order": [
-        "band",
-        "scale_factor",
-        "analysis_scale"
+        "ndvi_method",
+        "grouping_unit"
       ]
     },
     "draw_ndvi": {
@@ -326,6 +375,7 @@
       "workflow_details",
       "gee_client",
       "time_range",
+      "historical_time_range",
       "groupers",
       "roi",
       "calculate_ndvi",

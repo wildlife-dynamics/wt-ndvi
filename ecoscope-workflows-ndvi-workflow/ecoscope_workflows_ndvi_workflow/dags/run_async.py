@@ -36,10 +36,16 @@ def main(params: Params):
         "workflow_details": [],
         "gee_client": [],
         "time_range": [],
+        "historical_time_range": [],
         "groupers": [],
         "roi": [],
         "split_roi_groups": ["roi", "groupers"],
-        "calculate_ndvi": ["gee_client", "time_range", "split_roi_groups"],
+        "calculate_ndvi": [
+            "gee_client",
+            "time_range",
+            "historical_time_range",
+            "split_roi_groups",
+        ],
         "draw_ndvi": ["calculate_ndvi"],
         "persist_ndvi": ["draw_ndvi"],
         "ndvi_chart_widget": ["persist_ndvi"],
@@ -83,6 +89,18 @@ def main(params: Params):
             | (params_dict.get("time_range") or {}),
             method="call",
         ),
+        "historical_time_range": Node(
+            async_task=set_time_range.validate()
+            .set_task_instance_id("historical_time_range")
+            .handle_errors()
+            .with_tracing()
+            .set_executor("lithops"),
+            partial={
+                "time_format": "%d %b %Y %H:%M:%S %Z",
+            }
+            | (params_dict.get("historical_time_range") or {}),
+            method="call",
+        ),
         "groupers": Node(
             async_task=set_groupers.validate()
             .set_task_instance_id("groupers")
@@ -123,7 +141,8 @@ def main(params: Params):
             partial={
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
-                "img_coll_name": "MODIS/061/MYD13A1",
+                "historical_time_range": DependsOn("historical_time_range"),
+                "analysis_scale": 500,
             }
             | (params_dict.get("calculate_ndvi") or {}),
             method="mapvalues",
