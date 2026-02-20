@@ -15,8 +15,8 @@ base:
       since: "2020-01-01T00:00:00Z"
       until: "2022-12-31T23:59:59Z"
     groupers:
-      groupers:
-        - "name"
+      groupers: 
+        - index_name: "name"
     roi:
       config:
         source: remote_file
@@ -40,7 +40,7 @@ precomputed:
       until: "2022-12-31T23:59:59Z"
     groupers:
       groupers:
-        - "name"
+        - index_name: "name"
     calculate_ndvi:
       ndvi_method: precomputed
       grouping_unit: month
@@ -67,7 +67,7 @@ calculated:
       until: "2022-12-31T23:59:59Z"
     groupers:
       groupers:
-        - "name"
+        - index_name: "name"
     calculate_ndvi:
       ndvi_method: calculated
       grouping_unit: week

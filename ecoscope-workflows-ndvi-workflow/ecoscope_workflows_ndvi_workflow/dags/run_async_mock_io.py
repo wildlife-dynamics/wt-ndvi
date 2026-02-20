@@ -56,7 +56,7 @@ def main(params: Params):
         "time_range": [],
         "historical_time_range": [],
         "groupers": [],
-        "roi": ["gee_client"],
+        "roi": [],
         "split_roi_groups": ["roi", "groupers"],
         "calculate_ndvi": [
             "gee_client",
@@ -134,10 +134,7 @@ def main(params: Params):
             .handle_errors()
             .with_tracing()
             .set_executor("lithops"),
-            partial={
-                "client": DependsOn("gee_client"),
-            }
-            | (params_dict.get("roi") or {}),
+            partial=(params_dict.get("roi") or {}),
             method="call",
         ),
         "split_roi_groups": Node(

@@ -38,8 +38,6 @@ workflow:
   - name: Load ROI
     id: roi
     task: get_spatial_feature_group
-    partial:
-      client: ${{ workflow.gee_client.return }}
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups

@@ -166,6 +166,7 @@ groupers = (
 
 roi_params = dict(
     config=...,
+    client=...,
 )
 
 # %%
@@ -176,7 +177,7 @@ roi = (
     get_spatial_feature_group.set_task_instance_id("roi")
     .handle_errors()
     .with_tracing()
-    .partial(client=gee_client, **roi_params)
+    .partial(**roi_params)
     .call()
 )
 
