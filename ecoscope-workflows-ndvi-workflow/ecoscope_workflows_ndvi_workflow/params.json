@@ -101,6 +101,21 @@
       "description": "Choose the period of time to analyze.",
       "title": "Historical Time Range"
     },
+    "er_client": {
+      "additionalProperties": false,
+      "properties": {
+        "data_source": {
+          "$ref": "#/$defs/EarthRangerConnection",
+          "title": "",
+          "description": "Select one of your configured data sources."
+        }
+      },
+      "required": [
+        "data_source"
+      ],
+      "type": "object",
+      "title": "EarthRanger Data Source"
+    },
     "groupers": {
       "additionalProperties": false,
       "properties": {
@@ -226,6 +241,19 @@
       "title": "TimezoneInfo",
       "type": "object"
     },
+    "EarthRangerConnection": {
+      "properties": {
+        "name": {
+          "title": "Data Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "EarthRangerConnection",
+      "type": "object"
+    },
     "SpatialGrouper": {
       "properties": {
         "spatial_index_name": {
@@ -338,6 +366,7 @@
         },
         "file_path": {
           "description": "Local path to geoparquet or geopackage file",
+          "ecoscope:filePicker": true,
           "title": "File Path",
           "type": "string"
         },
@@ -443,6 +472,7 @@
       "gee_client",
       "time_range",
       "historical_time_range",
+      "er_client",
       "groupers",
       "roi",
       "calculate_ndvi"

@@ -17,6 +17,7 @@ from ecoscope_workflows_core.tasks.config import (
 )
 from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
+from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
 
@@ -55,8 +56,9 @@ def main(params: Params):
         "gee_client": [],
         "time_range": [],
         "historical_time_range": [],
+        "er_client": [],
         "groupers": [],
-        "roi": [],
+        "roi": ["er_client"],
         "split_roi_groups": ["roi", "groupers"],
         "calculate_ndvi": [
             "gee_client",
@@ -119,6 +121,15 @@ def main(params: Params):
             | (params_dict.get("historical_time_range") or {}),
             method="call",
         ),
+        "er_client": Node(
+            async_task=set_er_connection.validate()
+            .set_task_instance_id("er_client")
+            .handle_errors()
+            .with_tracing()
+            .set_executor("lithops"),
+            partial=(params_dict.get("er_client") or {}),
+            method="call",
+        ),
         "groupers": Node(
             async_task=set_groupers.validate()
             .set_task_instance_id("groupers")
@@ -134,7 +145,10 @@ def main(params: Params):
             .handle_errors()
             .with_tracing()
             .set_executor("lithops"),
-            partial=(params_dict.get("roi") or {}),
+            partial={
+                "client": DependsOn("er_client"),
+            }
+            | (params_dict.get("roi") or {}),
             method="call",
         ),
         "split_roi_groups": Node(

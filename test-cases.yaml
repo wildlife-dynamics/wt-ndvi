@@ -8,6 +8,9 @@ base:
     gee_client:
       data_source:
         name: "ecoscope_poc"
+    er_client:
+      data_source:
+        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
@@ -15,7 +18,7 @@ base:
       since: "2020-01-01T00:00:00Z"
       until: "2022-12-31T23:59:59Z"
     groupers:
-      groupers: 
+      groupers:
         - index_name: "name"
     roi:
       config:
@@ -32,6 +35,9 @@ precomputed:
     gee_client:
       data_source:
         name: "ecoscope_poc"
+    er_client:
+      data_source:
+        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
@@ -49,6 +55,36 @@ precomputed:
         source: remote_file
         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
 
+earthranger:
+  name: EarthRanger Spatial Features Test Case
+  mock_io: false
+  params:
+    workflow_details:
+      name: "NDVI Workflow"
+      description: "Normalized Difference Vegetation Index Workflow"
+    gee_client:
+      data_source:
+        name: "ecoscope_poc"
+    er_client:
+      data_source:
+        name: "mep_dev"
+    time_range:
+      since: "2023-01-01T00:00:00Z"
+      until: "2023-12-31T23:59:59Z"
+    historical_time_range:
+      since: "2020-01-01T00:00:00Z"
+      until: "2022-12-31T23:59:59Z"
+    groupers:
+      groupers:
+        - index_name: "name"
+    calculate_ndvi:
+      ndvi_method: precomputed
+      grouping_unit: month
+    roi:
+      config:
+        source: earthranger
+        spatial_features_group_name: "AOIs"
+
 calculated:
   name: Calculated NDVI Test Case
   mock_io: false
@@ -59,6 +95,9 @@ calculated:
     gee_client:
       data_source:
         name: "ecoscope_poc"
+    er_client:
+      data_source:
+        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
