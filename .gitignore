@@ -25,6 +25,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+_version.py
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -163,6 +164,5 @@ cython_debug/
 .pixi
 .tmp
 .DS_Store
-
-# snapshot diffs
-__diff_output__/
+.claude
+.env
