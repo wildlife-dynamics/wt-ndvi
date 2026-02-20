@@ -32,6 +32,11 @@ class CalculateNdvi(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
+    image_size: int | None = Field(
+        1000000000,
+        description="Number of historical satellite images to fetch. Set to a large value to retrieve all available historical data. Only used when baseline_time_range is not provided.",
+        title="Image Size",
+    )
     ndvi_method: NdviMethod | None = Field(
         "precomputed",
         description="Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'calculated': Uses MODIS MCD43A4 daily NBAR (nadir BRDF-adjusted reflectance). Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps.",
@@ -149,15 +154,6 @@ class TimeRange(BaseModel):
     timezone: TimezoneInfo | None = Field(None, title="Timezone")
 
 
-class HistoricalTimeRange(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    since: datetime = Field(..., description="The start time", title="Since")
-    until: datetime = Field(..., description="The end time", title="Until")
-    timezone: TimezoneInfo | None = Field(None, title="Timezone")
-
-
 class ErClient(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -205,11 +201,6 @@ class FormData(BaseModel):
     )
     time_range: TimeRange | None = Field(
         None, description="Choose the period of time to analyze.", title="Time Range"
-    )
-    historical_time_range: HistoricalTimeRange | None = Field(
-        None,
-        description="Choose the period of time to analyze.",
-        title="Historical Time Range",
     )
     er_client: ErClient | None = Field(None, title="EarthRanger Data Source")
     groupers: Groupers | None = Field(None, title="Set Groupers")

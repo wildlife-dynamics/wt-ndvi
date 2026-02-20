@@ -112,31 +112,6 @@ time_range = (
 
 
 # %% [markdown]
-# ## Historical Time Range
-
-# %%
-# parameters
-
-historical_time_range_params = dict(
-    since=...,
-    until=...,
-    timezone=...,
-)
-
-# %%
-# call the task
-
-
-historical_time_range = (
-    set_time_range.set_task_instance_id("historical_time_range")
-    .handle_errors()
-    .with_tracing()
-    .partial(time_format="%d %b %Y %H:%M:%S %Z", **historical_time_range_params)
-    .call()
-)
-
-
-# %% [markdown]
 # ## EarthRanger Data Source
 
 # %%
@@ -233,6 +208,7 @@ split_roi_groups = (
 # parameters
 
 calculate_ndvi_params = dict(
+    image_size=...,
     ndvi_method=...,
     grouping_unit=...,
 )
@@ -248,7 +224,7 @@ calculate_ndvi = (
     .partial(
         client=gee_client,
         time_range=time_range,
-        historical_time_range=historical_time_range,
+        baseline_time_range=None,
         **calculate_ndvi_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

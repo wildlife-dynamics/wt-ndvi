@@ -68,39 +68,6 @@
       "description": "Choose the period of time to analyze.",
       "title": "Time Range"
     },
-    "historical_time_range": {
-      "additionalProperties": false,
-      "properties": {
-        "since": {
-          "format": "date-time",
-          "title": "Since",
-          "type": "string",
-          "description": "The start time"
-        },
-        "until": {
-          "format": "date-time",
-          "title": "Until",
-          "type": "string",
-          "description": "The end time"
-        },
-        "timezone": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/TimezoneInfo"
-            }
-          ],
-          "default": null,
-          "title": "Timezone"
-        }
-      },
-      "required": [
-        "since",
-        "until"
-      ],
-      "type": "object",
-      "description": "Choose the period of time to analyze.",
-      "title": "Historical Time Range"
-    },
     "er_client": {
       "additionalProperties": false,
       "properties": {
@@ -172,6 +139,12 @@
     "calculate_ndvi": {
       "additionalProperties": false,
       "properties": {
+        "image_size": {
+          "default": 1000000000,
+          "title": "Image Size",
+          "type": "integer",
+          "description": "Number of historical satellite images to fetch. Set to a large value to retrieve all available historical data. Only used when baseline_time_range is not provided."
+        },
         "ndvi_method": {
           "default": "precomputed",
           "enum": [
@@ -454,15 +427,9 @@
         "timezone"
       ]
     },
-    "historical_time_range": {
-      "ui:order": [
-        "since",
-        "until",
-        "timezone"
-      ]
-    },
     "calculate_ndvi": {
       "ui:order": [
+        "image_size",
         "ndvi_method",
         "grouping_unit"
       ]
@@ -471,7 +438,6 @@
       "workflow_details",
       "gee_client",
       "time_range",
-      "historical_time_range",
       "er_client",
       "groupers",
       "roi",

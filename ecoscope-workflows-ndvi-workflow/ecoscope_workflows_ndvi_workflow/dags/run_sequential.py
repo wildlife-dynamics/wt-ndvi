@@ -63,18 +63,6 @@ def main(params: Params):
         .call()
     )
 
-    historical_time_range = (
-        set_time_range.validate()
-        .set_task_instance_id("historical_time_range")
-        .handle_errors()
-        .with_tracing()
-        .partial(
-            time_format="%d %b %Y %H:%M:%S %Z",
-            **(params_dict.get("historical_time_range") or {}),
-        )
-        .call()
-    )
-
     er_client = (
         set_er_connection.validate()
         .set_task_instance_id("er_client")
@@ -121,7 +109,7 @@ def main(params: Params):
         .partial(
             client=gee_client,
             time_range=time_range,
-            historical_time_range=historical_time_range,
+            baseline_time_range=None,
             **(params_dict.get("calculate_ndvi") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

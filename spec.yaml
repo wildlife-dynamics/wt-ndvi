@@ -27,11 +27,6 @@ workflow:
     task: set_time_range
     partial:
       time_format: "%d %b %Y %H:%M:%S %Z"
-  - name: Historical Time Range
-    id: historical_time_range
-    task: set_time_range
-    partial:
-      time_format: "%d %b %Y %H:%M:%S %Z"
   - name: EarthRanger Data Source
     id: er_client
     task: set_er_connection
@@ -55,7 +50,7 @@ workflow:
     partial:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
-      historical_time_range: ${{ workflow.historical_time_range.return }}
+      baseline_time_range: null
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return}}
