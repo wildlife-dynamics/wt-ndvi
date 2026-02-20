@@ -83,7 +83,7 @@ earthranger:
     roi:
       config:
         source: earthranger
-        spatial_features_group_name: "AOIs"
+        spatial_features_group_name: "SpatialGrouperTest"
 
 calculated:
   name: Calculated NDVI Test Case
