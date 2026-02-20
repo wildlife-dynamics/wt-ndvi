@@ -19,9 +19,9 @@ from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
 
-download_roi = create_task_magicmock(  # 🧪
-    anchor="ecoscope_workflows_ext_ecoscope.tasks.io",  # 🧪
-    func_name="download_roi",  # 🧪
+get_spatial_feature_group = create_task_magicmock(  # 🧪
+    anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
+    func_name="get_spatial_feature_group",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 
@@ -100,11 +100,11 @@ def main(params: Params):
     )
 
     roi = (
-        download_roi.validate()
+        get_spatial_feature_group.validate()
         .set_task_instance_id("roi")
         .handle_errors()
         .with_tracing()
-        .partial(**(params_dict.get("roi") or {}))
+        .partial(client=gee_client, **(params_dict.get("roi") or {}))
         .call()
     )
 

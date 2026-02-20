@@ -20,9 +20,9 @@ from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
 
-download_roi = create_task_magicmock(  # 🧪
-    anchor="ecoscope_workflows_ext_ecoscope.tasks.io",  # 🧪
-    func_name="download_roi",  # 🧪
+get_spatial_feature_group = create_task_magicmock(  # 🧪
+    anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
+    func_name="get_spatial_feature_group",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 
@@ -56,7 +56,7 @@ def main(params: Params):
         "time_range": [],
         "historical_time_range": [],
         "groupers": [],
-        "roi": [],
+        "roi": ["gee_client"],
         "split_roi_groups": ["roi", "groupers"],
         "calculate_ndvi": [
             "gee_client",
@@ -129,12 +129,15 @@ def main(params: Params):
             method="call",
         ),
         "roi": Node(
-            async_task=download_roi.validate()
+            async_task=get_spatial_feature_group.validate()
             .set_task_instance_id("roi")
             .handle_errors()
             .with_tracing()
             .set_executor("lithops"),
-            partial=(params_dict.get("roi") or {}),
+            partial={
+                "client": DependsOn("gee_client"),
+            }
+            | (params_dict.get("roi") or {}),
             method="call",
         ),
         "split_roi_groups": Node(

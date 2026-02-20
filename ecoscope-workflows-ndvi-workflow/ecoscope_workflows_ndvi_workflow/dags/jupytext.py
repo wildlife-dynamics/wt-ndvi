@@ -27,10 +27,12 @@ from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_das
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
+from ecoscope_workflows_ext_custom.tasks.io import (
+    get_spatial_feature_group as get_spatial_feature_group,
+)
 from ecoscope_workflows_ext_ecoscope.tasks.io import (
     calculate_ndvi_range as calculate_ndvi_range,
 )
-from ecoscope_workflows_ext_ecoscope.tasks.io import download_roi as download_roi
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
@@ -163,10 +165,7 @@ groupers = (
 # parameters
 
 roi_params = dict(
-    url=...,
-    roi_column=...,
-    roi_name=...,
-    layer_name=...,
+    config=...,
 )
 
 # %%
@@ -174,10 +173,10 @@ roi_params = dict(
 
 
 roi = (
-    download_roi.set_task_instance_id("roi")
+    get_spatial_feature_group.set_task_instance_id("roi")
     .handle_errors()
     .with_tracing()
-    .partial(**roi_params)
+    .partial(client=gee_client, **roi_params)
     .call()
 )
 

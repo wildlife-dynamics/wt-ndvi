@@ -132,53 +132,24 @@
     "roi": {
       "additionalProperties": false,
       "properties": {
-        "url": {
-          "title": "Url",
-          "type": "string",
-          "description": "The path to ROI gpkg file"
-        },
-        "roi_column": {
+        "config": {
           "anyOf": [
             {
-              "type": "string"
+              "$ref": "#/$defs/LocalFileSpatialFeatures"
             },
             {
-              "type": "null"
-            }
-          ],
-          "default": "name",
-          "title": "Roi Column",
-          "description": "The column name of the ROI name"
-        },
-        "roi_name": {
-          "anyOf": [
-            {
-              "type": "string"
+              "$ref": "#/$defs/RemoteFileSpatialFeatures"
             },
             {
-              "type": "null"
+              "$ref": "#/$defs/EarthRangerSpatialFeatures"
             }
           ],
-          "default": null,
-          "title": "Roi Name",
-          "description": "The ROI name"
-        },
-        "layer_name": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Layer Name",
-          "description": "The layer name"
+          "title": "Config",
+          "description": "Configuration for spatial features source"
         }
       },
       "required": [
-        "url"
+        "config"
       ],
       "type": "object",
       "title": "Load ROI"
@@ -256,51 +227,188 @@
       "type": "object"
     },
     "SpatialGrouper": {
-      "title": "Spatial Regions",
-      "type": "string"
+      "properties": {
+        "spatial_index_name": {
+          "title": "Spatial Regions",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spatial_index_name"
+      ],
+      "title": "Spatial",
+      "type": "object"
     },
     "TemporalGrouper": {
-      "oneOf": [
-        {
-          "const": "%Y",
-          "title": "Year (example: 2024)"
-        },
-        {
-          "const": "%B",
-          "title": "Month (example: September)"
-        },
-        {
-          "const": "%Y-%m",
-          "title": "Year and Month (example: 2023-01)"
-        },
-        {
-          "const": "%j",
-          "title": "Day of the year as a number (example: 365)"
-        },
-        {
-          "const": "%d",
-          "title": "Day of the month as a number (example: 31)"
-        },
-        {
-          "const": "%A",
-          "title": "Day of the week (example: Sunday)"
-        },
-        {
-          "const": "%H",
-          "title": "Hour (24-hour clock) as number (example: 22)"
-        },
-        {
-          "const": "%Y-%m-%d",
-          "title": "Date (example: 2025-01-31)"
+      "properties": {
+        "temporal_index": {
+          "oneOf": [
+            {
+              "const": "%Y",
+              "title": "Year (example: 2024)"
+            },
+            {
+              "const": "%B",
+              "title": "Month (example: September)"
+            },
+            {
+              "const": "%Y-%m",
+              "title": "Year and Month (example: 2023-01)"
+            },
+            {
+              "const": "%j",
+              "title": "Day of the year as a number (example: 365)"
+            },
+            {
+              "const": "%d",
+              "title": "Day of the month as a number (example: 31)"
+            },
+            {
+              "const": "%A",
+              "title": "Day of the week (example: Sunday)"
+            },
+            {
+              "const": "%H",
+              "title": "Hour (24-hour clock) as number (example: 22)"
+            },
+            {
+              "const": "%Y-%m-%d",
+              "title": "Date (example: 2025-01-31)"
+            }
+          ],
+          "title": "Time",
+          "type": "string"
         }
+      },
+      "required": [
+        "temporal_index"
       ],
       "title": "Time",
-      "type": "string"
+      "type": "object"
     },
     "ValueGrouper": {
-      "oneOf": [],
+      "properties": {
+        "index_name": {
+          "oneOf": [],
+          "title": "Category",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index_name"
+      ],
       "title": "Category",
-      "type": "string"
+      "type": "object"
+    },
+    "EarthRangerSpatialFeatures": {
+      "description": "Load spatial features from EarthRanger.",
+      "properties": {
+        "source": {
+          "const": "earthranger",
+          "default": "earthranger",
+          "enum": [
+            "earthranger"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "spatial_features_group_name": {
+          "description": "Name of the spatial features group in EarthRanger",
+          "title": "Spatial Features Group Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spatial_features_group_name"
+      ],
+      "title": "EarthRangerSpatialFeatures",
+      "type": "object"
+    },
+    "LocalFileSpatialFeatures": {
+      "description": "Load spatial features from a local file.",
+      "properties": {
+        "source": {
+          "const": "local_file",
+          "default": "local_file",
+          "enum": [
+            "local_file"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "file_path": {
+          "description": "Local path to geoparquet or geopackage file",
+          "title": "File Path",
+          "type": "string"
+        },
+        "layer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Layer name (for geopackage files only)",
+          "title": "Layer"
+        },
+        "name_column": {
+          "default": "name",
+          "description": "Column to use as region name",
+          "title": "Name Column",
+          "type": "string"
+        }
+      },
+      "required": [
+        "file_path"
+      ],
+      "title": "LocalFileSpatialFeatures",
+      "type": "object"
+    },
+    "RemoteFileSpatialFeatures": {
+      "description": "Load spatial features from a remote URL.",
+      "properties": {
+        "source": {
+          "const": "remote_file",
+          "default": "remote_file",
+          "enum": [
+            "remote_file"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "url": {
+          "description": "URL to download geoparquet or geopackage file",
+          "title": "Url",
+          "type": "string"
+        },
+        "layer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Layer name (for geopackage files only)",
+          "title": "Layer"
+        },
+        "name_column": {
+          "default": "name",
+          "description": "Column to use as region name",
+          "title": "Name Column",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "RemoteFileSpatialFeatures",
+      "type": "object"
     }
   },
   "uiSchema": {
@@ -322,14 +430,6 @@
         "since",
         "until",
         "timezone"
-      ]
-    },
-    "roi": {
-      "ui:order": [
-        "url",
-        "roi_column",
-        "roi_name",
-        "layer_name"
       ]
     },
     "calculate_ndvi": {

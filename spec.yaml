@@ -6,6 +6,9 @@ requirements:
   - name: ecoscope-workflows-ext-ecoscope
     version: 0.22.2
     channel: https://repo.prefix.dev/ecoscope-workflows/
+  - name: ecoscope-workflows-ext-custom
+    version: 0.0.28
+    channel: https://repo.prefix.dev/ecoscope-workflows-custom/
 rjsf-overrides:
   $defs:
     ValueGrouper.oneOf: [
@@ -34,7 +37,9 @@ workflow:
     task: set_groupers
   - name: Load ROI
     id: roi
-    task: download_roi
+    task: get_spatial_feature_group
+    partial:
+      client: ${{ workflow.gee_client.return }}
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups

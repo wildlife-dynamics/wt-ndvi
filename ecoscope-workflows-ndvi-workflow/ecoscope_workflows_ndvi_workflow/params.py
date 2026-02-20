@@ -5,9 +5,9 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class WorkflowDetails(BaseModel):
@@ -16,20 +16,6 @@ class WorkflowDetails(BaseModel):
     )
     name: str = Field(..., title="Workflow Name")
     description: Optional[str] = Field("", title="Workflow Description")
-
-
-class Roi(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    url: str = Field(..., description="The path to ROI gpkg file", title="Url")
-    roi_column: Optional[str] = Field(
-        "name", description="The column name of the ROI name", title="Roi Column"
-    )
-    roi_name: Optional[str] = Field(None, description="The ROI name", title="Roi Name")
-    layer_name: Optional[str] = Field(
-        None, description="The layer name", title="Layer Name"
-    )
 
 
 class NdviMethod(str, Enum):
@@ -70,16 +56,65 @@ class TimezoneInfo(BaseModel):
     utc: str = Field(..., title="Utc")
 
 
-class SpatialGrouper(RootModel[str]):
-    root: str = Field(..., title="Spatial Regions")
+class SpatialGrouper(BaseModel):
+    spatial_index_name: str = Field(..., title="Spatial Regions")
 
 
-class TemporalGrouper(RootModel[str]):
-    root: str = Field(..., title="Time")
+class TemporalGrouper(BaseModel):
+    temporal_index: str = Field(..., title="Time")
 
 
-class ValueGrouper(RootModel[str]):
-    root: str = Field(..., title="Category")
+class ValueGrouper(BaseModel):
+    index_name: str = Field(..., title="Category")
+
+
+class Source(str, Enum):
+    earthranger = "earthranger"
+
+
+class EarthRangerSpatialFeatures(BaseModel):
+    source: Literal["earthranger"] = Field("earthranger", title="Source")
+    spatial_features_group_name: str = Field(
+        ...,
+        description="Name of the spatial features group in EarthRanger",
+        title="Spatial Features Group Name",
+    )
+
+
+class Source1(str, Enum):
+    local_file = "local_file"
+
+
+class LocalFileSpatialFeatures(BaseModel):
+    source: Literal["local_file"] = Field("local_file", title="Source")
+    file_path: str = Field(
+        ...,
+        description="Local path to geoparquet or geopackage file",
+        title="File Path",
+    )
+    layer: Optional[str] = Field(
+        None, description="Layer name (for geopackage files only)", title="Layer"
+    )
+    name_column: Optional[str] = Field(
+        "name", description="Column to use as region name", title="Name Column"
+    )
+
+
+class Source2(str, Enum):
+    remote_file = "remote_file"
+
+
+class RemoteFileSpatialFeatures(BaseModel):
+    source: Literal["remote_file"] = Field("remote_file", title="Source")
+    url: str = Field(
+        ..., description="URL to download geoparquet or geopackage file", title="Url"
+    )
+    layer: Optional[str] = Field(
+        None, description="Layer name (for geopackage files only)", title="Layer"
+    )
+    name_column: Optional[str] = Field(
+        "name", description="Column to use as region name", title="Name Column"
+    )
 
 
 class GeeClient(BaseModel):
@@ -119,6 +154,17 @@ class Groupers(BaseModel):
             description="            Specify how the data should be grouped to create the views for your dashboard.\n            This field is optional; if left blank, all the data will appear in a single view.\n            ",
             title=" ",
         )
+    )
+
+
+class Roi(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    config: Union[
+        LocalFileSpatialFeatures, RemoteFileSpatialFeatures, EarthRangerSpatialFeatures
+    ] = Field(
+        ..., description="Configuration for spatial features source", title="Config"
     )
 
 

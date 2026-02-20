@@ -18,7 +18,9 @@ base:
       groupers:
         - "name"
     roi:
-      url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+      config:
+        source: remote_file
+        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
 
 precomputed:
   name: Precomputed NDVI Test Case
@@ -43,7 +45,9 @@ precomputed:
       ndvi_method: precomputed
       grouping_unit: month
     roi:
-      url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+      config:
+        source: remote_file
+        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
 
 calculated:
   name: Calculated NDVI Test Case
@@ -68,4 +72,6 @@ calculated:
       ndvi_method: calculated
       grouping_unit: week
     roi:
-      url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+      config:
+        source: remote_file
+        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
