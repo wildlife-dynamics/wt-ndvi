@@ -285,8 +285,12 @@ class TemporalGrouper(BaseModel):
     temporal_index: TemporalIndex = Field(..., title="Time")
 
 
-class ValueGrouper(Enum):
-    ROI_Name = "name"
+class IndexName(str, Enum):
+    AOI_Name = "name"
+
+
+class ValueGrouper(BaseModel):
+    index_name: IndexName = Field(..., title="Category")
 
 
 class Source(str, Enum):
@@ -407,8 +411,8 @@ class Groupers(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    groupers: list[ValueGrouper | TemporalGrouper | SpatialGrouper] | None = Field(
-        None,
+    groupers: list[ValueGrouper] | None = Field(
+        [{"index_name": "name"}],
         description="            Specify how the data should be grouped to create the views for your dashboard.\n            This field is optional; if left blank, all the data will appear in a single view.\n            ",
         title=" ",
     )

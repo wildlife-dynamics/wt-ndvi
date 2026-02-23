@@ -87,17 +87,15 @@
       "additionalProperties": false,
       "properties": {
         "groupers": {
-          "default": null,
+          "default": [
+            {
+              "index_name": "name"
+            }
+          ],
           "items": {
             "anyOf": [
               {
                 "$ref": "#/$defs/ValueGrouper"
-              },
-              {
-                "$ref": "#/$defs/TemporalGrouper"
-              },
-              {
-                "$ref": "#/$defs/SpatialGrouper"
               }
             ],
             "title": "Group by"
@@ -609,7 +607,12 @@
     "ValueGrouper": {
       "properties": {
         "index_name": {
-          "oneOf": [],
+          "oneOf": [
+            {
+              "const": "name",
+              "title": "AOI Name"
+            }
+          ],
           "title": "Category",
           "type": "string"
         }
@@ -618,13 +621,7 @@
         "index_name"
       ],
       "title": "Category",
-      "type": "object",
-      "oneOf": [
-        {
-          "const": "name",
-          "title": "ROI Name"
-        }
-      ]
+      "type": "object"
     },
     "EarthRangerSpatialFeatures": {
       "description": "Load spatial features from EarthRanger.",

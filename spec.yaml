@@ -11,8 +11,15 @@ requirements:
     channel: https://repo.prefix.dev/ecoscope-workflows-custom/
 rjsf-overrides:
   $defs:
-    ValueGrouper.oneOf: [
-      {"const": "name", "title": "ROI Name"},
+    ValueGrouper.properties.index_name.oneOf: [
+      {"const": "name", "title": "AOI Name"},
+    ]
+  properties:
+    groupers.properties.groupers.items.anyOf: [
+      {"$ref": "#/$defs/ValueGrouper"},
+    ]
+    groupers.properties.groupers.default: [
+      {"index_name": "name"},
     ]
 
 workflow:
