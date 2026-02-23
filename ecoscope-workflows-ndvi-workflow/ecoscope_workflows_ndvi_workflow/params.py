@@ -231,19 +231,11 @@ class NdviTileUrl(BaseModel):
         description="Scale in meters for computing min/max statistics.",
         title="Scale",
     )
-
-
-class NdviRasterLayer(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
+    legend_title: str | None = Field(
+        None,
+        description="Title for the map legend. Defaults to the band name.",
+        title="Legend Title",
     )
-    opacity: confloat(ge=0.0, le=1.0) | None = Field(
-        1.0, description="Layer opacity from 0 to 1.", title="Opacity"
-    )
-    max_zoom: int | None = Field(
-        20, description="Maximum zoom level.", title="Max Zoom"
-    )
-    min_zoom: int | None = Field(0, description="Minimum zoom level.", title="Min Zoom")
 
 
 class GoogleEarthEngineConnection(BaseModel):
@@ -537,9 +529,6 @@ class Params(BaseModel):
     calculate_ndvi: CalculateNdvi | None = Field(None, title="Calculate NDVI")
     base_maps: BaseMaps | None = Field(None, title="Set Base Maps")
     ndvi_tile_url: NdviTileUrl | None = Field(None, title="Create NDVI Tile URL")
-    ndvi_raster_layer: NdviRasterLayer | None = Field(
-        None, title="Create NDVI Raster Layer"
-    )
     roi_boundary_layer: RoiBoundaryLayer | None = Field(
         None, title="Create ROI Boundary Layer"
     )

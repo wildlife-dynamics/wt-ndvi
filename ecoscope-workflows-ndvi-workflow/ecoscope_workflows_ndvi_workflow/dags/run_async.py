@@ -32,9 +32,6 @@ from ecoscope_workflows_ext_custom.tasks.io import (
 from ecoscope_workflows_ext_custom.tasks.results import (
     create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
-from ecoscope_workflows_ext_custom.tasks.results import (
-    create_tiled_bitmap_layer as create_tiled_bitmap_layer,
-)
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 from ecoscope_workflows_ext_custom.tasks.results import (
     set_base_maps_pydeck as set_base_maps_pydeck,
@@ -67,9 +64,8 @@ def main(params: Params):
         "grouped_ndvi_widget": ["ndvi_chart_widget"],
         "base_maps": [],
         "ndvi_tile_url": ["gee_client", "time_range", "split_roi_groups"],
-        "ndvi_raster_layer": ["ndvi_tile_url"],
         "roi_boundary_layer": ["split_roi_groups"],
-        "ndvi_map_layers": ["roi_boundary_layer", "ndvi_raster_layer"],
+        "ndvi_map_layers": ["roi_boundary_layer", "ndvi_tile_url"],
         "ndvi_map": ["base_maps", "ndvi_map_layers"],
         "persist_ndvi_map": ["ndvi_map"],
         "ndvi_map_widget": ["persist_ndvi_map"],
@@ -275,19 +271,6 @@ def main(params: Params):
                 "argvalues": DependsOn("split_roi_groups"),
             },
         ),
-        "ndvi_raster_layer": Node(
-            async_task=create_tiled_bitmap_layer.validate()
-            .set_task_instance_id("ndvi_raster_layer")
-            .handle_errors()
-            .with_tracing()
-            .set_executor("lithops"),
-            partial=(params_dict.get("ndvi_raster_layer") or {}),
-            method="mapvalues",
-            kwargs={
-                "argnames": ["url"],
-                "argvalues": DependsOn("ndvi_tile_url"),
-            },
-        ),
         "roi_boundary_layer": Node(
             async_task=create_polygon_layer_pydeck.validate()
             .set_task_instance_id("roi_boundary_layer")
@@ -310,7 +293,7 @@ def main(params: Params):
             partial={
                 "iterables": [
                     DependsOn("roi_boundary_layer"),
-                    DependsOn("ndvi_raster_layer"),
+                    DependsOn("ndvi_tile_url"),
                 ],
             }
             | (params_dict.get("ndvi_map_layers") or {}),

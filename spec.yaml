@@ -109,12 +109,6 @@ workflow:
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return }}
-  - name: Create NDVI Raster Layer
-    id: ndvi_raster_layer
-    task: create_tiled_bitmap_layer
-    mapvalues:
-      argnames: url
-      argvalues: ${{ workflow.ndvi_tile_url.return }}
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
     task: create_polygon_layer_pydeck
@@ -127,7 +121,7 @@ workflow:
     partial:
       iterables:
         - ${{ workflow.roi_boundary_layer.return }}
-        - ${{ workflow.ndvi_raster_layer.return }}
+        - ${{ workflow.ndvi_tile_url.return }}
   - name: Draw NDVI Map
     id: ndvi_map
     task: draw_map

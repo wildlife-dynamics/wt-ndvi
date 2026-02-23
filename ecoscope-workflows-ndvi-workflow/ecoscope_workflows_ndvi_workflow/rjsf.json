@@ -391,41 +391,17 @@
           "type": "integer",
           "description": "Scale in meters for computing min/max statistics.",
           "ecoscope:advanced": true
+        },
+        "legend_title": {
+          "default": null,
+          "title": "Legend Title",
+          "type": "string",
+          "description": "Title for the map legend. Defaults to the band name."
         }
       },
       "required": [],
       "type": "object",
       "title": "Create NDVI Tile URL"
-    },
-    "ndvi_raster_layer": {
-      "additionalProperties": false,
-      "properties": {
-        "opacity": {
-          "default": 1.0,
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "title": "Opacity",
-          "type": "number",
-          "description": "Layer opacity from 0 to 1."
-        },
-        "max_zoom": {
-          "default": 20,
-          "title": "Max Zoom",
-          "type": "integer",
-          "description": "Maximum zoom level.",
-          "ecoscope:advanced": true
-        },
-        "min_zoom": {
-          "default": 0,
-          "title": "Min Zoom",
-          "type": "integer",
-          "description": "Minimum zoom level.",
-          "ecoscope:advanced": true
-        }
-      },
-      "required": [],
-      "type": "object",
-      "title": "Create NDVI Raster Layer"
     },
     "roi_boundary_layer": {
       "additionalProperties": false,
@@ -1087,14 +1063,8 @@
     "ndvi_tile_url": {
       "ui:order": [
         "palette",
-        "scale"
-      ]
-    },
-    "ndvi_raster_layer": {
-      "ui:order": [
-        "opacity",
-        "max_zoom",
-        "min_zoom"
+        "scale",
+        "legend_title"
       ]
     },
     "roi_boundary_layer": {
@@ -1122,7 +1092,6 @@
       "calculate_ndvi",
       "base_maps",
       "ndvi_tile_url",
-      "ndvi_raster_layer",
       "roi_boundary_layer",
       "ndvi_map"
     ]

@@ -56,9 +56,6 @@ from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_das
 from ecoscope_workflows_ext_custom.tasks.results import (
     create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
-from ecoscope_workflows_ext_custom.tasks.results import (
-    create_tiled_bitmap_layer as create_tiled_bitmap_layer,
-)
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 
 from ..params import Params
@@ -230,15 +227,6 @@ def main(params: Params):
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
     )
 
-    ndvi_raster_layer = (
-        create_tiled_bitmap_layer.validate()
-        .set_task_instance_id("ndvi_raster_layer")
-        .handle_errors()
-        .with_tracing()
-        .partial(**(params_dict.get("ndvi_raster_layer") or {}))
-        .mapvalues(argnames=["url"], argvalues=ndvi_tile_url)
-    )
-
     roi_boundary_layer = (
         create_polygon_layer_pydeck.validate()
         .set_task_instance_id("roi_boundary_layer")
@@ -254,7 +242,7 @@ def main(params: Params):
         .handle_errors()
         .with_tracing()
         .partial(
-            iterables=[roi_boundary_layer, ndvi_raster_layer],
+            iterables=[roi_boundary_layer, ndvi_tile_url],
             **(params_dict.get("ndvi_map_layers") or {}),
         )
         .call()

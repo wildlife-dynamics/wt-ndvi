@@ -41,9 +41,6 @@ from ecoscope_workflows_ext_custom.tasks.io import (
 from ecoscope_workflows_ext_custom.tasks.results import (
     create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
-from ecoscope_workflows_ext_custom.tasks.results import (
-    create_tiled_bitmap_layer as create_tiled_bitmap_layer,
-)
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 from ecoscope_workflows_ext_custom.tasks.results import (
     set_base_maps_pydeck as set_base_maps_pydeck,
@@ -383,6 +380,7 @@ base_maps = (
 ndvi_tile_url_params = dict(
     palette=...,
     scale=...,
+    legend_title=...,
 )
 
 # %%
@@ -402,31 +400,6 @@ ndvi_tile_url = (
         **ndvi_tile_url_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
-)
-
-
-# %% [markdown]
-# ## Create NDVI Raster Layer
-
-# %%
-# parameters
-
-ndvi_raster_layer_params = dict(
-    opacity=...,
-    max_zoom=...,
-    min_zoom=...,
-)
-
-# %%
-# call the task
-
-
-ndvi_raster_layer = (
-    create_tiled_bitmap_layer.set_task_instance_id("ndvi_raster_layer")
-    .handle_errors()
-    .with_tracing()
-    .partial(**ndvi_raster_layer_params)
-    .mapvalues(argnames=["url"], argvalues=ndvi_tile_url)
 )
 
 
@@ -470,9 +443,7 @@ ndvi_map_layers = (
     groupbykey.set_task_instance_id("ndvi_map_layers")
     .handle_errors()
     .with_tracing()
-    .partial(
-        iterables=[roi_boundary_layer, ndvi_raster_layer], **ndvi_map_layers_params
-    )
+    .partial(iterables=[roi_boundary_layer, ndvi_tile_url], **ndvi_map_layers_params)
     .call()
 )
 
