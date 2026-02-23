@@ -12,7 +12,7 @@ requirements:
 rjsf-overrides:
   $defs:
     ValueGrouper.properties.index_name.oneOf: [
-      {"const": "name", "title": "AOI Name"},
+      {"const": "name", "title": "ROI Name"},
     ]
   properties:
     groupers.properties.groupers.items.anyOf: [
@@ -21,7 +21,19 @@ rjsf-overrides:
     groupers.properties.groupers.default: [
       {"index_name": "name"},
     ]
+    roi.properties.config.anyOf: [
+      {"$ref": "#/$defs/LocalFileSpatialFeatures"},
+      {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
+    ]
     roi.properties.config.default: {"file_path": "", "name_column": "name"}
+    ndvi_method.properties.var.title: " "
+    ndvi_method.properties.var.description: "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
+    ndvi_method.properties.var.enum: [
+      "MODIS MYD13A1 16-Day Composite",
+      "MODIS MCD43A4 Daily NBAR",
+    ]
+    ndvi_method.properties.var.default: "MODIS MYD13A1 16-Day Composite"
+    ndvi_method.required: []
 
 workflow:
   - name: Set Workflow Details
@@ -52,12 +64,16 @@ workflow:
     partial:
       df: ${{ workflow.roi.return }}
       groupers: ${{ workflow.groupers.return }}
-  - name: Calculate NDVI
+  - name: NDVI Method
+    id: ndvi_method
+    task: set_string_var
+  - name: NDVI Trend
     id: calculate_ndvi
     task: calculate_ndvi_range
     partial:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
+      ndvi_method: ${{ workflow.ndvi_method.return }}
       baseline_time_range: null # todo: add baseline time range when supported by web
       image_size: 1000000000 # todo: use baseline time range when supported by web
     mapvalues:
@@ -112,6 +128,7 @@ workflow:
     partial:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
+      ndvi_method: ${{ workflow.ndvi_method.return }}
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return }}

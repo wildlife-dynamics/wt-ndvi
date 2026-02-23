@@ -25,6 +25,7 @@ get_spatial_feature_group = create_task_magicmock(  # 🧪
     anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
     func_name="get_spatial_feature_group",  # 🧪
 )  # 🧪
+from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 
 calculate_ndvi_range = create_task_magicmock(  # 🧪
@@ -75,13 +76,24 @@ def main(params: Params):
         "groupers": [],
         "roi": ["er_client"],
         "split_roi_groups": ["roi", "groupers"],
-        "calculate_ndvi": ["gee_client", "time_range", "split_roi_groups"],
+        "ndvi_method": [],
+        "calculate_ndvi": [
+            "gee_client",
+            "time_range",
+            "ndvi_method",
+            "split_roi_groups",
+        ],
         "draw_ndvi": ["calculate_ndvi"],
         "persist_ndvi": ["draw_ndvi"],
         "ndvi_chart_widget": ["persist_ndvi"],
         "grouped_ndvi_widget": ["ndvi_chart_widget"],
         "base_maps": [],
-        "ndvi_tile_url": ["gee_client", "time_range", "split_roi_groups"],
+        "ndvi_tile_url": [
+            "gee_client",
+            "time_range",
+            "ndvi_method",
+            "split_roi_groups",
+        ],
         "roi_boundary_layer": ["split_roi_groups"],
         "ndvi_map_layers": ["roi_boundary_layer", "ndvi_tile_url"],
         "ndvi_map": ["base_maps", "ndvi_map_layers"],
@@ -171,6 +183,15 @@ def main(params: Params):
             | (params_dict.get("split_roi_groups") or {}),
             method="call",
         ),
+        "ndvi_method": Node(
+            async_task=set_string_var.validate()
+            .set_task_instance_id("ndvi_method")
+            .handle_errors()
+            .with_tracing()
+            .set_executor("lithops"),
+            partial=(params_dict.get("ndvi_method") or {}),
+            method="call",
+        ),
         "calculate_ndvi": Node(
             async_task=calculate_ndvi_range.validate()
             .set_task_instance_id("calculate_ndvi")
@@ -180,6 +201,7 @@ def main(params: Params):
             partial={
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
+                "ndvi_method": DependsOn("ndvi_method"),
                 "baseline_time_range": None,
                 "image_size": 1000000000,
             }
@@ -279,6 +301,7 @@ def main(params: Params):
             partial={
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
+                "ndvi_method": DependsOn("ndvi_method"),
             }
             | (params_dict.get("ndvi_tile_url") or {}),
             method="mapvalues",

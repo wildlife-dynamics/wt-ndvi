@@ -12,6 +12,7 @@
 
 import os
 
+from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.config import (
     set_workflow_details as set_workflow_details,
 )
@@ -216,13 +217,35 @@ split_roi_groups = (
 
 
 # %% [markdown]
-# ## Calculate NDVI
+# ## NDVI Method
+
+# %%
+# parameters
+
+ndvi_method_params = dict(
+    var=...,
+)
+
+# %%
+# call the task
+
+
+ndvi_method = (
+    set_string_var.set_task_instance_id("ndvi_method")
+    .handle_errors()
+    .with_tracing()
+    .partial(**ndvi_method_params)
+    .call()
+)
+
+
+# %% [markdown]
+# ## NDVI Trend
 
 # %%
 # parameters
 
 calculate_ndvi_params = dict(
-    ndvi_method=...,
     grouping_unit=...,
 )
 
@@ -237,6 +260,7 @@ calculate_ndvi = (
     .partial(
         client=gee_client,
         time_range=time_range,
+        ndvi_method=ndvi_method,
         baseline_time_range=None,
         image_size=1000000000,
         **calculate_ndvi_params,
@@ -378,7 +402,6 @@ base_maps = (
 # parameters
 
 ndvi_tile_url_params = dict(
-    ndvi_method=...,
     reducer=...,
     palette=...,
     scale=...,
@@ -392,7 +415,12 @@ ndvi_tile_url = (
     create_ndvi_tile_url.set_task_instance_id("ndvi_tile_url")
     .handle_errors()
     .with_tracing()
-    .partial(client=gee_client, time_range=time_range, **ndvi_tile_url_params)
+    .partial(
+        client=gee_client,
+        time_range=time_range,
+        ndvi_method=ndvi_method,
+        **ndvi_tile_url_params,
+    )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
 )
 

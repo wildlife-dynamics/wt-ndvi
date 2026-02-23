@@ -17,9 +17,11 @@ class WorkflowDetails(BaseModel):
     description: str | None = Field("", title="Workflow Description")
 
 
-class NdviMethod(str, Enum):
-    MODIS_MYD13A1_16_Day_Composite = "MODIS MYD13A1 16-Day Composite"
-    MODIS_MCD43A4_Daily_NBAR = "MODIS MCD43A4 Daily NBAR"
+class NdviMethod(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    var: str = Field(..., title="")
 
 
 class GroupingUnit(str, Enum):
@@ -32,11 +34,6 @@ class GroupingUnit(str, Enum):
 class CalculateNdvi(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
-    )
-    ndvi_method: NdviMethod | None = Field(
-        "MODIS MYD13A1 16-Day Composite",
-        description="Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps.",
-        title="Ndvi Method",
     )
     grouping_unit: GroupingUnit | None = Field(
         "month",
@@ -224,11 +221,6 @@ class NdviTileUrl(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    ndvi_method: NdviMethod | None = Field(
-        "precomputed",
-        description="Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. 'calculated': Uses MODIS MCD43A4 daily NBAR, computes NDVI from NIR/Red bands.",
-        title="Ndvi Method",
-    )
     reducer: Reducer | None = Field(
         "mean",
         description="Reducer to apply to the ImageCollection over the time range.",
@@ -300,7 +292,7 @@ class LocalFileSpatialFeatures(BaseModel):
     )
     layer: str | None = Field(
         None,
-        description="Layer name (only required for geopackage files)",
+        description="Layer name (only applicable to geopackage files)",
         title="Layer",
     )
     name_column: str | None = Field(
@@ -472,7 +464,8 @@ class Params(BaseModel):
     er_client: ErClient | None = Field(None, title="EarthRanger Data Source")
     groupers: Groupers | None = Field(None, title="Set Groupers")
     roi: Roi | None = Field(None, title="Load ROI")
-    calculate_ndvi: CalculateNdvi | None = Field(None, title="Calculate NDVI")
+    ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")
+    calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
     base_maps: BaseMaps | None = Field(None, title="Set Base Maps")
     ndvi_tile_url: NdviTileUrl | None = Field(None, title="Create NDVI Tile URL")
     roi_boundary_layer: RoiBoundaryLayer | None = Field(

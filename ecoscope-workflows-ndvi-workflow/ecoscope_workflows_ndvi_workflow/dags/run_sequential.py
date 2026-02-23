@@ -2,6 +2,7 @@
 import json
 import os
 
+from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.config import (
     set_workflow_details as set_workflow_details,
 )
@@ -115,6 +116,15 @@ def main(params: Params):
         .call()
     )
 
+    ndvi_method = (
+        set_string_var.validate()
+        .set_task_instance_id("ndvi_method")
+        .handle_errors()
+        .with_tracing()
+        .partial(**(params_dict.get("ndvi_method") or {}))
+        .call()
+    )
+
     calculate_ndvi = (
         calculate_ndvi_range.validate()
         .set_task_instance_id("calculate_ndvi")
@@ -123,6 +133,7 @@ def main(params: Params):
         .partial(
             client=gee_client,
             time_range=time_range,
+            ndvi_method=ndvi_method,
             baseline_time_range=None,
             image_size=1000000000,
             **(params_dict.get("calculate_ndvi") or {}),
@@ -202,6 +213,7 @@ def main(params: Params):
         .partial(
             client=gee_client,
             time_range=time_range,
+            ndvi_method=ndvi_method,
             **(params_dict.get("ndvi_tile_url") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

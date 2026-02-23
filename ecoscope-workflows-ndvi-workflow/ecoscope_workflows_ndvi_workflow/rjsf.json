@@ -119,9 +119,6 @@
             },
             {
               "$ref": "#/$defs/RemoteFileSpatialFeatures"
-            },
-            {
-              "$ref": "#/$defs/EarthRangerSpatialFeatures"
             }
           ],
           "title": "Spatial Feature Data Source",
@@ -137,19 +134,27 @@
       "type": "object",
       "title": "Load ROI"
     },
-    "calculate_ndvi": {
+    "ndvi_method": {
       "additionalProperties": false,
       "properties": {
-        "ndvi_method": {
-          "default": "MODIS MYD13A1 16-Day Composite",
+        "var": {
+          "title": " ",
+          "type": "string",
+          "description": "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps.",
           "enum": [
             "MODIS MYD13A1 16-Day Composite",
             "MODIS MCD43A4 Daily NBAR"
           ],
-          "title": "Ndvi Method",
-          "type": "string",
-          "description": "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
-        },
+          "default": "MODIS MYD13A1 16-Day Composite"
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": "NDVI Method"
+    },
+    "calculate_ndvi": {
+      "additionalProperties": false,
+      "properties": {
         "grouping_unit": {
           "default": "month",
           "enum": [
@@ -165,7 +170,7 @@
       },
       "required": [],
       "type": "object",
-      "title": "Calculate NDVI"
+      "title": "NDVI Trend"
     },
     "base_maps": {
       "additionalProperties": false,
@@ -372,16 +377,6 @@
     "ndvi_tile_url": {
       "additionalProperties": false,
       "properties": {
-        "ndvi_method": {
-          "default": "precomputed",
-          "enum": [
-            "MODIS MYD13A1 16-Day Composite",
-            "MODIS MCD43A4 Daily NBAR"
-          ],
-          "title": "Ndvi Method",
-          "type": "string",
-          "description": "Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. 'calculated': Uses MODIS MCD43A4 daily NBAR, computes NDVI from NIR/Red bands."
-        },
         "reducer": {
           "default": "mean",
           "enum": [
@@ -607,7 +602,7 @@
           "oneOf": [
             {
               "const": "name",
-              "title": "AOI Name"
+              "title": "ROI Name"
             }
           ],
           "title": "Category",
@@ -643,7 +638,7 @@
         },
         "layer": {
           "default": null,
-          "description": "Layer name (only required for geopackage files)",
+          "description": "Layer name (only applicable to geopackage files)",
           "ecoscope:advanced": true,
           "title": "Layer",
           "type": "string"
@@ -848,15 +843,8 @@
         "timezone"
       ]
     },
-    "calculate_ndvi": {
-      "ui:order": [
-        "ndvi_method",
-        "grouping_unit"
-      ]
-    },
     "ndvi_tile_url": {
       "ui:order": [
-        "ndvi_method",
         "reducer",
         "palette",
         "scale"
@@ -878,6 +866,7 @@
       "er_client",
       "groupers",
       "roi",
+      "ndvi_method",
       "calculate_ndvi",
       "base_maps",
       "ndvi_tile_url",
