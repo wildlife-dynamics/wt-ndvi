@@ -33,11 +33,6 @@ class CalculateNdvi(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    image_size: int | None = Field(
-        1000000000,
-        description="Number of historical satellite images to fetch. Set to a large value to retrieve all available historical data. Only used when baseline_time_range is not provided.",
-        title="Image Size",
-    )
     ndvi_method: NdviMethod | None = Field(
         "MODIS MYD13A1 16-Day Composite",
         description="Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps.",
@@ -289,12 +284,7 @@ class ValueGrouper(BaseModel):
     index_name: str = Field(..., title="Category")
 
 
-class Source(str, Enum):
-    earthranger = "earthranger"
-
-
 class EarthRangerSpatialFeatures(BaseModel):
-    source: Literal["earthranger"] = Field("earthranger", title="Source")
     spatial_features_group_name: str = Field(
         ...,
         description="Name of the spatial features group in EarthRanger",
@@ -302,36 +292,32 @@ class EarthRangerSpatialFeatures(BaseModel):
     )
 
 
-class Source1(str, Enum):
-    local_file = "local_file"
-
-
 class LocalFileSpatialFeatures(BaseModel):
-    source: Literal["local_file"] = Field("local_file", title="Source")
     file_path: str = Field(
         ...,
-        description="Local path to geoparquet or geopackage file",
+        description="Path to geoparquet (.parquet) or geopackage (.gpkg) file",
         title="File Path",
     )
     layer: str | None = Field(
-        None, description="Layer name (for geopackage files only)", title="Layer"
+        None,
+        description="Layer name (only required for geopackage files)",
+        title="Layer",
     )
     name_column: str | None = Field(
         "name", description="Column to use as region name", title="Name Column"
     )
 
 
-class Source2(str, Enum):
-    remote_file = "remote_file"
-
-
 class RemoteFileSpatialFeatures(BaseModel):
-    source: Literal["remote_file"] = Field("remote_file", title="Source")
     url: str = Field(
-        ..., description="URL to download geoparquet or geopackage file", title="Url"
+        ...,
+        description="URL to geoparquet (.parquet) or geopackage (.gpkg) file",
+        title="Url",
     )
     layer: str | None = Field(
-        None, description="Layer name (for geopackage files only)", title="Layer"
+        None,
+        description="Layer name (only required for geopackage files)",
+        title="Layer",
     )
     name_column: str | None = Field(
         "name", description="Column to use as region name", title="Name Column"
@@ -422,9 +408,7 @@ class Roi(BaseModel):
         LocalFileSpatialFeatures
         | RemoteFileSpatialFeatures
         | EarthRangerSpatialFeatures
-    ) = Field(
-        ..., description="Configuration for spatial features source", title="Config"
-    )
+    ) = Field(..., title="Spatial Feature Data Source")
 
 
 class NdviMap(BaseModel):

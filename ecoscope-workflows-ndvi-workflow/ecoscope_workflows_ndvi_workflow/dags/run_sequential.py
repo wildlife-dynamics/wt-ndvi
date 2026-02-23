@@ -124,6 +124,7 @@ def main(params: Params):
             client=gee_client,
             time_range=time_range,
             baseline_time_range=None,
+            image_size=1000000000,
             **(params_dict.get("calculate_ndvi") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

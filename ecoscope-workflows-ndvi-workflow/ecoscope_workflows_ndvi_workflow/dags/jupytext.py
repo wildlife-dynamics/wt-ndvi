@@ -222,7 +222,6 @@ split_roi_groups = (
 # parameters
 
 calculate_ndvi_params = dict(
-    image_size=...,
     ndvi_method=...,
     grouping_unit=...,
 )
@@ -239,6 +238,7 @@ calculate_ndvi = (
         client=gee_client,
         time_range=time_range,
         baseline_time_range=None,
+        image_size=1000000000,
         **calculate_ndvi_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

@@ -126,8 +126,7 @@
               "$ref": "#/$defs/EarthRangerSpatialFeatures"
             }
           ],
-          "title": "Config",
-          "description": "Configuration for spatial features source"
+          "title": "Spatial Feature Data Source"
         }
       },
       "required": [
@@ -139,12 +138,6 @@
     "calculate_ndvi": {
       "additionalProperties": false,
       "properties": {
-        "image_size": {
-          "default": 1000000000,
-          "title": "Image Size",
-          "type": "integer",
-          "description": "Number of historical satellite images to fetch. Set to a large value to retrieve all available historical data. Only used when baseline_time_range is not provided."
-        },
         "ndvi_method": {
           "default": "MODIS MYD13A1 16-Day Composite",
           "enum": [
@@ -621,17 +614,7 @@
       "type": "object"
     },
     "EarthRangerSpatialFeatures": {
-      "description": "Load spatial features from EarthRanger.",
       "properties": {
-        "source": {
-          "const": "earthranger",
-          "default": "earthranger",
-          "enum": [
-            "earthranger"
-          ],
-          "title": "Source",
-          "type": "string"
-        },
         "spatial_features_group_name": {
           "description": "Name of the spatial features group in EarthRanger",
           "title": "Spatial Features Group Name",
@@ -641,38 +624,22 @@
       "required": [
         "spatial_features_group_name"
       ],
-      "title": "EarthRangerSpatialFeatures",
+      "title": "EarthRanger",
       "type": "object"
     },
     "LocalFileSpatialFeatures": {
-      "description": "Load spatial features from a local file.",
       "properties": {
-        "source": {
-          "const": "local_file",
-          "default": "local_file",
-          "enum": [
-            "local_file"
-          ],
-          "title": "Source",
-          "type": "string"
-        },
         "file_path": {
-          "description": "Local path to geoparquet or geopackage file",
+          "description": "Path to geoparquet (.parquet) or geopackage (.gpkg) file",
           "title": "File Path",
           "type": "string"
         },
         "layer": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
-          "description": "Layer name (for geopackage files only)",
-          "title": "Layer"
+          "description": "Layer name (only required for geopackage files)",
+          "ecoscope:advanced": true,
+          "title": "Layer",
+          "type": "string"
         },
         "name_column": {
           "default": "name",
@@ -684,38 +651,22 @@
       "required": [
         "file_path"
       ],
-      "title": "LocalFileSpatialFeatures",
+      "title": "Local File",
       "type": "object"
     },
     "RemoteFileSpatialFeatures": {
-      "description": "Load spatial features from a remote URL.",
       "properties": {
-        "source": {
-          "const": "remote_file",
-          "default": "remote_file",
-          "enum": [
-            "remote_file"
-          ],
-          "title": "Source",
-          "type": "string"
-        },
         "url": {
-          "description": "URL to download geoparquet or geopackage file",
+          "description": "URL to geoparquet (.parquet) or geopackage (.gpkg) file",
           "title": "Url",
           "type": "string"
         },
         "layer": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
           "default": null,
-          "description": "Layer name (for geopackage files only)",
-          "title": "Layer"
+          "description": "Layer name (only required for geopackage files)",
+          "ecoscope:advanced": true,
+          "title": "Layer",
+          "type": "string"
         },
         "name_column": {
           "default": "name",
@@ -727,7 +678,7 @@
       "required": [
         "url"
       ],
-      "title": "RemoteFileSpatialFeatures",
+      "title": "Remote URL",
       "type": "object"
     },
     "LegendFromDataframe": {
@@ -892,7 +843,6 @@
     },
     "calculate_ndvi": {
       "ui:order": [
-        "image_size",
         "ndvi_method",
         "grouping_unit"
       ]

@@ -21,6 +21,7 @@ rjsf-overrides:
     groupers.properties.groupers.default: [
       {"index_name": "name"},
     ]
+    roi.properties.config.default: {"file_path": "", "name_column": "name"}
 
 workflow:
   - name: Set Workflow Details
@@ -57,7 +58,8 @@ workflow:
     partial:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
-      baseline_time_range: null
+      baseline_time_range: null # todo: add baseline time range when supported by web
+      image_size: 1000000000 # todo: use baseline time range when supported by web
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return}}

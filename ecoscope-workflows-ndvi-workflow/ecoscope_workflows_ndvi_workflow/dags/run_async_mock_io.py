@@ -181,6 +181,7 @@ def main(params: Params):
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
                 "baseline_time_range": None,
+                "image_size": 1000000000,
             }
             | (params_dict.get("calculate_ndvi") or {}),
             method="mapvalues",
