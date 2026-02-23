@@ -148,8 +148,8 @@
         "ndvi_method": {
           "default": "precomputed",
           "enum": [
-            "precomputed",
-            "calculated"
+            "MODIS MYD13A1 16-Day Composite",
+            "MODIS MCD43A4 Daily NBAR"
           ],
           "title": "Ndvi Method",
           "type": "string",
@@ -160,11 +160,12 @@
           "enum": [
             "month",
             "week",
-            "day_of_year"
+            "day_of_year",
+            "modis_16_day"
           ],
           "title": "Grouping Unit",
           "type": "string",
-          "description": "Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366)."
+          "description": "Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366). 'modis_16_day': Compare against same MODIS 16-day composite period (0-22)."
         }
       },
       "required": [],
@@ -379,8 +380,8 @@
         "ndvi_method": {
           "default": "precomputed",
           "enum": [
-            "precomputed",
-            "calculated"
+            "MODIS MYD13A1 16-Day Composite",
+            "MODIS MCD43A4 Daily NBAR"
           ],
           "title": "Ndvi Method",
           "type": "string",

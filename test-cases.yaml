@@ -42,13 +42,14 @@ precomputed:
       groupers:
         - index_name: "name"
     calculate_ndvi:
-      ndvi_method: precomputed
+      ndvi_method: "MODIS MYD13A1 16-Day Composite"
       grouping_unit: month
     ndvi_tile_url:
-      ndvi_method: precomputed
+      ndvi_method: "MODIS MYD13A1 16-Day Composite"
     base_maps:
       base_maps:
-        - layer_name: "TERRAIN"
+        # Note: cannot use layer_name: TERRAIN since layer_name is typed as SkipJsonSchema[str] on TileLayer
+        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
         source: remote_file

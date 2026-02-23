@@ -18,14 +18,15 @@ class WorkflowDetails(BaseModel):
 
 
 class NdviMethod(str, Enum):
-    precomputed = "precomputed"
-    calculated = "calculated"
+    MODIS_MYD13A1_16_Day_Composite = "MODIS MYD13A1 16-Day Composite"
+    MODIS_MCD43A4_Daily_NBAR = "MODIS MCD43A4 Daily NBAR"
 
 
 class GroupingUnit(str, Enum):
     month = "month"
     week = "week"
     day_of_year = "day_of_year"
+    modis_16_day = "modis_16_day"
 
 
 class CalculateNdvi(BaseModel):
@@ -44,7 +45,7 @@ class CalculateNdvi(BaseModel):
     )
     grouping_unit: GroupingUnit | None = Field(
         "month",
-        description="Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366).",
+        description="Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366). 'modis_16_day': Compare against same MODIS 16-day composite period (0-22).",
         title="Grouping Unit",
     )
 
