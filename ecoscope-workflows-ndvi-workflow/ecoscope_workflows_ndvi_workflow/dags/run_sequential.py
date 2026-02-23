@@ -214,6 +214,9 @@ def main(params: Params):
             client=gee_client,
             time_range=time_range,
             ndvi_method=ndvi_method,
+            reducer="mean",
+            palette=None,
+            scale=500,
             **(params_dict.get("ndvi_tile_url") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
@@ -233,6 +236,7 @@ def main(params: Params):
                 "filled": False,
                 "line_width_units": "pixels",
             },
+            legend=None,
             **(params_dict.get("roi_boundary_layer") or {}),
         )
         .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
@@ -255,7 +259,15 @@ def main(params: Params):
         .set_task_instance_id("ndvi_map")
         .handle_errors()
         .with_tracing()
-        .partial(tile_layers=base_maps, **(params_dict.get("ndvi_map") or {}))
+        .partial(
+            tile_layers=base_maps,
+            static=False,
+            title=None,
+            legend_style=None,
+            max_zoom=20,
+            view_state=None,
+            **(params_dict.get("ndvi_map") or {}),
+        )
         .mapvalues(
             argnames=["geo_layers", "overlay_tile_layers"], argvalues=ndvi_map_layers
         )

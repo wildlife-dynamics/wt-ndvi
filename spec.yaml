@@ -34,6 +34,13 @@ rjsf-overrides:
     ]
     ndvi_method.properties.var.default: "MODIS MYD13A1 16-Day Composite"
     ndvi_method.required: []
+    calculate_ndvi.title: "NDVI Trend"
+    base_maps.properties.base_maps.title: "Map Base Layers"
+    base_maps.properties.base_maps.default: [
+      {"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", "opacity": 1, "max_zoom": 20},
+    ]
+  uiSchema:
+    base_maps.base_maps.items.ui:options.label: false
 
 workflow:
   - name: Set Workflow Details
@@ -119,7 +126,7 @@ workflow:
     task: merge_widget_views
     partial:
       widgets: ${{ workflow.ndvi_chart_widget.return }}
-  - name: Set Base Maps
+  - name: NDVI Map
     id: base_maps
     task: set_base_maps_pydeck
   - name: Create NDVI Tile URL
@@ -129,6 +136,9 @@ workflow:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
       ndvi_method: ${{ workflow.ndvi_method.return }}
+      reducer: mean
+      palette: null
+      scale: 500
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return }}
@@ -143,6 +153,7 @@ workflow:
         stroked: true
         filled: false
         line_width_units: pixels
+      legend: null
     mapvalues:
       argnames: geodataframe
       argvalues: ${{ workflow.split_roi_groups.return }}
@@ -158,6 +169,11 @@ workflow:
     task: draw_map
     partial:
       tile_layers: ${{ workflow.base_maps.return }}
+      static: false
+      title: null
+      legend_style: null
+      max_zoom: 20
+      view_state: null
     mapvalues:
       argnames: [geo_layers, overlay_tile_layers]
       argvalues: ${{ workflow.ndvi_map_layers.return }}

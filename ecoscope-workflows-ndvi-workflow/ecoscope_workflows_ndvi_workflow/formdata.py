@@ -207,43 +207,10 @@ class BaseMaps(BaseModel):
                 "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
                 "opacity": 1,
                 "max_zoom": 20,
-            },
-            {
-                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-                "opacity": 0.5,
-                "max_zoom": 20,
-            },
+            }
         ],
         description="Select tile layers to use as base layers in map outputs. The first layer in the list will be the bottommost layer displayed.",
-        title=" ",
-    )
-
-
-class Reducer(str, Enum):
-    mean = "mean"
-    median = "median"
-    min = "min"
-    max = "max"
-
-
-class NdviTileUrl(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    reducer: Reducer | None = Field(
-        "mean",
-        description="Reducer to apply to the ImageCollection over the time range.",
-        title="Reducer",
-    )
-    palette: list[str] | None = Field(
-        None,
-        description="Color palette for visualization, as hex color strings.",
-        title="Palette",
-    )
-    scale: int | None = Field(
-        500,
-        description="Scale in meters for computing min/max statistics.",
-        title="Scale",
+        title="Map Base Layers",
     )
 
 
@@ -329,44 +296,6 @@ class RemoteFileSpatialFeatures(BaseModel):
     )
 
 
-class Sort(str, Enum):
-    ascending = "ascending"
-    descending = "descending"
-
-
-class LegendFromDataframe(BaseModel):
-    title: str | None = Field("Legend", title="Title")
-    label_column: str | None = Field("labels", title="Label Column")
-    color_column: str | None = Field("colors", title="Color Column")
-    sort: Sort | None = Field(None, title="Sort")
-    label_suffix: str | None = Field(None, title="Label Suffix")
-
-
-class LegendValue(BaseModel):
-    label: str = Field(..., title="Label")
-    color: str = Field(..., title="Color")
-
-
-class Placement(str, Enum):
-    top_left = "top-left"
-    top_right = "top-right"
-    bottom_left = "bottom-left"
-    bottom_right = "bottom-right"
-    fill = "fill"
-
-
-class LegendStyle(BaseModel):
-    placement: Placement | None = Field("bottom-right", title="Placement")
-
-
-class ViewState(BaseModel):
-    longitude: confloat(ge=-180.0, le=180.0) | None = Field(0, title="Longitude")
-    latitude: confloat(ge=-90.0, le=90.0) | None = Field(0, title="Latitude")
-    zoom: confloat(ge=0.0, le=20.0) | None = Field(0, title="Zoom")
-    pitch: confloat(ge=0.0, le=60.0) | None = Field(0, title="Pitch")
-    bearing: confloat(le=360.0) | None = Field(0, title="Bearing")
-
-
 class GeeClient(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -417,49 +346,6 @@ class Roi(BaseModel):
     )
 
 
-class NdviMap(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    static: bool | None = Field(
-        False, description="Set to true to disable map pan/zoom.", title="Static"
-    )
-    title: str | None = Field(
-        None,
-        description="            The map title. Note this is the title drawn on the map canvas itself, and will result\n            in duplicate titles if set in the context of a dashboard in which the iframe/widget\n            container also has a title set on it.\n            ",
-        title="Title",
-    )
-    legend_style: LegendStyle | None = Field(
-        None,
-        description="Additional arguments for configuring the legend.",
-        title="Legend Style",
-    )
-    max_zoom: int | None = Field(
-        20,
-        description="            The maximum zoom level allowed by the map.\n            This setting will be overridden if provided\n            tile layers max zoom levels are lower than this value.\n            ",
-        title="Max Zoom",
-    )
-    view_state: ViewState | None = Field(
-        None, description="Manually set the view state of the map.", title="View State"
-    )
-
-
-class LegendSegment(BaseModel):
-    values: list[LegendValue] = Field(..., title="Values")
-    title: str | None = Field("Legend", title="Title")
-
-
-class RoiBoundaryLayer(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    legend: LegendFromDataframe | LegendSegment | None = Field(
-        None,
-        description="If present, includes this layer in the map legend",
-        title="Legend",
-    )
-
-
 class FormData(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -480,9 +366,4 @@ class FormData(BaseModel):
     roi: Roi | None = Field(None, title="Load ROI")
     ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")
     calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
-    base_maps: BaseMaps | None = Field(None, title="Set Base Maps")
-    ndvi_tile_url: NdviTileUrl | None = Field(None, title="Create NDVI Tile URL")
-    roi_boundary_layer: RoiBoundaryLayer | None = Field(
-        None, title="Create ROI Boundary Layer"
-    )
-    ndvi_map: NdviMap | None = Field(None, title="Draw NDVI Map")
+    base_maps: BaseMaps | None = Field(None, title="NDVI Map")

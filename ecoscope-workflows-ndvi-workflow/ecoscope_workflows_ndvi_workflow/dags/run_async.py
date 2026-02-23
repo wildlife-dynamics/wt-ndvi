@@ -284,6 +284,9 @@ def main(params: Params):
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
                 "ndvi_method": DependsOn("ndvi_method"),
+                "reducer": "mean",
+                "palette": None,
+                "scale": 500,
             }
             | (params_dict.get("ndvi_tile_url") or {}),
             method="mapvalues",
@@ -312,6 +315,7 @@ def main(params: Params):
                     "filled": False,
                     "line_width_units": "pixels",
                 },
+                "legend": None,
             }
             | (params_dict.get("roi_boundary_layer") or {}),
             method="mapvalues",
@@ -343,6 +347,11 @@ def main(params: Params):
             .set_executor("lithops"),
             partial={
                 "tile_layers": DependsOn("base_maps"),
+                "static": False,
+                "title": None,
+                "legend_style": None,
+                "max_zoom": 20,
+                "view_state": None,
             }
             | (params_dict.get("ndvi_map") or {}),
             method="mapvalues",

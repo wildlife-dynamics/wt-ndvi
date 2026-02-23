@@ -373,7 +373,7 @@ grouped_ndvi_widget = (
 
 
 # %% [markdown]
-# ## Set Base Maps
+# ## NDVI Map
 
 # %%
 # parameters
@@ -401,11 +401,7 @@ base_maps = (
 # %%
 # parameters
 
-ndvi_tile_url_params = dict(
-    reducer=...,
-    palette=...,
-    scale=...,
-)
+ndvi_tile_url_params = dict()
 
 # %%
 # call the task
@@ -419,6 +415,9 @@ ndvi_tile_url = (
         client=gee_client,
         time_range=time_range,
         ndvi_method=ndvi_method,
+        reducer="mean",
+        palette=None,
+        scale=500,
         **ndvi_tile_url_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
@@ -431,9 +430,7 @@ ndvi_tile_url = (
 # %%
 # parameters
 
-roi_boundary_layer_params = dict(
-    legend=...,
-)
+roi_boundary_layer_params = dict()
 
 # %%
 # call the task
@@ -452,6 +449,7 @@ roi_boundary_layer = (
             "filled": False,
             "line_width_units": "pixels",
         },
+        legend=None,
         **roi_boundary_layer_params,
     )
     .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
@@ -486,11 +484,6 @@ ndvi_map_layers = (
 # parameters
 
 ndvi_map_params = dict(
-    static=...,
-    title=...,
-    legend_style=...,
-    max_zoom=...,
-    view_state=...,
     widget_id=...,
 )
 
@@ -502,7 +495,15 @@ ndvi_map = (
     draw_map.set_task_instance_id("ndvi_map")
     .handle_errors()
     .with_tracing()
-    .partial(tile_layers=base_maps, **ndvi_map_params)
+    .partial(
+        tile_layers=base_maps,
+        static=False,
+        title=None,
+        legend_style=None,
+        max_zoom=20,
+        view_state=None,
+        **ndvi_map_params,
+    )
     .mapvalues(
         argnames=["geo_layers", "overlay_tile_layers"], argvalues=ndvi_map_layers
     )

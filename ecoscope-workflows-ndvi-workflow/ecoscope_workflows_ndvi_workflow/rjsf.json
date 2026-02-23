@@ -181,11 +181,6 @@
               "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
               "opacity": 1,
               "max_zoom": 20
-            },
-            {
-              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-              "opacity": 0.5,
-              "max_zoom": 20
             }
           ],
           "items": {
@@ -364,7 +359,7 @@
               }
             ]
           },
-          "title": " ",
+          "title": "Map Base Layers",
           "type": "array",
           "description": "Select tile layers to use as base layers in map outputs. The first layer in the list will be the bottommost layer displayed.",
           "ecoscope:advanced": true
@@ -372,113 +367,7 @@
       },
       "type": "object",
       "required": [],
-      "title": "Set Base Maps"
-    },
-    "ndvi_tile_url": {
-      "additionalProperties": false,
-      "properties": {
-        "reducer": {
-          "default": "mean",
-          "enum": [
-            "mean",
-            "median",
-            "min",
-            "max"
-          ],
-          "title": "Reducer",
-          "type": "string",
-          "description": "Reducer to apply to the ImageCollection over the time range."
-        },
-        "palette": {
-          "default": null,
-          "items": {
-            "type": "string"
-          },
-          "title": "Palette",
-          "type": "array",
-          "description": "Color palette for visualization, as hex color strings."
-        },
-        "scale": {
-          "default": 500,
-          "title": "Scale",
-          "type": "integer",
-          "description": "Scale in meters for computing min/max statistics.",
-          "ecoscope:advanced": true
-        }
-      },
-      "required": [],
-      "type": "object",
-      "title": "Create NDVI Tile URL"
-    },
-    "roi_boundary_layer": {
-      "additionalProperties": false,
-      "properties": {
-        "legend": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/LegendFromDataframe"
-            },
-            {
-              "$ref": "#/$defs/LegendSegment"
-            }
-          ],
-          "default": null,
-          "title": "Legend",
-          "description": "If present, includes this layer in the map legend",
-          "ecoscope:advanced": true
-        }
-      },
-      "required": [],
-      "type": "object",
-      "title": "Create ROI Boundary Layer"
-    },
-    "ndvi_map": {
-      "additionalProperties": false,
-      "properties": {
-        "static": {
-          "default": false,
-          "title": "Static",
-          "type": "boolean",
-          "description": "Set to true to disable map pan/zoom."
-        },
-        "title": {
-          "default": null,
-          "title": "Title",
-          "type": "string",
-          "description": "            The map title. Note this is the title drawn on the map canvas itself, and will result\n            in duplicate titles if set in the context of a dashboard in which the iframe/widget\n            container also has a title set on it.\n            ",
-          "ecoscope:advanced": true
-        },
-        "legend_style": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/LegendStyle"
-            }
-          ],
-          "default": null,
-          "title": "Legend Style",
-          "description": "Additional arguments for configuring the legend."
-        },
-        "max_zoom": {
-          "default": 20,
-          "title": "Max Zoom",
-          "type": "integer",
-          "description": "            The maximum zoom level allowed by the map.\n            This setting will be overridden if provided\n            tile layers max zoom levels are lower than this value.\n            "
-        },
-        "view_state": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/ViewState"
-            }
-          ],
-          "default": null,
-          "title": "View State",
-          "description": "Manually set the view state of the map.",
-          "ecoscope:advanced": true
-        }
-      },
-      "type": "object",
-      "required": [],
-      "title": "Draw NDVI Map"
+      "title": "NDVI Map"
     }
   },
   "$defs": {
@@ -682,151 +571,6 @@
       ],
       "title": "Remote URL",
       "type": "object"
-    },
-    "LegendFromDataframe": {
-      "properties": {
-        "title": {
-          "default": "Legend",
-          "ecoscope:advanced": true,
-          "title": "Title",
-          "type": "string"
-        },
-        "label_column": {
-          "default": "labels",
-          "ecoscope:advanced": true,
-          "title": "Label Column",
-          "type": "string"
-        },
-        "color_column": {
-          "default": "colors",
-          "ecoscope:advanced": true,
-          "title": "Color Column",
-          "type": "string"
-        },
-        "sort": {
-          "default": null,
-          "ecoscope:advanced": true,
-          "enum": [
-            "ascending",
-            "descending"
-          ],
-          "title": "Sort",
-          "type": "string"
-        },
-        "label_suffix": {
-          "default": null,
-          "ecoscope:advanced": true,
-          "title": "Label Suffix",
-          "type": "string"
-        }
-      },
-      "title": "LegendFromDataframe",
-      "type": "object"
-    },
-    "LegendSegment": {
-      "properties": {
-        "values": {
-          "items": {
-            "$ref": "#/$defs/LegendValue"
-          },
-          "title": "Values",
-          "type": "array"
-        },
-        "title": {
-          "default": "Legend",
-          "title": "Title",
-          "type": "string"
-        }
-      },
-      "required": [
-        "values"
-      ],
-      "title": "LegendSegment",
-      "type": "object"
-    },
-    "LegendValue": {
-      "properties": {
-        "label": {
-          "title": "Label",
-          "type": "string"
-        },
-        "color": {
-          "title": "Color",
-          "type": "string"
-        }
-      },
-      "required": [
-        "label",
-        "color"
-      ],
-      "title": "LegendValue",
-      "type": "object"
-    },
-    "LegendStyle": {
-      "description": "Additional legend configuration options applied per map, rather than per layer",
-      "properties": {
-        "placement": {
-          "default": "bottom-right",
-          "ecoscope:advanced": true,
-          "enum": [
-            "top-left",
-            "top-right",
-            "bottom-left",
-            "bottom-right",
-            "fill"
-          ],
-          "title": "Placement",
-          "type": "string"
-        }
-      },
-      "title": "LegendStyle",
-      "type": "object"
-    },
-    "ViewState": {
-      "description": "Represents a deck.gl view state",
-      "properties": {
-        "longitude": {
-          "default": 0,
-          "ecoscope:advanced": true,
-          "maximum": 180.0,
-          "minimum": -180.0,
-          "title": "Longitude",
-          "type": "number"
-        },
-        "latitude": {
-          "default": 0,
-          "ecoscope:advanced": true,
-          "maximum": 90.0,
-          "minimum": -90.0,
-          "title": "Latitude",
-          "type": "number"
-        },
-        "zoom": {
-          "default": 0,
-          "ecoscope:advanced": true,
-          "maximum": 20.0,
-          "minimum": 0.0,
-          "title": "Zoom",
-          "type": "number"
-        },
-        "pitch": {
-          "default": 0,
-          "ecoscope:advanced": true,
-          "maximum": 60.0,
-          "minimum": 0.0,
-          "title": "Pitch",
-          "type": "number"
-        },
-        "bearing": {
-          "default": 0,
-          "ecoscope:advanced": true,
-          "maximum": 360.0,
-          "title": "Bearing",
-          "type": "number"
-        }
-      },
-      "title": "ViewState",
-      "type": "object"
     }
   },
   "uiSchema": {
@@ -843,22 +587,6 @@
         "timezone"
       ]
     },
-    "ndvi_tile_url": {
-      "ui:order": [
-        "reducer",
-        "palette",
-        "scale"
-      ]
-    },
-    "ndvi_map": {
-      "ui:order": [
-        "static",
-        "title",
-        "legend_style",
-        "max_zoom",
-        "view_state"
-      ]
-    },
     "ui:order": [
       "workflow_details",
       "gee_client",
@@ -868,11 +596,17 @@
       "roi",
       "ndvi_method",
       "calculate_ndvi",
-      "base_maps",
-      "ndvi_tile_url",
-      "roi_boundary_layer",
-      "ndvi_map"
-    ]
+      "base_maps"
+    ],
+    "base_maps": {
+      "base_maps": {
+        "items": {
+          "ui:options": {
+            "label": false
+          }
+        }
+      }
+    }
   },
   "additionalProperties": false
 }
