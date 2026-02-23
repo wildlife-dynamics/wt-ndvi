@@ -94,6 +94,69 @@ workflow:
     task: merge_widget_views
     partial:
       widgets: ${{ workflow.ndvi_chart_widget.return }}
+  - name: Set Base Maps
+    id: base_maps
+    task: set_base_maps_pydeck
+  - name: Create NDVI Tile URL
+    id: ndvi_tile_url
+    task: create_ee_raster_tile_url
+    partial:
+      client: ${{ workflow.gee_client.return }}
+      time_range: ${{ workflow.time_range.return }}
+      image_collection: "MODIS/061/MYD13A1"
+      band: "NDVI"
+      reducer: "mean"
+    mapvalues:
+      argnames: roi
+      argvalues: ${{ workflow.split_roi_groups.return }}
+  - name: Create NDVI Raster Layer
+    id: ndvi_raster_layer
+    task: create_tiled_bitmap_layer
+    mapvalues:
+      argnames: url
+      argvalues: ${{ workflow.ndvi_tile_url.return }}
+  - name: Create ROI Boundary Layer
+    id: roi_boundary_layer
+    task: create_polygon_layer_pydeck
+    mapvalues:
+      argnames: geodataframe
+      argvalues: ${{ workflow.split_roi_groups.return }}
+  - name: Combine Map Layers
+    id: ndvi_map_layers
+    task: groupbykey
+    partial:
+      iterables:
+        - ${{ workflow.roi_boundary_layer.return }}
+        - ${{ workflow.ndvi_raster_layer.return }}
+  - name: Draw NDVI Map
+    id: ndvi_map
+    task: draw_map
+    partial:
+      tile_layers: ${{ workflow.base_maps.return }}
+    mapvalues:
+      argnames: [geo_layers, overlay_tile_layers]
+      argvalues: ${{ workflow.ndvi_map_layers.return }}
+  - name: Persist NDVI Map
+    id: persist_ndvi_map
+    task: persist_text
+    partial:
+      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+    mapvalues:
+      argnames: text
+      argvalues: ${{ workflow.ndvi_map.return }}
+  - name: Create NDVI Map Widget
+    id: ndvi_map_widget
+    task: create_map_widget_single_view
+    partial:
+      title: "NDVI Map"
+    map:
+      argnames: [view, data]
+      argvalues: ${{ workflow.persist_ndvi_map.return }}
+  - name: Merge NDVI Map Widget Views
+    id: grouped_ndvi_map_widget
+    task: merge_widget_views
+    partial:
+      widgets: ${{ workflow.ndvi_map_widget.return }}
   - name: Create a Dashboard
     id: ndvi_dashboard
     task: gather_dashboard
@@ -101,5 +164,6 @@ workflow:
       details: ${{ workflow.workflow_details.return}}
       widgets:
         - ${{ workflow.grouped_ndvi_widget.return }}
+        - ${{ workflow.grouped_ndvi_map_widget.return }}
       time_range: ${{ workflow.time_range.return}}
       groupers: ${{ workflow.groupers.return }}

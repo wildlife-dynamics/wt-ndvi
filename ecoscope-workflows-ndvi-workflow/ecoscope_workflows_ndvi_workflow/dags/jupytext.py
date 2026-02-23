@@ -16,11 +16,15 @@ from ecoscope_workflows_core.tasks.config import (
     set_workflow_details as set_workflow_details,
 )
 from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
+from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
 from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
+from ecoscope_workflows_core.tasks.results import (
+    create_map_widget_single_view as create_map_widget_single_view,
+)
 from ecoscope_workflows_core.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
 )
@@ -29,7 +33,20 @@ from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
 from ecoscope_workflows_ext_custom.tasks.io import (
+    create_ee_raster_tile_url as create_ee_raster_tile_url,
+)
+from ecoscope_workflows_ext_custom.tasks.io import (
     get_spatial_feature_group as get_spatial_feature_group,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    create_polygon_layer_pydeck as create_polygon_layer_pydeck,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    create_tiled_bitmap_layer as create_tiled_bitmap_layer,
+)
+from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
+from ecoscope_workflows_ext_custom.tasks.results import (
+    set_base_maps_pydeck as set_base_maps_pydeck,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.io import (
     calculate_ndvi_range as calculate_ndvi_range,
@@ -335,6 +352,230 @@ grouped_ndvi_widget = (
 
 
 # %% [markdown]
+# ## Set Base Maps
+
+# %%
+# parameters
+
+base_maps_params = dict(
+    base_maps=...,
+)
+
+# %%
+# call the task
+
+
+base_maps = (
+    set_base_maps_pydeck.set_task_instance_id("base_maps")
+    .handle_errors()
+    .with_tracing()
+    .partial(**base_maps_params)
+    .call()
+)
+
+
+# %% [markdown]
+# ## Create NDVI Tile URL
+
+# %%
+# parameters
+
+ndvi_tile_url_params = dict(
+    palette=...,
+    scale=...,
+)
+
+# %%
+# call the task
+
+
+ndvi_tile_url = (
+    create_ee_raster_tile_url.set_task_instance_id("ndvi_tile_url")
+    .handle_errors()
+    .with_tracing()
+    .partial(
+        client=gee_client,
+        time_range=time_range,
+        image_collection="MODIS/061/MYD13A1",
+        band="NDVI",
+        reducer="mean",
+        **ndvi_tile_url_params,
+    )
+    .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
+)
+
+
+# %% [markdown]
+# ## Create NDVI Raster Layer
+
+# %%
+# parameters
+
+ndvi_raster_layer_params = dict(
+    opacity=...,
+    max_zoom=...,
+    min_zoom=...,
+)
+
+# %%
+# call the task
+
+
+ndvi_raster_layer = (
+    create_tiled_bitmap_layer.set_task_instance_id("ndvi_raster_layer")
+    .handle_errors()
+    .with_tracing()
+    .partial(**ndvi_raster_layer_params)
+    .mapvalues(argnames=["url"], argvalues=ndvi_tile_url)
+)
+
+
+# %% [markdown]
+# ## Create ROI Boundary Layer
+
+# %%
+# parameters
+
+roi_boundary_layer_params = dict(
+    layer_style=...,
+    legend=...,
+)
+
+# %%
+# call the task
+
+
+roi_boundary_layer = (
+    create_polygon_layer_pydeck.set_task_instance_id("roi_boundary_layer")
+    .handle_errors()
+    .with_tracing()
+    .partial(**roi_boundary_layer_params)
+    .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
+)
+
+
+# %% [markdown]
+# ## Combine Map Layers
+
+# %%
+# parameters
+
+ndvi_map_layers_params = dict()
+
+# %%
+# call the task
+
+
+ndvi_map_layers = (
+    groupbykey.set_task_instance_id("ndvi_map_layers")
+    .handle_errors()
+    .with_tracing()
+    .partial(
+        iterables=[roi_boundary_layer, ndvi_raster_layer], **ndvi_map_layers_params
+    )
+    .call()
+)
+
+
+# %% [markdown]
+# ## Draw NDVI Map
+
+# %%
+# parameters
+
+ndvi_map_params = dict(
+    static=...,
+    title=...,
+    legend_style=...,
+    max_zoom=...,
+    view_state=...,
+    widget_id=...,
+)
+
+# %%
+# call the task
+
+
+ndvi_map = (
+    draw_map.set_task_instance_id("ndvi_map")
+    .handle_errors()
+    .with_tracing()
+    .partial(tile_layers=base_maps, **ndvi_map_params)
+    .mapvalues(
+        argnames=["geo_layers", "overlay_tile_layers"], argvalues=ndvi_map_layers
+    )
+)
+
+
+# %% [markdown]
+# ## Persist NDVI Map
+
+# %%
+# parameters
+
+persist_ndvi_map_params = dict(
+    filename=...,
+    filename_suffix=...,
+)
+
+# %%
+# call the task
+
+
+persist_ndvi_map = (
+    persist_text.set_task_instance_id("persist_ndvi_map")
+    .handle_errors()
+    .with_tracing()
+    .partial(
+        root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"], **persist_ndvi_map_params
+    )
+    .mapvalues(argnames=["text"], argvalues=ndvi_map)
+)
+
+
+# %% [markdown]
+# ## Create NDVI Map Widget
+
+# %%
+# parameters
+
+ndvi_map_widget_params = dict()
+
+# %%
+# call the task
+
+
+ndvi_map_widget = (
+    create_map_widget_single_view.set_task_instance_id("ndvi_map_widget")
+    .handle_errors()
+    .with_tracing()
+    .partial(title="NDVI Map", **ndvi_map_widget_params)
+    .map(argnames=["view", "data"], argvalues=persist_ndvi_map)
+)
+
+
+# %% [markdown]
+# ## Merge NDVI Map Widget Views
+
+# %%
+# parameters
+
+grouped_ndvi_map_widget_params = dict()
+
+# %%
+# call the task
+
+
+grouped_ndvi_map_widget = (
+    merge_widget_views.set_task_instance_id("grouped_ndvi_map_widget")
+    .handle_errors()
+    .with_tracing()
+    .partial(widgets=ndvi_map_widget, **grouped_ndvi_map_widget_params)
+    .call()
+)
+
+
+# %% [markdown]
 # ## Create a Dashboard
 
 # %%
@@ -354,7 +595,7 @@ ndvi_dashboard = (
     .with_tracing()
     .partial(
         details=workflow_details,
-        widgets=[grouped_ndvi_widget],
+        widgets=[grouped_ndvi_widget, grouped_ndvi_map_widget],
         time_range=time_range,
         groupers=groupers,
         **ndvi_dashboard_params,

@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, confloat, constr
 
 
 class WorkflowDetails(BaseModel):
@@ -47,6 +47,203 @@ class CalculateNdvi(BaseModel):
         description="Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366).",
         title="Grouping Unit",
     )
+
+
+class Url(str, Enum):
+    https___tile_openstreetmap_org__z___x___y__png = (
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    )
+
+
+class BaseMaps1(BaseModel):
+    url: Literal["https://tile.openstreetmap.org/{z}/{x}/{y}.png"] = Field(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png", title="Preset Layer URL"
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Layer Opacity",
+    )
+
+
+class Url1(str, Enum):
+    https___server_arcgisonline_com_ArcGIS_rest_services_World_Street_Map_MapServer_tile__z___y___x_ = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+
+
+class BaseMaps2(BaseModel):
+    url: Literal[
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+    ] = Field(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        title="Preset Layer URL",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Layer Opacity",
+    )
+
+
+class Url2(str, Enum):
+    https___server_arcgisonline_com_ArcGIS_rest_services_World_Imagery_MapServer_tile__z___y___x_ = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+
+
+class BaseMaps3(BaseModel):
+    url: Literal[
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    ] = Field(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        title="Preset Layer URL",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Layer Opacity",
+    )
+
+
+class Url3(str, Enum):
+    https___server_arcgisonline_com_ArcGIS_rest_services_World_Topo_Map_MapServer_tile__z___y___x_ = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+
+
+class BaseMaps4(BaseModel):
+    url: Literal[
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+    ] = Field(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        title="Preset Layer URL",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Layer Opacity",
+    )
+
+
+class Url4(str, Enum):
+    https___tiles_arcgis_com_tiles_POUcpLYXNckpLjnY_arcgis_rest_services_landDx_basemap_tiles_mapservice_MapServer_tile__z___y___x_ = "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}"
+
+
+class BaseMaps5(BaseModel):
+    url: Literal[
+        "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}"
+    ] = Field(
+        "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
+        title="Preset Layer URL",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Layer Opacity",
+    )
+
+
+class Url5(str, Enum):
+    https___server_arcgisonline_com_arcgis_rest_services_Elevation_World_Hillshade_MapServer_tile__z___y___x_ = "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}"
+
+
+class BaseMaps6(BaseModel):
+    url: Literal[
+        "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}"
+    ] = Field(
+        "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+        title="Preset Layer URL",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Layer Opacity",
+    )
+
+
+class BaseMaps7(BaseModel):
+    url: (
+        constr(
+            pattern=r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()@:%_\+.~#?&//=\{\}]*)"
+        )
+        | None
+    ) = Field(
+        "https://example.tiles.com/{z}/{x}/{y}.png",
+        description="The URL of a publicly accessible tiled raster service.",
+        title="Custom Layer URL",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1,
+        description="Set layer transparency from 1 (fully visible) to 0 (hidden).",
+        title="Custom Layer Opacity",
+    )
+    max_zoom: int | None = Field(
+        20,
+        description="Set the maximum zoom level to fetch tiles for.",
+        title="Custom Layer Max Zoom",
+    )
+    min_zoom: int | None = Field(
+        0,
+        description="Set the minimum zoom level to fetch tiles for.",
+        title="Custom Layer Min Zoom",
+    )
+
+
+class BaseMaps(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    base_maps: (
+        list[
+            BaseMaps1
+            | BaseMaps2
+            | BaseMaps3
+            | BaseMaps4
+            | BaseMaps5
+            | BaseMaps6
+            | BaseMaps7
+        ]
+        | None
+    ) = Field(
+        [
+            {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                "opacity": 1,
+                "max_zoom": 20,
+            },
+            {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                "opacity": 0.5,
+                "max_zoom": 20,
+            },
+        ],
+        description="Select tile layers to use as base layers in map outputs. The first layer in the list will be the bottommost layer displayed.",
+        title=" ",
+    )
+
+
+class NdviTileUrl(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    palette: list[str] | None = Field(
+        None,
+        description="Color palette for visualization, as hex color strings.",
+        title="Palette",
+    )
+    scale: int | None = Field(
+        500,
+        description="Scale in meters for computing min/max statistics.",
+        title="Scale",
+    )
+
+
+class NdviRasterLayer(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        1.0, description="Layer opacity from 0 to 1.", title="Opacity"
+    )
+    max_zoom: int | None = Field(
+        20, description="Maximum zoom level.", title="Max Zoom"
+    )
+    min_zoom: int | None = Field(0, description="Minimum zoom level.", title="Min Zoom")
 
 
 class GoogleEarthEngineConnection(BaseModel):
@@ -136,6 +333,72 @@ class RemoteFileSpatialFeatures(BaseModel):
     )
 
 
+class Sort(str, Enum):
+    ascending = "ascending"
+    descending = "descending"
+
+
+class LegendFromDataframe(BaseModel):
+    title: str | None = Field("Legend", title="Title")
+    label_column: str | None = Field("labels", title="Label Column")
+    color_column: str | None = Field("colors", title="Color Column")
+    sort: Sort | None = Field(None, title="Sort")
+    label_suffix: str | None = Field(None, title="Label Suffix")
+
+
+class LegendValue(BaseModel):
+    label: str = Field(..., title="Label")
+    color: str = Field(..., title="Color")
+
+
+class LineWidthUnits(str, Enum):
+    meters = "meters"
+    pixels = "pixels"
+
+
+class PolygonLayerStyle(BaseModel):
+    auto_highlight: bool | None = Field(False, title="Auto Highlight")
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(1, title="Opacity")
+    pickable: bool | None = Field(True, title="Pickable")
+    get_polygon: str | None = Field("geometry.coordinates", title="Get Polygon")
+    get_fill_color: str | None = Field(None, title="Get Fill Color")
+    get_line_color: str | None = Field(None, title="Get Line Color")
+    get_elevation: str | float | None = Field(None, title="Get Elevation")
+    get_line_width: str | float | None = Field(None, title="Get Line Width")
+    line_width_units: LineWidthUnits | None = Field("pixels", title="Line Width Units")
+    line_width_scale: float | None = Field(1, title="Line Width Scale")
+    line_width_min_pixels: float | None = Field(0, title="Line Width Min Pixels")
+    line_width_max_pixels: float | None = Field(None, title="Line Width Max Pixels")
+    line_miter_limit: float | None = Field(4, title="Line Miter Limit")
+    line_joint_rounded: bool | None = Field(False, title="Line Joint Rounded")
+    stroked: bool | None = Field(False, title="Stroked")
+    filled: bool | None = Field(True, title="Filled")
+    billboard: bool | None = Field(False, title="Billboard")
+    antialiasing: bool | None = Field(True, title="Antialiasing")
+    extruded: bool | None = Field(False, title="Extruded")
+    wireframe: bool | None = Field(True, title="Wireframe")
+
+
+class Placement(str, Enum):
+    top_left = "top-left"
+    top_right = "top-right"
+    bottom_left = "bottom-left"
+    bottom_right = "bottom-right"
+    fill = "fill"
+
+
+class LegendStyle(BaseModel):
+    placement: Placement | None = Field("bottom-right", title="Placement")
+
+
+class ViewState(BaseModel):
+    longitude: confloat(ge=-180.0, le=180.0) | None = Field(0, title="Longitude")
+    latitude: confloat(ge=-90.0, le=90.0) | None = Field(0, title="Latitude")
+    zoom: confloat(ge=0.0, le=20.0) | None = Field(0, title="Zoom")
+    pitch: confloat(ge=0.0, le=60.0) | None = Field(0, title="Pitch")
+    bearing: confloat(le=360.0) | None = Field(0, title="Bearing")
+
+
 class GeeClient(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -187,6 +450,72 @@ class Roi(BaseModel):
     )
 
 
+class NdviMap(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    static: bool | None = Field(
+        False, description="Set to true to disable map pan/zoom.", title="Static"
+    )
+    title: str | None = Field(
+        None,
+        description="            The map title. Note this is the title drawn on the map canvas itself, and will result\n            in duplicate titles if set in the context of a dashboard in which the iframe/widget\n            container also has a title set on it.\n            ",
+        title="Title",
+    )
+    legend_style: LegendStyle | None = Field(
+        None,
+        description="Additional arguments for configuring the legend.",
+        title="Legend Style",
+    )
+    max_zoom: int | None = Field(
+        20,
+        description="            The maximum zoom level allowed by the map.\n            This setting will be overridden if provided\n            tile layers max zoom levels are lower than this value.\n            ",
+        title="Max Zoom",
+    )
+    view_state: ViewState | None = Field(
+        None, description="Manually set the view state of the map.", title="View State"
+    )
+
+
+class LegendSegment(BaseModel):
+    values: list[LegendValue] = Field(..., title="Values")
+    title: str | None = Field("Legend", title="Title")
+
+
+class RoiBoundaryLayer(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    layer_style: PolygonLayerStyle | None = Field(
+        default_factory=lambda: PolygonLayerStyle.model_validate(
+            {
+                "auto_highlight": False,
+                "opacity": 1,
+                "pickable": True,
+                "get_polygon": "geometry.coordinates",
+                "line_width_units": "pixels",
+                "line_width_scale": 1,
+                "line_width_min_pixels": 0,
+                "line_miter_limit": 4,
+                "line_joint_rounded": False,
+                "stroked": False,
+                "filled": True,
+                "billboard": False,
+                "antialiasing": True,
+                "extruded": False,
+                "wireframe": True,
+            }
+        ),
+        description="Style arguments for the layer.",
+        title="Layer Style",
+    )
+    legend: LegendFromDataframe | LegendSegment | None = Field(
+        None,
+        description="If present, includes this layer in the map legend",
+        title="Legend",
+    )
+
+
 class FormData(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -206,3 +535,12 @@ class FormData(BaseModel):
     groupers: Groupers | None = Field(None, title="Set Groupers")
     roi: Roi | None = Field(None, title="Load ROI")
     calculate_ndvi: CalculateNdvi | None = Field(None, title="Calculate NDVI")
+    base_maps: BaseMaps | None = Field(None, title="Set Base Maps")
+    ndvi_tile_url: NdviTileUrl | None = Field(None, title="Create NDVI Tile URL")
+    ndvi_raster_layer: NdviRasterLayer | None = Field(
+        None, title="Create NDVI Raster Layer"
+    )
+    roi_boundary_layer: RoiBoundaryLayer | None = Field(
+        None, title="Create ROI Boundary Layer"
+    )
+    ndvi_map: NdviMap | None = Field(None, title="Draw NDVI Map")

@@ -170,6 +170,359 @@
       "required": [],
       "type": "object",
       "title": "Calculate NDVI"
+    },
+    "base_maps": {
+      "additionalProperties": false,
+      "properties": {
+        "base_maps": {
+          "default": [
+            {
+              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+              "opacity": 1,
+              "max_zoom": 20
+            },
+            {
+              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+              "opacity": 0.5,
+              "max_zoom": 20
+            }
+          ],
+          "items": {
+            "title": "Base Layer",
+            "anyOf": [
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    "enum": [
+                      "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Open Street Map",
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Roadmap",
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Satellite",
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Terrain",
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "LandDx",
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "USGS Hillshade",
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "url": {
+                    "default": "https://example.tiles.com/{z}/{x}/{y}.png",
+                    "description": "The URL of a publicly accessible tiled raster service.",
+                    "pattern": "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()@:%_\\+.~#?&//=\\{\\}]*)",
+                    "title": "Custom Layer URL",
+                    "type": "string"
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Custom Layer Opacity",
+                    "type": "number"
+                  },
+                  "max_zoom": {
+                    "default": 20,
+                    "description": "Set the maximum zoom level to fetch tiles for.",
+                    "title": "Custom Layer Max Zoom",
+                    "type": "integer"
+                  },
+                  "min_zoom": {
+                    "default": 0,
+                    "description": "Set the minimum zoom level to fetch tiles for.",
+                    "title": "Custom Layer Min Zoom",
+                    "type": "integer"
+                  }
+                },
+                "title": "Custom Layer (Advanced)",
+                "type": "object"
+              }
+            ]
+          },
+          "title": " ",
+          "type": "array",
+          "description": "Select tile layers to use as base layers in map outputs. The first layer in the list will be the bottommost layer displayed.",
+          "ecoscope:advanced": true
+        }
+      },
+      "type": "object",
+      "required": [],
+      "title": "Set Base Maps"
+    },
+    "ndvi_tile_url": {
+      "additionalProperties": false,
+      "properties": {
+        "palette": {
+          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "title": "Palette",
+          "type": "array",
+          "description": "Color palette for visualization, as hex color strings."
+        },
+        "scale": {
+          "default": 500,
+          "title": "Scale",
+          "type": "integer",
+          "description": "Scale in meters for computing min/max statistics.",
+          "ecoscope:advanced": true
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": "Create NDVI Tile URL"
+    },
+    "ndvi_raster_layer": {
+      "additionalProperties": false,
+      "properties": {
+        "opacity": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Opacity",
+          "type": "number",
+          "description": "Layer opacity from 0 to 1."
+        },
+        "max_zoom": {
+          "default": 20,
+          "title": "Max Zoom",
+          "type": "integer",
+          "description": "Maximum zoom level.",
+          "ecoscope:advanced": true
+        },
+        "min_zoom": {
+          "default": 0,
+          "title": "Min Zoom",
+          "type": "integer",
+          "description": "Minimum zoom level.",
+          "ecoscope:advanced": true
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": "Create NDVI Raster Layer"
+    },
+    "roi_boundary_layer": {
+      "additionalProperties": false,
+      "properties": {
+        "layer_style": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/PolygonLayerStyle"
+            }
+          ],
+          "default": {
+            "auto_highlight": false,
+            "opacity": 1,
+            "pickable": true,
+            "get_polygon": "geometry.coordinates",
+            "line_width_units": "pixels",
+            "line_width_scale": 1,
+            "line_width_min_pixels": 0,
+            "line_miter_limit": 4,
+            "line_joint_rounded": false,
+            "stroked": false,
+            "filled": true,
+            "billboard": false,
+            "antialiasing": true,
+            "extruded": false,
+            "wireframe": true
+          },
+          "title": "Layer Style",
+          "description": "Style arguments for the layer.",
+          "ecoscope:advanced": true
+        },
+        "legend": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LegendFromDataframe"
+            },
+            {
+              "$ref": "#/$defs/LegendSegment"
+            }
+          ],
+          "default": null,
+          "title": "Legend",
+          "description": "If present, includes this layer in the map legend",
+          "ecoscope:advanced": true
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": "Create ROI Boundary Layer"
+    },
+    "ndvi_map": {
+      "additionalProperties": false,
+      "properties": {
+        "static": {
+          "default": false,
+          "title": "Static",
+          "type": "boolean",
+          "description": "Set to true to disable map pan/zoom."
+        },
+        "title": {
+          "default": null,
+          "title": "Title",
+          "type": "string",
+          "description": "            The map title. Note this is the title drawn on the map canvas itself, and will result\n            in duplicate titles if set in the context of a dashboard in which the iframe/widget\n            container also has a title set on it.\n            ",
+          "ecoscope:advanced": true
+        },
+        "legend_style": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/LegendStyle"
+            }
+          ],
+          "default": null,
+          "title": "Legend Style",
+          "description": "Additional arguments for configuring the legend."
+        },
+        "max_zoom": {
+          "default": 20,
+          "title": "Max Zoom",
+          "type": "integer",
+          "description": "            The maximum zoom level allowed by the map.\n            This setting will be overridden if provided\n            tile layers max zoom levels are lower than this value.\n            "
+        },
+        "view_state": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/ViewState"
+            }
+          ],
+          "default": null,
+          "title": "View State",
+          "description": "Manually set the view state of the map.",
+          "ecoscope:advanced": true
+        }
+      },
+      "type": "object",
+      "required": [],
+      "title": "Draw NDVI Map"
     }
   },
   "$defs": {
@@ -345,7 +698,6 @@
         },
         "file_path": {
           "description": "Local path to geoparquet or geopackage file",
-          "ecoscope:filePicker": true,
           "title": "File Path",
           "type": "string"
         },
@@ -417,6 +769,298 @@
       ],
       "title": "RemoteFileSpatialFeatures",
       "type": "object"
+    },
+    "LegendFromDataframe": {
+      "properties": {
+        "title": {
+          "default": "Legend",
+          "ecoscope:advanced": true,
+          "title": "Title",
+          "type": "string"
+        },
+        "label_column": {
+          "default": "labels",
+          "ecoscope:advanced": true,
+          "title": "Label Column",
+          "type": "string"
+        },
+        "color_column": {
+          "default": "colors",
+          "ecoscope:advanced": true,
+          "title": "Color Column",
+          "type": "string"
+        },
+        "sort": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "enum": [
+            "ascending",
+            "descending"
+          ],
+          "title": "Sort",
+          "type": "string"
+        },
+        "label_suffix": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Label Suffix",
+          "type": "string"
+        }
+      },
+      "title": "LegendFromDataframe",
+      "type": "object"
+    },
+    "LegendSegment": {
+      "properties": {
+        "values": {
+          "items": {
+            "$ref": "#/$defs/LegendValue"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "title": {
+          "default": "Legend",
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "title": "LegendSegment",
+      "type": "object"
+    },
+    "LegendValue": {
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "color": {
+          "title": "Color",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "color"
+      ],
+      "title": "LegendValue",
+      "type": "object"
+    },
+    "PolygonLayerStyle": {
+      "description": "Polygon Layer style kwargs\nSee https://deck.gl/docs/api-reference/layers/polygon-layer for more info",
+      "properties": {
+        "auto_highlight": {
+          "default": false,
+          "ecoscope:advanced": true,
+          "title": "Auto Highlight",
+          "type": "boolean"
+        },
+        "opacity": {
+          "default": 1,
+          "ecoscope:advanced": true,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Opacity",
+          "type": "number"
+        },
+        "pickable": {
+          "default": true,
+          "ecoscope:advanced": true,
+          "title": "Pickable",
+          "type": "boolean"
+        },
+        "get_polygon": {
+          "default": "geometry.coordinates",
+          "ecoscope:advanced": true,
+          "title": "Get Polygon",
+          "type": "string"
+        },
+        "get_fill_color": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Get Fill Color",
+          "type": "string"
+        },
+        "get_line_color": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Get Line Color",
+          "type": "string"
+        },
+        "get_elevation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Get Elevation"
+        },
+        "get_line_width": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Get Line Width"
+        },
+        "line_width_units": {
+          "default": "pixels",
+          "ecoscope:advanced": true,
+          "enum": [
+            "meters",
+            "pixels"
+          ],
+          "title": "Line Width Units",
+          "type": "string"
+        },
+        "line_width_scale": {
+          "default": 1,
+          "ecoscope:advanced": true,
+          "title": "Line Width Scale",
+          "type": "number"
+        },
+        "line_width_min_pixels": {
+          "default": 0,
+          "ecoscope:advanced": true,
+          "title": "Line Width Min Pixels",
+          "type": "number"
+        },
+        "line_width_max_pixels": {
+          "default": null,
+          "ecoscope:advanced": true,
+          "title": "Line Width Max Pixels",
+          "type": "number"
+        },
+        "line_miter_limit": {
+          "default": 4,
+          "ecoscope:advanced": true,
+          "title": "Line Miter Limit",
+          "type": "number"
+        },
+        "line_joint_rounded": {
+          "default": false,
+          "ecoscope:advanced": true,
+          "title": "Line Joint Rounded",
+          "type": "boolean"
+        },
+        "stroked": {
+          "default": false,
+          "ecoscope:advanced": true,
+          "title": "Stroked",
+          "type": "boolean"
+        },
+        "filled": {
+          "default": true,
+          "ecoscope:advanced": true,
+          "title": "Filled",
+          "type": "boolean"
+        },
+        "billboard": {
+          "default": false,
+          "ecoscope:advanced": true,
+          "title": "Billboard",
+          "type": "boolean"
+        },
+        "antialiasing": {
+          "default": true,
+          "ecoscope:advanced": true,
+          "title": "Antialiasing",
+          "type": "boolean"
+        },
+        "extruded": {
+          "default": false,
+          "ecoscope:advanced": true,
+          "title": "Extruded",
+          "type": "boolean"
+        },
+        "wireframe": {
+          "default": true,
+          "ecoscope:advanced": true,
+          "title": "Wireframe",
+          "type": "boolean"
+        }
+      },
+      "title": "PolygonLayerStyle",
+      "type": "object"
+    },
+    "LegendStyle": {
+      "description": "Additional legend configuration options applied per map, rather than per layer",
+      "properties": {
+        "placement": {
+          "default": "bottom-right",
+          "ecoscope:advanced": true,
+          "enum": [
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+            "fill"
+          ],
+          "title": "Placement",
+          "type": "string"
+        }
+      },
+      "title": "LegendStyle",
+      "type": "object"
+    },
+    "ViewState": {
+      "description": "Represents a deck.gl view state",
+      "properties": {
+        "longitude": {
+          "default": 0,
+          "ecoscope:advanced": true,
+          "maximum": 180.0,
+          "minimum": -180.0,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "latitude": {
+          "default": 0,
+          "ecoscope:advanced": true,
+          "maximum": 90.0,
+          "minimum": -90.0,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "zoom": {
+          "default": 0,
+          "ecoscope:advanced": true,
+          "maximum": 20.0,
+          "minimum": 0.0,
+          "title": "Zoom",
+          "type": "number"
+        },
+        "pitch": {
+          "default": 0,
+          "ecoscope:advanced": true,
+          "maximum": 60.0,
+          "minimum": 0.0,
+          "title": "Pitch",
+          "type": "number"
+        },
+        "bearing": {
+          "default": 0,
+          "ecoscope:advanced": true,
+          "maximum": 360.0,
+          "title": "Bearing",
+          "type": "number"
+        }
+      },
+      "title": "ViewState",
+      "type": "object"
     }
   },
   "uiSchema": {
@@ -440,6 +1084,34 @@
         "grouping_unit"
       ]
     },
+    "ndvi_tile_url": {
+      "ui:order": [
+        "palette",
+        "scale"
+      ]
+    },
+    "ndvi_raster_layer": {
+      "ui:order": [
+        "opacity",
+        "max_zoom",
+        "min_zoom"
+      ]
+    },
+    "roi_boundary_layer": {
+      "ui:order": [
+        "layer_style",
+        "legend"
+      ]
+    },
+    "ndvi_map": {
+      "ui:order": [
+        "static",
+        "title",
+        "legend_style",
+        "max_zoom",
+        "view_state"
+      ]
+    },
     "ui:order": [
       "workflow_details",
       "gee_client",
@@ -447,7 +1119,12 @@
       "er_client",
       "groupers",
       "roi",
-      "calculate_ndvi"
+      "calculate_ndvi",
+      "base_maps",
+      "ndvi_tile_url",
+      "ndvi_raster_layer",
+      "roi_boundary_layer",
+      "ndvi_map"
     ]
   },
   "additionalProperties": false

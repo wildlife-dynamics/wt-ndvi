@@ -34,13 +34,32 @@ from ecoscope_workflows_core.tasks.io import persist_text as persist_text
 from ecoscope_workflows_core.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
 )
-from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_dashboard
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    set_base_maps_pydeck as set_base_maps_pydeck,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
+
+create_ee_raster_tile_url = create_task_magicmock(  # 🧪
+    anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
+    func_name="create_ee_raster_tile_url",  # 🧪
+)  # 🧪
+from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
+from ecoscope_workflows_core.tasks.results import (
+    create_map_widget_single_view as create_map_widget_single_view,
+)
+from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_dashboard
+from ecoscope_workflows_ext_custom.tasks.results import (
+    create_polygon_layer_pydeck as create_polygon_layer_pydeck,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    create_tiled_bitmap_layer as create_tiled_bitmap_layer,
+)
+from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 
 from ..params import Params
 
@@ -186,6 +205,105 @@ def main(params: Params):
         .call()
     )
 
+    base_maps = (
+        set_base_maps_pydeck.validate()
+        .set_task_instance_id("base_maps")
+        .handle_errors()
+        .with_tracing()
+        .partial(**(params_dict.get("base_maps") or {}))
+        .call()
+    )
+
+    ndvi_tile_url = (
+        create_ee_raster_tile_url.validate()
+        .set_task_instance_id("ndvi_tile_url")
+        .handle_errors()
+        .with_tracing()
+        .partial(
+            client=gee_client,
+            time_range=time_range,
+            image_collection="MODIS/061/MYD13A1",
+            band="NDVI",
+            reducer="mean",
+            **(params_dict.get("ndvi_tile_url") or {}),
+        )
+        .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
+    )
+
+    ndvi_raster_layer = (
+        create_tiled_bitmap_layer.validate()
+        .set_task_instance_id("ndvi_raster_layer")
+        .handle_errors()
+        .with_tracing()
+        .partial(**(params_dict.get("ndvi_raster_layer") or {}))
+        .mapvalues(argnames=["url"], argvalues=ndvi_tile_url)
+    )
+
+    roi_boundary_layer = (
+        create_polygon_layer_pydeck.validate()
+        .set_task_instance_id("roi_boundary_layer")
+        .handle_errors()
+        .with_tracing()
+        .partial(**(params_dict.get("roi_boundary_layer") or {}))
+        .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
+    )
+
+    ndvi_map_layers = (
+        groupbykey.validate()
+        .set_task_instance_id("ndvi_map_layers")
+        .handle_errors()
+        .with_tracing()
+        .partial(
+            iterables=[roi_boundary_layer, ndvi_raster_layer],
+            **(params_dict.get("ndvi_map_layers") or {}),
+        )
+        .call()
+    )
+
+    ndvi_map = (
+        draw_map.validate()
+        .set_task_instance_id("ndvi_map")
+        .handle_errors()
+        .with_tracing()
+        .partial(tile_layers=base_maps, **(params_dict.get("ndvi_map") or {}))
+        .mapvalues(
+            argnames=["geo_layers", "overlay_tile_layers"], argvalues=ndvi_map_layers
+        )
+    )
+
+    persist_ndvi_map = (
+        persist_text.validate()
+        .set_task_instance_id("persist_ndvi_map")
+        .handle_errors()
+        .with_tracing()
+        .partial(
+            root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+            **(params_dict.get("persist_ndvi_map") or {}),
+        )
+        .mapvalues(argnames=["text"], argvalues=ndvi_map)
+    )
+
+    ndvi_map_widget = (
+        create_map_widget_single_view.validate()
+        .set_task_instance_id("ndvi_map_widget")
+        .handle_errors()
+        .with_tracing()
+        .partial(title="NDVI Map", **(params_dict.get("ndvi_map_widget") or {}))
+        .map(argnames=["view", "data"], argvalues=persist_ndvi_map)
+    )
+
+    grouped_ndvi_map_widget = (
+        merge_widget_views.validate()
+        .set_task_instance_id("grouped_ndvi_map_widget")
+        .handle_errors()
+        .with_tracing()
+        .partial(
+            widgets=ndvi_map_widget,
+            **(params_dict.get("grouped_ndvi_map_widget") or {}),
+        )
+        .call()
+    )
+
     ndvi_dashboard = (
         gather_dashboard.validate()
         .set_task_instance_id("ndvi_dashboard")
@@ -193,7 +311,7 @@ def main(params: Params):
         .with_tracing()
         .partial(
             details=workflow_details,
-            widgets=[grouped_ndvi_widget],
+            widgets=[grouped_ndvi_widget, grouped_ndvi_map_widget],
             time_range=time_range,
             groupers=groupers,
             **(params_dict.get("ndvi_dashboard") or {}),

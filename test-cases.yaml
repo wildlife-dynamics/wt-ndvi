@@ -44,6 +44,9 @@ precomputed:
     calculate_ndvi:
       ndvi_method: precomputed
       grouping_unit: month
+    base_maps:
+      base_maps:
+        - layer_name: "TERRAIN"
     roi:
       config:
         source: remote_file
