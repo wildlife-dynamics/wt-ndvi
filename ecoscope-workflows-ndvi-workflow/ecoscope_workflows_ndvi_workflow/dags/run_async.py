@@ -12,7 +12,6 @@ from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
-from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.tasks.results import (
     create_map_widget_single_view as create_map_widget_single_view,
@@ -54,9 +53,8 @@ def main(params: Params):
         "workflow_details": [],
         "gee_client": [],
         "time_range": [],
-        "er_client": [],
         "groupers": [],
-        "roi": ["er_client"],
+        "roi": [],
         "split_roi_groups": ["roi", "groupers"],
         "ndvi_method": [],
         "calculate_ndvi": [
@@ -122,15 +120,6 @@ def main(params: Params):
             | (params_dict.get("time_range") or {}),
             method="call",
         ),
-        "er_client": Node(
-            async_task=set_er_connection.validate()
-            .set_task_instance_id("er_client")
-            .handle_errors()
-            .with_tracing()
-            .set_executor("lithops"),
-            partial=(params_dict.get("er_client") or {}),
-            method="call",
-        ),
         "groupers": Node(
             async_task=set_groupers.validate()
             .set_task_instance_id("groupers")
@@ -147,7 +136,7 @@ def main(params: Params):
             .with_tracing()
             .set_executor("lithops"),
             partial={
-                "client": DependsOn("er_client"),
+                "client": None,
             }
             | (params_dict.get("roi") or {}),
             method="call",

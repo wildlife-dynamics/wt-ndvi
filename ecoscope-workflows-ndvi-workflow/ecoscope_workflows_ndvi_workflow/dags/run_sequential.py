@@ -11,7 +11,6 @@ from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
-from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.tasks.results import (
     create_map_widget_single_view as create_map_widget_single_view,
@@ -78,15 +77,6 @@ def main(params: Params):
         .call()
     )
 
-    er_client = (
-        set_er_connection.validate()
-        .set_task_instance_id("er_client")
-        .handle_errors()
-        .with_tracing()
-        .partial(**(params_dict.get("er_client") or {}))
-        .call()
-    )
-
     groupers = (
         set_groupers.validate()
         .set_task_instance_id("groupers")
@@ -101,7 +91,7 @@ def main(params: Params):
         .set_task_instance_id("roi")
         .handle_errors()
         .with_tracing()
-        .partial(client=er_client, **(params_dict.get("roi") or {}))
+        .partial(client=None, **(params_dict.get("roi") or {}))
         .call()
     )
 

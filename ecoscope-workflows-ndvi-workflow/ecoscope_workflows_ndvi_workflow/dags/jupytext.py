@@ -21,7 +21,6 @@ from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
-from ecoscope_workflows_core.tasks.io import set_er_connection as set_er_connection
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.tasks.results import (
     create_map_widget_single_view as create_map_widget_single_view,
@@ -127,29 +126,6 @@ time_range = (
 
 
 # %% [markdown]
-# ## EarthRanger Data Source
-
-# %%
-# parameters
-
-er_client_params = dict(
-    data_source=...,
-)
-
-# %%
-# call the task
-
-
-er_client = (
-    set_er_connection.set_task_instance_id("er_client")
-    .handle_errors()
-    .with_tracing()
-    .partial(**er_client_params)
-    .call()
-)
-
-
-# %% [markdown]
 # ## Set Groupers
 
 # %%
@@ -190,7 +166,7 @@ roi = (
     get_spatial_feature_group.set_task_instance_id("roi")
     .handle_errors()
     .with_tracing()
-    .partial(client=er_client, **roi_params)
+    .partial(client=None, **roi_params)
     .call()
 )
 

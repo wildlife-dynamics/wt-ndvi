@@ -68,21 +68,6 @@
       "description": "Choose the period of time to analyze.",
       "title": "Time Range"
     },
-    "er_client": {
-      "additionalProperties": false,
-      "properties": {
-        "data_source": {
-          "$ref": "#/$defs/EarthRangerConnection",
-          "title": "",
-          "description": "Select one of your configured data sources."
-        }
-      },
-      "required": [
-        "data_source"
-      ],
-      "type": "object",
-      "title": "EarthRanger Data Source"
-    },
     "groupers": {
       "additionalProperties": false,
       "properties": {
@@ -412,19 +397,6 @@
       "title": "TimezoneInfo",
       "type": "object"
     },
-    "EarthRangerConnection": {
-      "properties": {
-        "name": {
-          "title": "Data Source",
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "title": "EarthRangerConnection",
-      "type": "object"
-    },
     "SpatialGrouper": {
       "properties": {
         "spatial_index_name": {
@@ -591,7 +563,6 @@
       "workflow_details",
       "gee_client",
       "time_range",
-      "er_client",
       "groupers",
       "roi",
       "ndvi_method",

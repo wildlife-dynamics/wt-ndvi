@@ -221,10 +221,6 @@ class TimezoneInfo(BaseModel):
     utc: str = Field(..., title="Utc")
 
 
-class EarthRangerConnection(BaseModel):
-    name: str = Field(..., title="Data Source")
-
-
 class SpatialGrouper(BaseModel):
     spatial_index_name: str = Field(..., title="Spatial Regions")
 
@@ -306,15 +302,6 @@ class TimeRange(BaseModel):
     timezone: TimezoneInfo | None = Field(None, title="Timezone")
 
 
-class ErClient(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    data_source: EarthRangerConnection = Field(
-        ..., description="Select one of your configured data sources.", title=""
-    )
-
-
 class Groupers(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -352,7 +339,6 @@ class Params(BaseModel):
     time_range: TimeRange | None = Field(
         None, description="Choose the period of time to analyze.", title="Time Range"
     )
-    er_client: ErClient | None = Field(None, title="EarthRanger Data Source")
     groupers: Groupers | None = Field(None, title="Set Groupers")
     roi: Roi | None = Field(None, title="Load ROI")
     ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")

@@ -54,9 +54,9 @@ workflow:
     task: set_time_range
     partial:
       time_format: "%d %b %Y %H:%M:%S %Z"
-  - name: EarthRanger Data Source
-    id: er_client
-    task: set_er_connection
+  # - name: EarthRanger Data Source
+  #   id: er_client
+  #   task: set_er_connection
   - name: Set Groupers
     id: groupers
     task: set_groupers
@@ -64,7 +64,8 @@ workflow:
     id: roi
     task: get_spatial_feature_group
     partial:
-      client: ${{ workflow.er_client.return }}
+      # client: ${{ workflow.er_client.return }} # todo: support multiple clients and client types
+      client: null
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups
