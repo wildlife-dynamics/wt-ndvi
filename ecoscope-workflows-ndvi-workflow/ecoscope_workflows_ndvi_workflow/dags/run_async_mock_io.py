@@ -45,9 +45,9 @@ from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
 
-create_ee_raster_tile_url = create_task_magicmock(  # 🧪
+create_ndvi_tile_url = create_task_magicmock(  # 🧪
     anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
-    func_name="create_ee_raster_tile_url",  # 🧪
+    func_name="create_ndvi_tile_url",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.results import (
@@ -270,7 +270,7 @@ def main(params: Params):
             method="call",
         ),
         "ndvi_tile_url": Node(
-            async_task=create_ee_raster_tile_url.validate()
+            async_task=create_ndvi_tile_url.validate()
             .set_task_instance_id("ndvi_tile_url")
             .handle_errors()
             .with_tracing()
@@ -278,9 +278,6 @@ def main(params: Params):
             partial={
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
-                "image_collection": "MODIS/061/MYD13A1",
-                "band": "NDVI",
-                "reducer": "mean",
             }
             | (params_dict.get("ndvi_tile_url") or {}),
             method="mapvalues",

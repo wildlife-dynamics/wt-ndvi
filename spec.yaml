@@ -99,13 +99,10 @@ workflow:
     task: set_base_maps_pydeck
   - name: Create NDVI Tile URL
     id: ndvi_tile_url
-    task: create_ee_raster_tile_url
+    task: create_ndvi_tile_url
     partial:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
-      image_collection: "MODIS/061/MYD13A1"
-      band: "NDVI"
-      reducer: "mean"
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return }}

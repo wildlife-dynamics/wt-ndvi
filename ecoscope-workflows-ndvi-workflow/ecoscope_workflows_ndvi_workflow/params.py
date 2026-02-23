@@ -217,9 +217,26 @@ class BaseMaps(BaseModel):
     )
 
 
+class Reducer(str, Enum):
+    mean = "mean"
+    median = "median"
+    min = "min"
+    max = "max"
+
+
 class NdviTileUrl(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+    )
+    ndvi_method: NdviMethod | None = Field(
+        "precomputed",
+        description="Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. 'calculated': Uses MODIS MCD43A4 daily NBAR, computes NDVI from NIR/Red bands.",
+        title="Ndvi Method",
+    )
+    reducer: Reducer | None = Field(
+        "mean",
+        description="Reducer to apply to the ImageCollection over the time range.",
+        title="Reducer",
     )
     palette: list[str] | None = Field(
         None,
@@ -230,11 +247,6 @@ class NdviTileUrl(BaseModel):
         500,
         description="Scale in meters for computing min/max statistics.",
         title="Scale",
-    )
-    legend_title: str | None = Field(
-        None,
-        description="Title for the map legend. Defaults to the band name.",
-        title="Legend Title",
     )
 
 

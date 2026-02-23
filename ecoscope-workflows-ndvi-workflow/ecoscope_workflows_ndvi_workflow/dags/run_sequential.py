@@ -23,7 +23,7 @@ from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
 from ecoscope_workflows_ext_custom.tasks.io import (
-    create_ee_raster_tile_url as create_ee_raster_tile_url,
+    create_ndvi_tile_url as create_ndvi_tile_url,
 )
 from ecoscope_workflows_ext_custom.tasks.io import (
     get_spatial_feature_group as get_spatial_feature_group,
@@ -194,16 +194,13 @@ def main(params: Params):
     )
 
     ndvi_tile_url = (
-        create_ee_raster_tile_url.validate()
+        create_ndvi_tile_url.validate()
         .set_task_instance_id("ndvi_tile_url")
         .handle_errors()
         .with_tracing()
         .partial(
             client=gee_client,
             time_range=time_range,
-            image_collection="MODIS/061/MYD13A1",
-            band="NDVI",
-            reducer="mean",
             **(params_dict.get("ndvi_tile_url") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

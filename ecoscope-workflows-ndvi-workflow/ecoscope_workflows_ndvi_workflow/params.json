@@ -376,6 +376,28 @@
     "ndvi_tile_url": {
       "additionalProperties": false,
       "properties": {
+        "ndvi_method": {
+          "default": "precomputed",
+          "enum": [
+            "precomputed",
+            "calculated"
+          ],
+          "title": "Ndvi Method",
+          "type": "string",
+          "description": "Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. 'calculated': Uses MODIS MCD43A4 daily NBAR, computes NDVI from NIR/Red bands."
+        },
+        "reducer": {
+          "default": "mean",
+          "enum": [
+            "mean",
+            "median",
+            "min",
+            "max"
+          ],
+          "title": "Reducer",
+          "type": "string",
+          "description": "Reducer to apply to the ImageCollection over the time range."
+        },
         "palette": {
           "default": null,
           "items": {
@@ -391,12 +413,6 @@
           "type": "integer",
           "description": "Scale in meters for computing min/max statistics.",
           "ecoscope:advanced": true
-        },
-        "legend_title": {
-          "default": null,
-          "title": "Legend Title",
-          "type": "string",
-          "description": "Title for the map legend. Defaults to the band name."
         }
       },
       "required": [],
@@ -1056,9 +1072,10 @@
     },
     "ndvi_tile_url": {
       "ui:order": [
+        "ndvi_method",
+        "reducer",
         "palette",
-        "scale",
-        "legend_title"
+        "scale"
       ]
     },
     "roi_boundary_layer": {

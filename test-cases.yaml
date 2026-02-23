@@ -44,6 +44,8 @@ precomputed:
     calculate_ndvi:
       ndvi_method: precomputed
       grouping_unit: month
+    ndvi_tile_url:
+      ndvi_method: precomputed
     base_maps:
       base_maps:
         - layer_name: "TERRAIN"
@@ -74,6 +76,8 @@ earthranger:
     calculate_ndvi:
       ndvi_method: precomputed
       grouping_unit: month
+    ndvi_tile_url:
+      ndvi_method: precomputed
     roi:
       config:
         source: earthranger
@@ -101,6 +105,8 @@ calculated:
     calculate_ndvi:
       ndvi_method: calculated
       grouping_unit: week
+    ndvi_tile_url:
+      ndvi_method: calculated
     roi:
       config:
         source: remote_file
