@@ -8,9 +8,6 @@ base:
     gee_client:
       data_source:
         name: "ecoscope_poc"
-    er_client:
-      data_source:
-        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
@@ -19,8 +16,14 @@ base:
         - index_name: "name"
     roi:
       config:
-        source: remote_file
         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+    ndvi_method:
+      var: "MODIS MYD13A1 16-Day Composite"
+    calculate_ndvi:
+      grouping_unit: month
+    base_maps:
+      base_maps:
+        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
 
 precomputed:
   name: Precomputed NDVI Test Case
@@ -32,31 +35,50 @@ precomputed:
     gee_client:
       data_source:
         name: "ecoscope_poc"
-    er_client:
-      data_source:
-        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
     groupers:
       groupers:
         - index_name: "name"
+    ndvi_method:
+      var: "MODIS MYD13A1 16-Day Composite"
     calculate_ndvi:
-      ndvi_method: "MODIS MYD13A1 16-Day Composite"
       grouping_unit: month
-    ndvi_tile_url:
-      ndvi_method: "MODIS MYD13A1 16-Day Composite"
     base_maps:
       base_maps:
         # Note: cannot use layer_name: TERRAIN since layer_name is typed as SkipJsonSchema[str] on TileLayer
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        source: remote_file
         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
 
-earthranger:
-  name: EarthRanger Spatial Features Test Case
+# earthranger:
+#   name: EarthRanger Spatial Features Test Case
+#   mock_io: false
+#   params:
+#     workflow_details:
+#       name: "NDVI Workflow"
+#       description: "Normalized Difference Vegetation Index Workflow"
+#     gee_client:
+#       data_source:
+#         name: "ecoscope_poc"
+#     time_range:
+#       since: "2023-01-01T00:00:00Z"
+#       until: "2023-12-31T23:59:59Z"
+#     groupers:
+#       groupers:
+#         - index_name: "name"
+#     ndvi_method:
+#       var: "MODIS MYD13A1 16-Day Composite"
+#     calculate_ndvi:
+#       grouping_unit: month
+#     roi:
+#       config:
+#         spatial_features_group_name: "SpatialGrouperTest"
+
+local-file:
+  name: Local File ROI Test Case
   mock_io: false
   params:
     workflow_details:
@@ -65,24 +87,23 @@ earthranger:
     gee_client:
       data_source:
         name: "ecoscope_poc"
-    er_client:
-      data_source:
-        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
     groupers:
       groupers:
         - index_name: "name"
+    ndvi_method:
+      var: "MODIS MYD13A1 16-Day Composite"
     calculate_ndvi:
-      ndvi_method: precomputed
       grouping_unit: month
-    ndvi_tile_url:
-      ndvi_method: precomputed
+    base_maps:
+      base_maps:
+        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        source: earthranger
-        spatial_features_group_name: "SpatialGrouperTest"
+        file_path: "/Users/yunwu/Downloads/AOIs.gpkg"
+        name_column: "region"
 
 calculated:
   name: Calculated NDVI Test Case
@@ -94,21 +115,19 @@ calculated:
     gee_client:
       data_source:
         name: "ecoscope_poc"
-    er_client:
-      data_source:
-        name: "mep_dev"
     time_range:
       since: "2023-01-01T00:00:00Z"
       until: "2023-12-31T23:59:59Z"
     groupers:
       groupers:
         - index_name: "name"
+    ndvi_method:
+      var: "MODIS MCD43A4 Daily NBAR"
     calculate_ndvi:
-      ndvi_method: calculated
       grouping_unit: week
-    ndvi_tile_url:
-      ndvi_method: calculated
+    base_maps:
+      base_maps:
+        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        source: remote_file
         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
