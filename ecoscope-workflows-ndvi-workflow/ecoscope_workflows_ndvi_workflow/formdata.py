@@ -39,8 +39,8 @@ class CalculateNdvi(BaseModel):
         title="Image Size",
     )
     ndvi_method: NdviMethod | None = Field(
-        "precomputed",
-        description="Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'calculated': Uses MODIS MCD43A4 daily NBAR (nadir BRDF-adjusted reflectance). Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps.",
+        "MODIS MYD13A1 16-Day Composite",
+        description="Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps.",
         title="Ndvi Method",
     )
     grouping_unit: GroupingUnit | None = Field(
@@ -356,34 +356,6 @@ class LegendValue(BaseModel):
     color: str = Field(..., title="Color")
 
 
-class LineWidthUnits(str, Enum):
-    meters = "meters"
-    pixels = "pixels"
-
-
-class PolygonLayerStyle(BaseModel):
-    auto_highlight: bool | None = Field(False, title="Auto Highlight")
-    opacity: confloat(ge=0.0, le=1.0) | None = Field(1, title="Opacity")
-    pickable: bool | None = Field(True, title="Pickable")
-    get_polygon: str | None = Field("geometry.coordinates", title="Get Polygon")
-    get_fill_color: str | None = Field(None, title="Get Fill Color")
-    get_line_color: str | None = Field(None, title="Get Line Color")
-    get_elevation: str | float | None = Field(None, title="Get Elevation")
-    get_line_width: str | float | None = Field(None, title="Get Line Width")
-    line_width_units: LineWidthUnits | None = Field("pixels", title="Line Width Units")
-    line_width_scale: float | None = Field(1, title="Line Width Scale")
-    line_width_min_pixels: float | None = Field(0, title="Line Width Min Pixels")
-    line_width_max_pixels: float | None = Field(None, title="Line Width Max Pixels")
-    line_miter_limit: float | None = Field(4, title="Line Miter Limit")
-    line_joint_rounded: bool | None = Field(False, title="Line Joint Rounded")
-    stroked: bool | None = Field(False, title="Stroked")
-    filled: bool | None = Field(True, title="Filled")
-    billboard: bool | None = Field(False, title="Billboard")
-    antialiasing: bool | None = Field(True, title="Antialiasing")
-    extruded: bool | None = Field(False, title="Extruded")
-    wireframe: bool | None = Field(True, title="Wireframe")
-
-
 class Placement(str, Enum):
     top_left = "top-left"
     top_right = "top-right"
@@ -490,29 +462,6 @@ class LegendSegment(BaseModel):
 class RoiBoundaryLayer(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
-    )
-    layer_style: PolygonLayerStyle | None = Field(
-        default_factory=lambda: PolygonLayerStyle.model_validate(
-            {
-                "auto_highlight": False,
-                "opacity": 1,
-                "pickable": True,
-                "get_polygon": "geometry.coordinates",
-                "line_width_units": "pixels",
-                "line_width_scale": 1,
-                "line_width_min_pixels": 0,
-                "line_miter_limit": 4,
-                "line_joint_rounded": False,
-                "stroked": False,
-                "filled": True,
-                "billboard": False,
-                "antialiasing": True,
-                "extruded": False,
-                "wireframe": True,
-            }
-        ),
-        description="Style arguments for the layer.",
-        title="Layer Style",
     )
     legend: LegendFromDataframe | LegendSegment | None = Field(
         None,

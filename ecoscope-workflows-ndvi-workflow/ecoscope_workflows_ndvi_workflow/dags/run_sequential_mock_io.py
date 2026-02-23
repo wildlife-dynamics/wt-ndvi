@@ -229,7 +229,17 @@ def main(params: Params):
         .set_task_instance_id("roi_boundary_layer")
         .handle_errors()
         .with_tracing()
-        .partial(**(params_dict.get("roi_boundary_layer") or {}))
+        .partial(
+            layer_style={
+                "get_line_color": [0, 128, 0, 255],
+                "get_line_width": 2,
+                "opacity": 1.0,
+                "stroked": True,
+                "filled": False,
+                "line_width_units": "pixels",
+            },
+            **(params_dict.get("roi_boundary_layer") or {}),
+        )
         .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
     )
 

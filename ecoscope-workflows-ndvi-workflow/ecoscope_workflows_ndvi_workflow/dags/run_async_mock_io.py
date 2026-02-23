@@ -292,7 +292,22 @@ def main(params: Params):
             .handle_errors()
             .with_tracing()
             .set_executor("lithops"),
-            partial=(params_dict.get("roi_boundary_layer") or {}),
+            partial={
+                "layer_style": {
+                    "get_line_color": [
+                        0,
+                        128,
+                        0,
+                        255,
+                    ],
+                    "get_line_width": 2,
+                    "opacity": 1.0,
+                    "stroked": True,
+                    "filled": False,
+                    "line_width_units": "pixels",
+                },
+            }
+            | (params_dict.get("roi_boundary_layer") or {}),
             method="mapvalues",
             kwargs={
                 "argnames": ["geodataframe"],

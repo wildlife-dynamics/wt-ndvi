@@ -109,6 +109,14 @@ workflow:
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
     task: create_polygon_layer_pydeck
+    partial:
+      layer_style:
+        get_line_color: [0, 128, 0, 255]
+        get_line_width: 2
+        opacity: 1.0
+        stroked: true
+        filled: false
+        line_width_units: pixels
     mapvalues:
       argnames: geodataframe
       argvalues: ${{ workflow.split_roi_groups.return }}

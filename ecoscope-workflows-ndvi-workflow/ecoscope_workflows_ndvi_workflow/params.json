@@ -146,14 +146,14 @@
           "description": "Number of historical satellite images to fetch. Set to a large value to retrieve all available historical data. Only used when baseline_time_range is not provided."
         },
         "ndvi_method": {
-          "default": "precomputed",
+          "default": "MODIS MYD13A1 16-Day Composite",
           "enum": [
             "MODIS MYD13A1 16-Day Composite",
             "MODIS MCD43A4 Daily NBAR"
           ],
           "title": "Ndvi Method",
           "type": "string",
-          "description": "Method to obtain NDVI values. 'precomputed': Uses MODIS MYD13A1 16-day composite with pre-calculated NDVI. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'calculated': Uses MODIS MCD43A4 daily NBAR (nadir BRDF-adjusted reflectance). Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
+          "description": "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
         },
         "grouping_unit": {
           "default": "month",
@@ -423,33 +423,6 @@
     "roi_boundary_layer": {
       "additionalProperties": false,
       "properties": {
-        "layer_style": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/PolygonLayerStyle"
-            }
-          ],
-          "default": {
-            "auto_highlight": false,
-            "opacity": 1,
-            "pickable": true,
-            "get_polygon": "geometry.coordinates",
-            "line_width_units": "pixels",
-            "line_width_scale": 1,
-            "line_width_min_pixels": 0,
-            "line_miter_limit": 4,
-            "line_joint_rounded": false,
-            "stroked": false,
-            "filled": true,
-            "billboard": false,
-            "antialiasing": true,
-            "extruded": false,
-            "wireframe": true
-          },
-          "title": "Layer Style",
-          "description": "Style arguments for the layer.",
-          "ecoscope:advanced": true
-        },
         "legend": {
           "anyOf": [
             {
@@ -836,153 +809,6 @@
       "title": "LegendValue",
       "type": "object"
     },
-    "PolygonLayerStyle": {
-      "description": "Polygon Layer style kwargs\nSee https://deck.gl/docs/api-reference/layers/polygon-layer for more info",
-      "properties": {
-        "auto_highlight": {
-          "default": false,
-          "ecoscope:advanced": true,
-          "title": "Auto Highlight",
-          "type": "boolean"
-        },
-        "opacity": {
-          "default": 1,
-          "ecoscope:advanced": true,
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "title": "Opacity",
-          "type": "number"
-        },
-        "pickable": {
-          "default": true,
-          "ecoscope:advanced": true,
-          "title": "Pickable",
-          "type": "boolean"
-        },
-        "get_polygon": {
-          "default": "geometry.coordinates",
-          "ecoscope:advanced": true,
-          "title": "Get Polygon",
-          "type": "string"
-        },
-        "get_fill_color": {
-          "default": null,
-          "ecoscope:advanced": true,
-          "title": "Get Fill Color",
-          "type": "string"
-        },
-        "get_line_color": {
-          "default": null,
-          "ecoscope:advanced": true,
-          "title": "Get Line Color",
-          "type": "string"
-        },
-        "get_elevation": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            }
-          ],
-          "default": null,
-          "ecoscope:advanced": true,
-          "title": "Get Elevation"
-        },
-        "get_line_width": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "number"
-            }
-          ],
-          "default": null,
-          "ecoscope:advanced": true,
-          "title": "Get Line Width"
-        },
-        "line_width_units": {
-          "default": "pixels",
-          "ecoscope:advanced": true,
-          "enum": [
-            "meters",
-            "pixels"
-          ],
-          "title": "Line Width Units",
-          "type": "string"
-        },
-        "line_width_scale": {
-          "default": 1,
-          "ecoscope:advanced": true,
-          "title": "Line Width Scale",
-          "type": "number"
-        },
-        "line_width_min_pixels": {
-          "default": 0,
-          "ecoscope:advanced": true,
-          "title": "Line Width Min Pixels",
-          "type": "number"
-        },
-        "line_width_max_pixels": {
-          "default": null,
-          "ecoscope:advanced": true,
-          "title": "Line Width Max Pixels",
-          "type": "number"
-        },
-        "line_miter_limit": {
-          "default": 4,
-          "ecoscope:advanced": true,
-          "title": "Line Miter Limit",
-          "type": "number"
-        },
-        "line_joint_rounded": {
-          "default": false,
-          "ecoscope:advanced": true,
-          "title": "Line Joint Rounded",
-          "type": "boolean"
-        },
-        "stroked": {
-          "default": false,
-          "ecoscope:advanced": true,
-          "title": "Stroked",
-          "type": "boolean"
-        },
-        "filled": {
-          "default": true,
-          "ecoscope:advanced": true,
-          "title": "Filled",
-          "type": "boolean"
-        },
-        "billboard": {
-          "default": false,
-          "ecoscope:advanced": true,
-          "title": "Billboard",
-          "type": "boolean"
-        },
-        "antialiasing": {
-          "default": true,
-          "ecoscope:advanced": true,
-          "title": "Antialiasing",
-          "type": "boolean"
-        },
-        "extruded": {
-          "default": false,
-          "ecoscope:advanced": true,
-          "title": "Extruded",
-          "type": "boolean"
-        },
-        "wireframe": {
-          "default": true,
-          "ecoscope:advanced": true,
-          "title": "Wireframe",
-          "type": "boolean"
-        }
-      },
-      "title": "PolygonLayerStyle",
-      "type": "object"
-    },
     "LegendStyle": {
       "description": "Additional legend configuration options applied per map, rather than per layer",
       "properties": {
@@ -1077,12 +903,6 @@
         "reducer",
         "palette",
         "scale"
-      ]
-    },
-    "roi_boundary_layer": {
-      "ui:order": [
-        "layer_style",
-        "legend"
       ]
     },
     "ndvi_map": {
