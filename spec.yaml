@@ -14,6 +14,10 @@ rjsf-overrides:
     ValueGrouper.properties.index_name.oneOf: [
       {"const": "name", "title": "ROI Name"},
     ]
+    LocalFileSpatialFeatures.properties.file_path.default: ""
+    LocalFileSpatialFeatures.properties.layer.type: ["string", "null"]
+    RemoteFileSpatialFeatures.properties.url.default: ""
+    RemoteFileSpatialFeatures.properties.layer.type: ["string", "null"]
   properties:
     groupers.properties.groupers.items.anyOf: [
       {"$ref": "#/$defs/ValueGrouper"},

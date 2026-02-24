@@ -495,14 +495,18 @@
         "file_path": {
           "description": "Path to geoparquet (.parquet) or geopackage (.gpkg) file",
           "title": "File Path",
-          "type": "string"
+          "type": "string",
+          "default": ""
         },
         "layer": {
           "default": null,
           "description": "Layer name (only applicable to geopackage files)",
           "ecoscope:advanced": true,
           "title": "Layer",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "name_column": {
           "default": "name",
@@ -522,14 +526,18 @@
         "url": {
           "description": "URL to geoparquet (.parquet) or geopackage (.gpkg) file",
           "title": "Url",
-          "type": "string"
+          "type": "string",
+          "default": ""
         },
         "layer": {
           "default": null,
           "description": "Layer name (only required for geopackage files)",
           "ecoscope:advanced": true,
           "title": "Layer",
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "name_column": {
           "default": "name",
