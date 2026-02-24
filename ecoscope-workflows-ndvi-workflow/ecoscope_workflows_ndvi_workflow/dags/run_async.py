@@ -135,10 +135,7 @@ def main(params: Params):
             .handle_errors()
             .with_tracing()
             .set_executor("lithops"),
-            partial={
-                "client": None,
-            }
-            | (params_dict.get("roi") or {}),
+            partial=(params_dict.get("roi") or {}),
             method="call",
         ),
         "split_roi_groups": Node(

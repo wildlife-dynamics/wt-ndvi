@@ -91,7 +91,7 @@ def main(params: Params):
         .set_task_instance_id("roi")
         .handle_errors()
         .with_tracing()
-        .partial(client=None, **(params_dict.get("roi") or {}))
+        .partial(**(params_dict.get("roi") or {}))
         .call()
     )
 

@@ -28,6 +28,7 @@ rjsf-overrides:
     roi.properties.config.anyOf: [
       {"$ref": "#/$defs/LocalFileSpatialFeatures"},
       {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
+      {"$ref": "#/$defs/EarthRangerSpatialFeatures"},
     ]
     roi.properties.config.default: {"file_path": "", "name_column": "name"}
     ndvi_method.properties.var.title: " "
@@ -58,18 +59,12 @@ workflow:
     task: set_time_range
     partial:
       time_format: "%d %b %Y %H:%M:%S %Z"
-  # - name: EarthRanger Data Source
-  #   id: er_client
-  #   task: set_er_connection
   - name: Set Groupers
     id: groupers
     task: set_groupers
   - name: Load ROI
     id: roi
     task: get_spatial_feature_group
-    partial:
-      # client: ${{ workflow.er_client.return }} # todo: support multiple clients and client types
-      client: null
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups

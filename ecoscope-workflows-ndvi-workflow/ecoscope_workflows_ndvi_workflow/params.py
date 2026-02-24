@@ -245,6 +245,11 @@ class ValueGrouper(BaseModel):
 
 
 class EarthRangerSpatialFeatures(BaseModel):
+    data_source: str = Field(
+        ...,
+        description="Select one of your configured EarthRanger data sources.",
+        title="Data Source",
+    )
     spatial_features_group_name: str = Field(
         ...,
         description="Name of the spatial features group in EarthRanger",

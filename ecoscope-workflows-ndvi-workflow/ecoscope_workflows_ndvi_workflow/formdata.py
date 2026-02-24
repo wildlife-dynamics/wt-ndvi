@@ -253,6 +253,11 @@ class ValueGrouper(BaseModel):
 
 
 class EarthRangerSpatialFeatures(BaseModel):
+    data_source: str = Field(
+        ...,
+        description="Select one of your configured EarthRanger data sources.",
+        title="Data Source",
+    )
     spatial_features_group_name: str = Field(
         ...,
         description="Name of the spatial features group in EarthRanger",
@@ -325,7 +330,11 @@ class Roi(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    config: LocalFileSpatialFeatures | RemoteFileSpatialFeatures = Field(
+    config: (
+        LocalFileSpatialFeatures
+        | RemoteFileSpatialFeatures
+        | EarthRangerSpatialFeatures
+    ) = Field(
         default_factory=lambda: LocalFileSpatialFeatures.model_validate(
             {"file_path": "", "name_column": "name"}
         ),
