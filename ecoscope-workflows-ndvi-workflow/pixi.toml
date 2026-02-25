@@ -3,8 +3,10 @@
 [workspace]
 name = "ecoscope-workflows-ndvi-workflow"
 channels = [
-    "https://repo.prefix.dev/ecoscope-workflows-custom/",
+    "file:///tmp/ecoscope-workflows/release/artifacts/",
+    "file:///tmp/ecoscope-workflows-custom/release/artifacts/",
     "https://repo.prefix.dev/ecoscope-workflows/",
+    "https://prefix.dev/ecoscope-workflows-custom",
     "conda-forge",
     "microsoft",
 ]
@@ -20,20 +22,20 @@ platforms = [
 linux = "4.4.0"
 
 [dependencies.ecoscope-workflows-core]
-version = "==0.22.2"
-channel = "https://repo.prefix.dev/ecoscope-workflows/"
+version = "*"
+channel = "file:///tmp/ecoscope-workflows/release/artifacts/"
 
 [dependencies.ecoscope-workflows-ext-ecoscope]
-version = "==0.22.2"
-channel = "https://repo.prefix.dev/ecoscope-workflows/"
+version = "*"
+channel = "file:///tmp/ecoscope-workflows/release/artifacts/"
 
 [dependencies.ecoscope-workflows-ext-custom]
-version = "==0.0.28"
-channel = "https://repo.prefix.dev/ecoscope-workflows-custom/"
+version = "*"
+channel = "file:///tmp/ecoscope-workflows-custom/release/artifacts/"
 
 [feature.runner.dependencies.ecoscope-workflows-runner]
-version = "==0.22.2"
-channel = "https://repo.prefix.dev/ecoscope-workflows/"
+version = "*"
+channel = "file:///tmp/ecoscope-workflows/release/artifacts/"
 
 [feature.runner.tasks]
 
@@ -125,5 +127,5 @@ solve-group = "test"
 no-default-feature = true
 
 [tasks]
-docker-build = "docker buildx build -t ecoscope-workflows-ndvi-workflow ."
+docker-build = "mkdir -p .tmp/ecoscope-workflows/release/artifacts/\n&& cp -r /tmp/ecoscope-workflows/release/artifacts/* .tmp/ecoscope-workflows/release/artifacts/\n&& docker buildx build -t ecoscope-workflows-ndvi-workflow .\n"
 ecoscope-workflows-ndvi-workflow = "python -m ecoscope_workflows_ndvi_workflow.cli"
