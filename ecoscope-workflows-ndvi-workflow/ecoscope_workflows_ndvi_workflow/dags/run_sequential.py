@@ -28,6 +28,9 @@ from ecoscope_workflows_ext_custom.tasks.io import (
 from ecoscope_workflows_ext_custom.tasks.io import (
     get_spatial_feature_group as get_spatial_feature_group,
 )
+from ecoscope_workflows_ext_custom.tasks.io import (
+    persist_df_wrapper as persist_df_wrapper,
+)
 from ecoscope_workflows_ext_custom.tasks.results import (
     create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
@@ -129,6 +132,20 @@ def main(params: Params):
             **(params_dict.get("calculate_ndvi") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
+    )
+
+    persist_ndvi_data = (
+        persist_df_wrapper.validate()
+        .set_task_instance_id("persist_ndvi_data")
+        .handle_errors()
+        .with_tracing()
+        .partial(
+            root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+            sanitize=True,
+            filename_prefix="ndvi",
+            **(params_dict.get("persist_ndvi_data") or {}),
+        )
+        .mapvalues(argnames=["df"], argvalues=calculate_ndvi)
     )
 
     draw_ndvi = (

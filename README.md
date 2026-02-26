@@ -76,11 +76,11 @@ Specify the time period for the NDVI analysis.
   - Note: The workflow pulls all historical MODIS images from Google Earth Engine to calculate baseline statistics (min, max, mean) for comparison. The trend chart displays only the current period you select, overlaid with the historical baseline. The NDVI map shows the mean NDVI for the selected time range only.
 
 #### 4. Group Data (Optional)
-Organize your data into separate dashboard views based on ROI name.
+Organize your data into separate dashboard views based on Region of Interest.
 
 - **Group by**: Create separate outputs grouped by:
-  - Category: ROI Name - creates separate views for each region of interest
-  - Default and highly recommended: Groups by ROI Name
+  - Category: Region of Interest - creates separate views for each region of interest
+  - Default and highly recommended: Groups by Region of Interest
 
 #### 5. Load ROI
 Specify where your Region of Interest boundaries come from. Choose one of three options:
@@ -196,7 +196,7 @@ The workflow creates an interactive dashboard with two main visualizations:
 
 ### Grouped Outputs
 
-If you configured data grouping (by ROI Name):
+If you configured data grouping (by Region of Interest):
 - Dashboard visualizations will have multiple views, with each region selectable from the dashboard
 - Each view shows the NDVI trend chart and map for that specific region
 
@@ -215,7 +215,7 @@ Here are some typical scenarios and how to configure the workflow for each:
 - **ROI**: Remote URL - `"https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"`
 - **NDVI Method**: `"MODIS MYD13A1 16-Day Composite"`
 - **Grouping Unit**: `month`
-- **Group by**: ROI Name
+- **Group by**: Region of Interest
 
 **Result**:
 - Separate NDVI trend charts for each region, comparing current monthly values against historical monthly baselines
@@ -234,7 +234,7 @@ Here are some typical scenarios and how to configure the workflow for each:
 - **ROI**: Remote URL - `"https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"`
 - **NDVI Method**: `"MODIS MCD43A4 Daily NBAR"`
 - **Grouping Unit**: `week`
-- **Group by**: ROI Name
+- **Group by**: Region of Interest
 
 **Result**:
 - More granular NDVI trend charts with weekly historical comparison

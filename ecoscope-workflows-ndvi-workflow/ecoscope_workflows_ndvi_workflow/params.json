@@ -154,6 +154,31 @@
       "type": "object",
       "title": "NDVI Trend"
     },
+    "persist_ndvi_data": {
+      "additionalProperties": false,
+      "properties": {
+        "filetypes": {
+          "default": [
+            "csv"
+          ],
+          "items": {
+            "enum": [
+              "csv",
+              "gpkg",
+              "geoparquet"
+            ],
+            "type": "string"
+          },
+          "title": "Filetypes",
+          "type": "array",
+          "description": "The output format",
+          "uniqueItems": true
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": "Persist NDVI Data"
+    },
     "base_maps": {
       "additionalProperties": false,
       "properties": {
@@ -500,22 +525,22 @@
           "title": "File Path",
           "type": "string"
         },
+        "name_column": {
+          "description": "Column to use as region name",
+          "title": "Name Column",
+          "type": "string"
+        },
         "layer": {
           "default": null,
           "description": "Layer name (only applicable to geopackage files)",
           "ecoscope:advanced": true,
           "title": "Layer",
           "type": "string"
-        },
-        "name_column": {
-          "default": "name",
-          "description": "Column to use as region name",
-          "title": "Name Column",
-          "type": "string"
         }
       },
       "required": [
-        "file_path"
+        "file_path",
+        "name_column"
       ],
       "title": "Local File",
       "type": "object"
@@ -527,22 +552,22 @@
           "title": "Url",
           "type": "string"
         },
-        "layer": {
-          "default": null,
-          "description": "Layer name (only required for geopackage files)",
-          "ecoscope:advanced": true,
-          "title": "Layer",
-          "type": "string"
-        },
         "name_column": {
-          "default": "name",
           "description": "Column to use as region name",
           "title": "Name Column",
+          "type": "string"
+        },
+        "layer": {
+          "default": null,
+          "description": "Layer name (only applicable for geopackage files)",
+          "ecoscope:advanced": true,
+          "title": "Layer",
           "type": "string"
         }
       },
       "required": [
-        "url"
+        "url",
+        "name_column"
       ],
       "title": "Remote URL",
       "type": "object"
@@ -570,6 +595,7 @@
       "roi",
       "ndvi_method",
       "calculate_ndvi",
+      "persist_ndvi_data",
       "base_maps"
     ]
   },

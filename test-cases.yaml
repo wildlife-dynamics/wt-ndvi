@@ -92,8 +92,8 @@ local-file:
       data_source:
         name: "ecoscope_poc"
     time_range:
-      since: "2023-01-01T00:00:00Z"
-      until: "2023-12-31T23:59:59Z"
+      since: "2025-01-01T00:00:00Z"
+      until: "2025-12-31T23:59:59Z"
     groupers:
       groupers:
         - index_name: "name"
@@ -128,7 +128,7 @@ calculated:
     ndvi_method:
       var: "MODIS MCD43A4 Daily NBAR"
     calculate_ndvi:
-      grouping_unit: week
+      grouping_unit: day_of_year
     base_maps:
       base_maps:
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"

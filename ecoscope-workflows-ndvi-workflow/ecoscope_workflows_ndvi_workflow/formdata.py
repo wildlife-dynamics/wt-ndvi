@@ -51,6 +51,21 @@ class CalculateNdvi(BaseModel):
     )
 
 
+class Filetype(str, Enum):
+    csv = "csv"
+    gpkg = "gpkg"
+    geoparquet = "geoparquet"
+
+
+class PersistNdviData(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    filetypes: list[Filetype] | None = Field(
+        ["csv"], description="The output format", title="Filetypes"
+    )
+
+
 class Url(str, Enum):
     https___tile_openstreetmap_org__z___x___y__png = (
         "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -245,7 +260,7 @@ class TemporalGrouper(BaseModel):
 
 
 class IndexName(str, Enum):
-    ROI_Name = "name"
+    Region_of_Interest = "name"
 
 
 class ValueGrouper(BaseModel):
@@ -271,13 +286,13 @@ class LocalFileSpatialFeatures(BaseModel):
         description="Path to geoparquet (.parquet) or geopackage (.gpkg) file",
         title="File Path",
     )
+    name_column: str = Field(
+        ..., description="Column to use as region name", title="Name Column"
+    )
     layer: str | None = Field(
         None,
         description="Layer name (only applicable to geopackage files)",
         title="Layer",
-    )
-    name_column: str | None = Field(
-        "name", description="Column to use as region name", title="Name Column"
     )
 
 
@@ -287,13 +302,13 @@ class RemoteFileSpatialFeatures(BaseModel):
         description="URL to geoparquet (.parquet) or geopackage (.gpkg) file",
         title="Url",
     )
+    name_column: str = Field(
+        ..., description="Column to use as region name", title="Name Column"
+    )
     layer: str | None = Field(
         None,
-        description="Layer name (only required for geopackage files)",
+        description="Layer name (only applicable for geopackage files)",
         title="Layer",
-    )
-    name_column: str | None = Field(
-        "name", description="Column to use as region name", title="Name Column"
     )
 
 
@@ -330,13 +345,9 @@ class Roi(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
-    config: (
-        LocalFileSpatialFeatures
-        | RemoteFileSpatialFeatures
-        | EarthRangerSpatialFeatures
-    ) = Field(
+    config: LocalFileSpatialFeatures | RemoteFileSpatialFeatures = Field(
         default_factory=lambda: LocalFileSpatialFeatures.model_validate(
-            {"file_path": "", "name_column": "name"}
+            {"file_path": "", "name_column": ""}
         ),
         title="Spatial Feature Data Source",
     )
@@ -361,4 +372,5 @@ class FormData(BaseModel):
     roi: Roi | None = Field(None, title="Load ROI")
     ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")
     calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
+    persist_ndvi_data: PersistNdviData | None = Field(None, title="Persist NDVI Data")
     base_maps: BaseMaps | None = Field(None, title="NDVI Map")

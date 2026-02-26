@@ -24,7 +24,7 @@ requirements:
 rjsf-overrides:
   $defs:
     ValueGrouper.properties.index_name.oneOf: [
-      {"const": "name", "title": "ROI Name"},
+      {"const": "name", "title": "Region of Interest"},
     ]
     LocalFileSpatialFeatures.properties.file_path.default: ""
     LocalFileSpatialFeatures.properties.layer.type: ["string", "null"]
@@ -40,9 +40,8 @@ rjsf-overrides:
     roi.properties.config.anyOf: [
       {"$ref": "#/$defs/LocalFileSpatialFeatures"},
       {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
-      {"$ref": "#/$defs/EarthRangerSpatialFeatures"},
     ]
-    roi.properties.config.default: {"file_path": "", "name_column": "name"}
+    roi.properties.config.default: {"file_path": "", "name_column": ""}
     ndvi_method.properties.var.title: " "
     ndvi_method.properties.var.description: "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
     ndvi_method.properties.var.enum: [
@@ -98,6 +97,16 @@ workflow:
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return}}
+  - name: Persist NDVI Data
+    id: persist_ndvi_data
+    task: persist_df_wrapper
+    partial:
+      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+      sanitize: true
+      filename_prefix: ndvi
+    mapvalues:
+      argnames: df
+      argvalues: ${{ workflow.calculate_ndvi.return }}
   - name: Draw NDVI
     id: draw_ndvi
     task: draw_historic_timeseries

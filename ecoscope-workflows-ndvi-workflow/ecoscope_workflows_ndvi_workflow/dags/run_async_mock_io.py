@@ -38,6 +38,9 @@ from ecoscope_workflows_core.tasks.results import (
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
+from ecoscope_workflows_ext_custom.tasks.io import (
+    persist_df_wrapper as persist_df_wrapper,
+)
 from ecoscope_workflows_ext_custom.tasks.results import (
     set_base_maps_pydeck as set_base_maps_pydeck,
 )
@@ -81,6 +84,7 @@ def main(params: Params):
             "ndvi_method",
             "split_roi_groups",
         ],
+        "persist_ndvi_data": ["calculate_ndvi"],
         "draw_ndvi": ["calculate_ndvi"],
         "persist_ndvi": ["draw_ndvi"],
         "ndvi_chart_widget": ["persist_ndvi"],
@@ -196,6 +200,24 @@ def main(params: Params):
             kwargs={
                 "argnames": ["roi"],
                 "argvalues": DependsOn("split_roi_groups"),
+            },
+        ),
+        "persist_ndvi_data": Node(
+            async_task=persist_df_wrapper.validate()
+            .set_task_instance_id("persist_ndvi_data")
+            .handle_errors()
+            .with_tracing()
+            .set_executor("lithops"),
+            partial={
+                "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+                "sanitize": True,
+                "filename_prefix": "ndvi",
+            }
+            | (params_dict.get("persist_ndvi_data") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["df"],
+                "argvalues": DependsOn("calculate_ndvi"),
             },
         ),
         "draw_ndvi": Node(
