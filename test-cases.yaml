@@ -106,8 +106,8 @@ local-file:
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        file_path: "/Users/yunwu/Downloads/AOIs.gpkg"
-        name_column: "region"
+        file_path: "/Users/yunwu/Downloads/Altay.gpkg"
+        name_column: "NAME_3"
 
 calculated:
   name: Calculated NDVI Test Case

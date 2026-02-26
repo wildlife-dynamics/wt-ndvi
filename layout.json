@@ -11,10 +11,10 @@
         "static": false
     },
     {
-        "i": "0",
+        "i": "1",
         "x": 12,
         "y": 0,
-        "widget_id": 0,
+        "widget_id": 1,
         "w": 10,
         "h": 12,
         "minW": 10,
