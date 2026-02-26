@@ -5,8 +5,8 @@ name = "ecoscope-workflows-ndvi-workflow"
 channels = [
     "file:///tmp/ecoscope-workflows/release/artifacts/",
     "file:///tmp/ecoscope-workflows-custom/release/artifacts/",
+    "https://repo.prefix.dev/ecoscope-workflows-custom/",
     "https://repo.prefix.dev/ecoscope-workflows/",
-    "https://prefix.dev/ecoscope-workflows-custom",
     "conda-forge",
     "microsoft",
 ]
@@ -32,6 +32,10 @@ channel = "file:///tmp/ecoscope-workflows/release/artifacts/"
 [dependencies.ecoscope-workflows-ext-custom]
 version = "*"
 channel = "file:///tmp/ecoscope-workflows-custom/release/artifacts/"
+
+[dependencies.pydeck]
+version = "*"
+channel = "https://repo.prefix.dev/ecoscope-workflows-custom/"
 
 [feature.runner.dependencies.ecoscope-workflows-runner]
 version = "*"
