@@ -48,9 +48,9 @@ from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
 
-create_ndvi_tile_url = create_task_magicmock(  # 🧪
+create_ndvi_tile = create_task_magicmock(  # 🧪
     anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
-    func_name="create_ndvi_tile_url",  # 🧪
+    func_name="create_ndvi_tile",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.results import (
@@ -90,14 +90,9 @@ def main(params: Params):
         "ndvi_chart_widget": ["persist_ndvi"],
         "grouped_ndvi_widget": ["ndvi_chart_widget"],
         "base_maps": [],
-        "ndvi_tile_url": [
-            "gee_client",
-            "time_range",
-            "ndvi_method",
-            "split_roi_groups",
-        ],
+        "ndvi_tile": ["gee_client", "time_range", "ndvi_method", "split_roi_groups"],
         "roi_boundary_layer": ["split_roi_groups"],
-        "ndvi_map_layers": ["roi_boundary_layer", "ndvi_tile_url"],
+        "ndvi_map_layers": ["roi_boundary_layer", "ndvi_tile"],
         "ndvi_map": ["base_maps", "ndvi_map_layers"],
         "persist_ndvi_map": ["ndvi_map"],
         "ndvi_map_widget": ["persist_ndvi_map"],
@@ -300,9 +295,9 @@ def main(params: Params):
             partial=(params_dict.get("base_maps") or {}),
             method="call",
         ),
-        "ndvi_tile_url": Node(
-            async_task=create_ndvi_tile_url.validate()
-            .set_task_instance_id("ndvi_tile_url")
+        "ndvi_tile": Node(
+            async_task=create_ndvi_tile.validate()
+            .set_task_instance_id("ndvi_tile")
             .handle_errors()
             .with_tracing()
             .set_executor("lithops"),
@@ -314,7 +309,7 @@ def main(params: Params):
                 "palette": None,
                 "scale": 500,
             }
-            | (params_dict.get("ndvi_tile_url") or {}),
+            | (params_dict.get("ndvi_tile") or {}),
             method="mapvalues",
             kwargs={
                 "argnames": ["roi"],
@@ -359,7 +354,7 @@ def main(params: Params):
             partial={
                 "iterables": [
                     DependsOn("roi_boundary_layer"),
-                    DependsOn("ndvi_tile_url"),
+                    DependsOn("ndvi_tile"),
                 ],
             }
             | (params_dict.get("ndvi_map_layers") or {}),

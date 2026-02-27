@@ -151,8 +151,8 @@ workflow:
     id: base_maps
     task: set_base_maps_pydeck
   - name: Create NDVI Tile URL
-    id: ndvi_tile_url
-    task: create_ndvi_tile_url
+    id: ndvi_tile
+    task: create_ndvi_tile
     partial:
       client: ${{ workflow.gee_client.return }}
       time_range: ${{ workflow.time_range.return }}
@@ -184,7 +184,7 @@ workflow:
     partial:
       iterables:
         - ${{ workflow.roi_boundary_layer.return }}
-        - ${{ workflow.ndvi_tile_url.return }}
+        - ${{ workflow.ndvi_tile.return }}
   - name: Draw NDVI Map
     id: ndvi_map
     task: draw_map

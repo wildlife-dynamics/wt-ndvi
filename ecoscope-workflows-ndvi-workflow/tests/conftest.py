@@ -41,7 +41,7 @@ MATCHSPEC_OVERRIDE = "ecoscope-workflows-ndvi-workflow"
 IO_TASKS_IMPORTABLE_REFERENCES = [
     "ecoscope_workflows_ext_custom.tasks.io.get_spatial_feature_group",
     "ecoscope_workflows_ext_ecoscope.tasks.io.calculate_ndvi_range",
-    "ecoscope_workflows_ext_custom.tasks.io.create_ndvi_tile_url",
+    "ecoscope_workflows_ext_custom.tasks.io.create_ndvi_tile",
 ]
 
 yaml = ruamel.yaml.YAML(typ="safe")

@@ -32,9 +32,7 @@ from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_das
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
-from ecoscope_workflows_ext_custom.tasks.io import (
-    create_ndvi_tile_url as create_ndvi_tile_url,
-)
+from ecoscope_workflows_ext_custom.tasks.io import create_ndvi_tile as create_ndvi_tile
 from ecoscope_workflows_ext_custom.tasks.io import (
     get_spatial_feature_group as get_spatial_feature_group,
 )
@@ -409,14 +407,14 @@ base_maps = (
 # %%
 # parameters
 
-ndvi_tile_url_params = dict()
+ndvi_tile_params = dict()
 
 # %%
 # call the task
 
 
-ndvi_tile_url = (
-    create_ndvi_tile_url.set_task_instance_id("ndvi_tile_url")
+ndvi_tile = (
+    create_ndvi_tile.set_task_instance_id("ndvi_tile")
     .handle_errors()
     .with_tracing()
     .partial(
@@ -426,7 +424,7 @@ ndvi_tile_url = (
         reducer="mean",
         palette=None,
         scale=500,
-        **ndvi_tile_url_params,
+        **ndvi_tile_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
 )
@@ -480,7 +478,7 @@ ndvi_map_layers = (
     groupbykey.set_task_instance_id("ndvi_map_layers")
     .handle_errors()
     .with_tracing()
-    .partial(iterables=[roi_boundary_layer, ndvi_tile_url], **ndvi_map_layers_params)
+    .partial(iterables=[roi_boundary_layer, ndvi_tile], **ndvi_map_layers_params)
     .call()
 )
 

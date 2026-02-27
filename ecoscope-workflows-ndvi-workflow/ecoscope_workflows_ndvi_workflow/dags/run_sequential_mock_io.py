@@ -47,9 +47,9 @@ from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
 
-create_ndvi_tile_url = create_task_magicmock(  # 🧪
+create_ndvi_tile = create_task_magicmock(  # 🧪
     anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
-    func_name="create_ndvi_tile_url",  # 🧪
+    func_name="create_ndvi_tile",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.results import (
@@ -230,9 +230,9 @@ def main(params: Params):
         .call()
     )
 
-    ndvi_tile_url = (
-        create_ndvi_tile_url.validate()
-        .set_task_instance_id("ndvi_tile_url")
+    ndvi_tile = (
+        create_ndvi_tile.validate()
+        .set_task_instance_id("ndvi_tile")
         .handle_errors()
         .with_tracing()
         .partial(
@@ -242,7 +242,7 @@ def main(params: Params):
             reducer="mean",
             palette=None,
             scale=500,
-            **(params_dict.get("ndvi_tile_url") or {}),
+            **(params_dict.get("ndvi_tile") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
     )
@@ -273,7 +273,7 @@ def main(params: Params):
         .handle_errors()
         .with_tracing()
         .partial(
-            iterables=[roi_boundary_layer, ndvi_tile_url],
+            iterables=[roi_boundary_layer, ndvi_tile],
             **(params_dict.get("ndvi_map_layers") or {}),
         )
         .call()
