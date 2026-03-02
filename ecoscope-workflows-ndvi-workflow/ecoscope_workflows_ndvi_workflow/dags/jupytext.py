@@ -402,7 +402,7 @@ base_maps = (
 
 
 # %% [markdown]
-# ## Create NDVI Tile URL
+# ## Create NDVI Tile Layer
 
 # %%
 # parameters

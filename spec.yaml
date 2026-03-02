@@ -150,7 +150,7 @@ workflow:
   - name: NDVI Map
     id: base_maps
     task: set_base_maps_pydeck
-  - name: Create NDVI Tile URL
+  - name: Create NDVI Tile Layer
     id: ndvi_tile
     task: create_ndvi_tile
     partial:
