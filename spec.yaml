@@ -160,6 +160,8 @@ workflow:
       reducer: mean
       palette: null
       scale: 500
+      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+      filename_prefix: ndvi_geotiff
     mapvalues:
       argnames: roi
       argvalues: ${{ workflow.split_roi_groups.return }}
