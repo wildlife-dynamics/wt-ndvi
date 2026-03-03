@@ -424,6 +424,8 @@ ndvi_tile = (
         reducer="mean",
         palette=None,
         scale=500,
+        root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+        filename_prefix="ndvi_geotiff",
         **ndvi_tile_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)

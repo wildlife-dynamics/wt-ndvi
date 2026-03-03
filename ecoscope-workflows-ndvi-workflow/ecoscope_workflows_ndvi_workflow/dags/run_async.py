@@ -288,6 +288,8 @@ def main(params: Params):
                 "reducer": "mean",
                 "palette": None,
                 "scale": 500,
+                "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+                "filename_prefix": "ndvi_geotiff",
             }
             | (params_dict.get("ndvi_tile") or {}),
             method="mapvalues",
