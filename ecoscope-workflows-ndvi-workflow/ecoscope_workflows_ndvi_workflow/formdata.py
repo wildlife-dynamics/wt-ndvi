@@ -380,7 +380,9 @@ class FormData(BaseModel):
         None, title="Select Google Earth Engine Data Source"
     )
     time_range: TimeRange | None = Field(
-        None, description="Choose the period of time to analyze.", title="Time Range"
+        None,
+        description="Choose the period of time to analyze. Please make sure you select a large enough time range to see results. We recommend at least 2 months, as the latest month's data may not be ready yet.",
+        title="Time Range",
     )
     groupers: Groupers | None = Field(None, title="Set Groupers")
     roi: Roi | None = Field(None, title="Load Region of Interest")

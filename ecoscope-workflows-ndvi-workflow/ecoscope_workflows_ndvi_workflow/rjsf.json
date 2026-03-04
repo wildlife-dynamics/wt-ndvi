@@ -65,7 +65,7 @@
         "until"
       ],
       "type": "object",
-      "description": "Choose the period of time to analyze.",
+      "description": "Choose the period of time to analyze. Please make sure you select a large enough time range to see results. We recommend at least 2 months, as the latest month's data may not be ready yet.",
       "title": "Time Range"
     },
     "groupers": {
@@ -630,8 +630,8 @@
     },
     "NDVI Map": {
       "ui:order": [
-        "base_maps",
-        "ndvi_tile"
+        "ndvi_tile",
+        "base_maps"
       ],
       "base_maps": {
         "base_maps": {

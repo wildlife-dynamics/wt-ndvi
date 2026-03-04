@@ -59,6 +59,7 @@ rjsf-overrides:
       {"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", "opacity": 1, "max_zoom": 20},
     ]
   uiSchema:
+    NDVI Map.ui:order: ["ndvi_tile", "base_maps"]
     NDVI Map.base_maps.base_maps.items.ui:options.label: false
 
 workflow:
