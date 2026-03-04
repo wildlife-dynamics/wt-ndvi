@@ -234,7 +234,13 @@ def main(params: Params):
                 "historic_band_title": "Historic Min-Max",
                 "historic_mean_title": "Historic Mean",
                 "layout_style": None,
-                "upper_lower_band_style": None,
+                "upper_lower_band_style": {
+                    "mode": "lines",
+                    "line": {
+                        "color": "rgba(144, 238, 144, 0.8)",
+                    },
+                    "fillcolor": "rgba(144, 238, 144, 0.3)",
+                },
                 "historic_mean_style": None,
                 "current_value_style": None,
                 "time_column": "img_date",
