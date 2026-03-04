@@ -229,6 +229,15 @@ class BaseMaps(BaseModel):
     )
 
 
+class NdviTile(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        0.7, description="Opacity of the NDVI tile layer (0.0 to 1.0).", title="Opacity"
+    )
+
+
 class GoogleEarthEngineConnection(BaseModel):
     name: str = Field(..., title="Data Source")
 
@@ -374,3 +383,4 @@ class FormData(BaseModel):
     calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
     persist_ndvi_data: PersistNdviData | None = Field(None, title="Persist NDVI Data")
     base_maps: BaseMaps | None = Field(None, title="NDVI Map")
+    ndvi_tile: NdviTile | None = Field(None, title="Create NDVI Tile Layer")

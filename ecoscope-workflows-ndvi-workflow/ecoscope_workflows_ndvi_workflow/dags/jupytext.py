@@ -414,7 +414,9 @@ base_maps = (
 # %%
 # parameters
 
-ndvi_tile_params = dict()
+ndvi_tile_params = dict(
+    opacity=...,
+)
 
 # %%
 # call the task

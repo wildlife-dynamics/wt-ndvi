@@ -50,6 +50,7 @@ rjsf-overrides:
     ]
     ndvi_method.properties.var.default: "MODIS MYD13A1 16-Day Composite"
     ndvi_method.required: []
+    ndvi_tile.properties.opacity.default: 0.7
     calculate_ndvi.title: "NDVI Trend"
     base_maps.properties.base_maps.title: "Map Base Layers"
     base_maps.properties.base_maps.default: [
