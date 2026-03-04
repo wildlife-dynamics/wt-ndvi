@@ -153,7 +153,7 @@ groupers = (
 
 
 # %% [markdown]
-# ## Load ROI
+# ## Load Region of Interest
 
 # %%
 # parameters

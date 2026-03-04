@@ -118,7 +118,7 @@
         "config"
       ],
       "type": "object",
-      "title": "Load ROI"
+      "title": "Load Region of Interest"
     },
     "ndvi_method": {
       "additionalProperties": false,

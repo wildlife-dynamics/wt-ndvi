@@ -73,7 +73,7 @@ workflow:
   - name: Set Groupers
     id: groupers
     task: set_groupers
-  - name: Load ROI
+  - name: Load Region of Interest
     id: roi
     task: get_spatial_features_group
   - name: Split ROIs by Group
@@ -119,7 +119,11 @@ workflow:
       historic_band_title: "Historic Min-Max"
       historic_mean_title: "Historic Mean"
       layout_style: null
-      upper_lower_band_style: null
+      upper_lower_band_style:
+        mode: lines
+        line:
+          color: "rgba(144, 238, 144, 0.8)"
+        fillcolor: "rgba(144, 238, 144, 0.3)"
       historic_mean_style: null
       current_value_style: null
       time_column: img_date

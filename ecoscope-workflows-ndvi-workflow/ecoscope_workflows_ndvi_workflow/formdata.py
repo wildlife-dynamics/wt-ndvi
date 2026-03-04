@@ -369,7 +369,7 @@ class FormData(BaseModel):
         None, description="Choose the period of time to analyze.", title="Time Range"
     )
     groupers: Groupers | None = Field(None, title="Set Groupers")
-    roi: Roi | None = Field(None, title="Load ROI")
+    roi: Roi | None = Field(None, title="Load Region of Interest")
     ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")
     calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
     persist_ndvi_data: PersistNdviData | None = Field(None, title="Persist NDVI Data")
