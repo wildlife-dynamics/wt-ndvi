@@ -62,7 +62,7 @@ class PersistNdviData(BaseModel):
         extra="forbid",
     )
     filetypes: list[Filetype] | None = Field(
-        ["csv"], description="The output format", title="Filetypes"
+        ["geoparquet"], description="The output format", title="Filetypes"
     )
 
 

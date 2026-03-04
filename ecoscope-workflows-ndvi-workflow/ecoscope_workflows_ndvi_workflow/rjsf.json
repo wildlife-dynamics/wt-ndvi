@@ -162,7 +162,7 @@
       "properties": {
         "filetypes": {
           "default": [
-            "csv"
+            "geoparquet"
           ],
           "items": {
             "enum": [
