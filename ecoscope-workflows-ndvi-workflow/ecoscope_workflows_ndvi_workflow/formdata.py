@@ -66,6 +66,15 @@ class PersistNdviData(BaseModel):
     )
 
 
+class NdviTile(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    opacity: confloat(ge=0.0, le=1.0) | None = Field(
+        0.7, description="Opacity of the NDVI tile layer (0.0 to 1.0).", title="Opacity"
+    )
+
+
 class Url(str, Enum):
     https___tile_openstreetmap_org__z___x___y__png = (
         "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -229,18 +238,9 @@ class BaseMaps(BaseModel):
     )
 
 
-class NdviTile(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    opacity: confloat(ge=0.0, le=1.0) | None = Field(
-        0.7, description="Opacity of the NDVI tile layer (0.0 to 1.0).", title="Opacity"
-    )
-
-
 class NDVIMap(BaseModel):
-    base_maps: BaseMaps | None = Field(None, title="")
     ndvi_tile: NdviTile | None = Field(None, title="")
+    base_maps: BaseMaps | None = Field(None, title="")
 
 
 class GoogleEarthEngineConnection(BaseModel):

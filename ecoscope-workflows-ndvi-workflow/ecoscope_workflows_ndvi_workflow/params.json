@@ -179,6 +179,22 @@
       "type": "object",
       "title": "Persist NDVI Data"
     },
+    "ndvi_tile": {
+      "additionalProperties": false,
+      "properties": {
+        "opacity": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Opacity",
+          "type": "number",
+          "description": "Opacity of the NDVI tile layer (0.0 to 1.0)."
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": ""
+    },
     "base_maps": {
       "additionalProperties": false,
       "properties": {
@@ -386,22 +402,6 @@
       },
       "type": "object",
       "required": [],
-      "title": ""
-    },
-    "ndvi_tile": {
-      "additionalProperties": false,
-      "properties": {
-        "opacity": {
-          "default": 1.0,
-          "maximum": 1.0,
-          "minimum": 0.0,
-          "title": "Opacity",
-          "type": "number",
-          "description": "Opacity of the NDVI tile layer (0.0 to 1.0)."
-        }
-      },
-      "required": [],
-      "type": "object",
       "title": ""
     }
   },
@@ -619,8 +619,8 @@
       "ndvi_method",
       "calculate_ndvi",
       "persist_ndvi_data",
-      "base_maps",
-      "ndvi_tile"
+      "ndvi_tile",
+      "base_maps"
     ]
   },
   "additionalProperties": false

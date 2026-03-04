@@ -40,9 +40,6 @@ from ecoscope_workflows_core.tasks.results import (
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
 )
-from ecoscope_workflows_ext_custom.tasks.results import (
-    set_base_maps_pydeck as set_base_maps_pydeck,
-)
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
@@ -62,6 +59,9 @@ from ecoscope_workflows_ext_custom.tasks.results import (
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 from ecoscope_workflows_ext_custom.tasks.results import (
     merge_tile_layers as merge_tile_layers,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    set_base_maps_pydeck as set_base_maps_pydeck,
 )
 
 from ..params import Params
@@ -228,15 +228,6 @@ def main(params: Params):
         .call()
     )
 
-    base_maps = (
-        set_base_maps_pydeck.validate()
-        .set_task_instance_id("base_maps")
-        .handle_errors()
-        .with_tracing()
-        .partial(**(params_dict.get("base_maps") or {}))
-        .call()
-    )
-
     ndvi_tile = (
         create_ndvi_tile.validate()
         .set_task_instance_id("ndvi_tile")
@@ -254,6 +245,15 @@ def main(params: Params):
             **(params_dict.get("ndvi_tile") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
+    )
+
+    base_maps = (
+        set_base_maps_pydeck.validate()
+        .set_task_instance_id("base_maps")
+        .handle_errors()
+        .with_tracing()
+        .partial(**(params_dict.get("base_maps") or {}))
+        .call()
     )
 
     roi_boundary_layer = (

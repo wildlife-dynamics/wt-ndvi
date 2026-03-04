@@ -208,15 +208,6 @@ def main(params: Params):
         .call()
     )
 
-    base_maps = (
-        set_base_maps_pydeck.validate()
-        .set_task_instance_id("base_maps")
-        .handle_errors()
-        .with_tracing()
-        .partial(**(params_dict.get("base_maps") or {}))
-        .call()
-    )
-
     ndvi_tile = (
         create_ndvi_tile.validate()
         .set_task_instance_id("ndvi_tile")
@@ -234,6 +225,15 @@ def main(params: Params):
             **(params_dict.get("ndvi_tile") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
+    )
+
+    base_maps = (
+        set_base_maps_pydeck.validate()
+        .set_task_instance_id("base_maps")
+        .handle_errors()
+        .with_tracing()
+        .partial(**(params_dict.get("base_maps") or {}))
+        .call()
     )
 
     roi_boundary_layer = (

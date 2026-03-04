@@ -41,9 +41,6 @@ from ecoscope_workflows_core.tasks.results import (
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
 )
-from ecoscope_workflows_ext_custom.tasks.results import (
-    set_base_maps_pydeck as set_base_maps_pydeck,
-)
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
@@ -63,6 +60,9 @@ from ecoscope_workflows_ext_custom.tasks.results import (
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 from ecoscope_workflows_ext_custom.tasks.results import (
     merge_tile_layers as merge_tile_layers,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    set_base_maps_pydeck as set_base_maps_pydeck,
 )
 
 from ..params import Params
@@ -92,8 +92,8 @@ def main(params: Params):
         "persist_ndvi": ["draw_ndvi"],
         "ndvi_chart_widget": ["persist_ndvi"],
         "grouped_ndvi_widget": ["ndvi_chart_widget"],
-        "base_maps": [],
         "ndvi_tile": ["gee_client", "time_range", "ndvi_method", "split_roi_groups"],
+        "base_maps": [],
         "roi_boundary_layer": ["split_roi_groups"],
         "merged_tile_layers": ["base_maps", "ndvi_tile"],
         "ndvi_map_layers": ["roi_boundary_layer", "merged_tile_layers"],
@@ -296,15 +296,6 @@ def main(params: Params):
             | (params_dict.get("grouped_ndvi_widget") or {}),
             method="call",
         ),
-        "base_maps": Node(
-            async_task=set_base_maps_pydeck.validate()
-            .set_task_instance_id("base_maps")
-            .handle_errors()
-            .with_tracing()
-            .set_executor("lithops"),
-            partial=(params_dict.get("base_maps") or {}),
-            method="call",
-        ),
         "ndvi_tile": Node(
             async_task=create_ndvi_tile.validate()
             .set_task_instance_id("ndvi_tile")
@@ -327,6 +318,15 @@ def main(params: Params):
                 "argnames": ["roi"],
                 "argvalues": DependsOn("split_roi_groups"),
             },
+        ),
+        "base_maps": Node(
+            async_task=set_base_maps_pydeck.validate()
+            .set_task_instance_id("base_maps")
+            .handle_errors()
+            .with_tracing()
+            .set_executor("lithops"),
+            partial=(params_dict.get("base_maps") or {}),
+            method="call",
         ),
         "roi_boundary_layer": Node(
             async_task=create_polygon_layer_pydeck.validate()

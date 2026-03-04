@@ -391,29 +391,6 @@ grouped_ndvi_widget = (
 # %%
 # parameters
 
-base_maps_params = dict(
-    base_maps=...,
-)
-
-# %%
-# call the task
-
-
-base_maps = (
-    set_base_maps_pydeck.set_task_instance_id("base_maps")
-    .handle_errors()
-    .with_tracing()
-    .partial(**base_maps_params)
-    .call()
-)
-
-
-# %% [markdown]
-# ##
-
-# %%
-# parameters
-
 ndvi_tile_params = dict(
     opacity=...,
 )
@@ -438,6 +415,29 @@ ndvi_tile = (
         **ndvi_tile_params,
     )
     .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
+)
+
+
+# %% [markdown]
+# ##
+
+# %%
+# parameters
+
+base_maps_params = dict(
+    base_maps=...,
+)
+
+# %%
+# call the task
+
+
+base_maps = (
+    set_base_maps_pydeck.set_task_instance_id("base_maps")
+    .handle_errors()
+    .with_tracing()
+    .partial(**base_maps_params)
+    .call()
 )
 
 

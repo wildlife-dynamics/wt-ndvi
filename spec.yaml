@@ -59,7 +59,6 @@ rjsf-overrides:
       {"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", "opacity": 1, "max_zoom": 20},
     ]
   uiSchema:
-    NDVI Map.ui:order: ["ndvi_tile", "base_maps"]
     NDVI Map.base_maps.base_maps.items.ui:options.label: false
 
 workflow:
@@ -161,9 +160,6 @@ workflow:
       Configure the NDVI map base layers and overlay settings.
     tasks:
       - name: ""
-        id: base_maps
-        task: set_base_maps_pydeck
-      - name: ""
         id: ndvi_tile
         task: create_ndvi_tile
         partial:
@@ -178,6 +174,9 @@ workflow:
         mapvalues:
           argnames: roi
           argvalues: ${{ workflow.split_roi_groups.return }}
+      - name: ""
+        id: base_maps
+        task: set_base_maps_pydeck
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
     task: create_polygon_layer_pydeck
