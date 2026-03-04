@@ -75,7 +75,7 @@ workflow:
     task: set_groupers
   - name: Load ROI
     id: roi
-    task: get_spatial_feature_group
+    task: get_spatial_features_group
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups

@@ -34,9 +34,6 @@ from ecoscope_workflows_core.tasks.results import (
 )
 from ecoscope_workflows_ext_custom.tasks.io import create_ndvi_tile as create_ndvi_tile
 from ecoscope_workflows_ext_custom.tasks.io import (
-    get_spatial_feature_group as get_spatial_feature_group,
-)
-from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
 )
 from ecoscope_workflows_ext_custom.tasks.results import (
@@ -44,10 +41,16 @@ from ecoscope_workflows_ext_custom.tasks.results import (
 )
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
 from ecoscope_workflows_ext_custom.tasks.results import (
+    merge_tile_layers as merge_tile_layers,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
     set_base_maps_pydeck as set_base_maps_pydeck,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.io import (
     calculate_ndvi_range as calculate_ndvi_range,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.io import (
+    get_spatial_features_group as get_spatial_features_group,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
@@ -164,7 +167,7 @@ roi_params = dict(
 
 
 roi = (
-    get_spatial_feature_group.set_task_instance_id("roi")
+    get_spatial_features_group.set_task_instance_id("roi")
     .handle_errors()
     .with_tracing()
     .partial(**roi_params)
@@ -465,6 +468,27 @@ roi_boundary_layer = (
 
 
 # %% [markdown]
+# ## Merge Tile Layers
+
+# %%
+# parameters
+
+merged_tile_layers_params = dict()
+
+# %%
+# call the task
+
+
+merged_tile_layers = (
+    merge_tile_layers.set_task_instance_id("merged_tile_layers")
+    .handle_errors()
+    .with_tracing()
+    .partial(base_layers=base_maps, **merged_tile_layers_params)
+    .mapvalues(argnames=["overlay"], argvalues=ndvi_tile)
+)
+
+
+# %% [markdown]
 # ## Combine Map Layers
 
 # %%
@@ -480,7 +504,9 @@ ndvi_map_layers = (
     groupbykey.set_task_instance_id("ndvi_map_layers")
     .handle_errors()
     .with_tracing()
-    .partial(iterables=[roi_boundary_layer, ndvi_tile], **ndvi_map_layers_params)
+    .partial(
+        iterables=[roi_boundary_layer, merged_tile_layers], **ndvi_map_layers_params
+    )
     .call()
 )
 
@@ -492,6 +518,7 @@ ndvi_map_layers = (
 # parameters
 
 ndvi_map_params = dict(
+    overlay_tile_layers=...,
     widget_id=...,
 )
 
@@ -504,7 +531,6 @@ ndvi_map = (
     .handle_errors()
     .with_tracing()
     .partial(
-        tile_layers=base_maps,
         static=False,
         title=None,
         legend_style=None,
@@ -512,9 +538,7 @@ ndvi_map = (
         view_state=None,
         **ndvi_map_params,
     )
-    .mapvalues(
-        argnames=["geo_layers", "overlay_tile_layers"], argvalues=ndvi_map_layers
-    )
+    .mapvalues(argnames=["geo_layers", "tile_layers"], argvalues=ndvi_map_layers)
 )
 
 

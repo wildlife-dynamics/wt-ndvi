@@ -20,9 +20,9 @@ from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
 
-get_spatial_feature_group = create_task_magicmock(  # 🧪
-    anchor="ecoscope_workflows_ext_custom.tasks.io",  # 🧪
-    func_name="get_spatial_feature_group",  # 🧪
+get_spatial_features_group = create_task_magicmock(  # 🧪
+    anchor="ecoscope_workflows_ext_ecoscope.tasks.io",  # 🧪
+    func_name="get_spatial_features_group",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
@@ -61,6 +61,9 @@ from ecoscope_workflows_ext_custom.tasks.results import (
     create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
 from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
+from ecoscope_workflows_ext_custom.tasks.results import (
+    merge_tile_layers as merge_tile_layers,
+)
 
 from ..params import Params
 
@@ -92,8 +95,9 @@ def main(params: Params):
         "base_maps": [],
         "ndvi_tile": ["gee_client", "time_range", "ndvi_method", "split_roi_groups"],
         "roi_boundary_layer": ["split_roi_groups"],
-        "ndvi_map_layers": ["roi_boundary_layer", "ndvi_tile"],
-        "ndvi_map": ["base_maps", "ndvi_map_layers"],
+        "merged_tile_layers": ["base_maps", "ndvi_tile"],
+        "ndvi_map_layers": ["roi_boundary_layer", "merged_tile_layers"],
+        "ndvi_map": ["ndvi_map_layers"],
         "persist_ndvi_map": ["ndvi_map"],
         "ndvi_map_widget": ["persist_ndvi_map"],
         "grouped_ndvi_map_widget": ["ndvi_map_widget"],
@@ -147,7 +151,7 @@ def main(params: Params):
             method="call",
         ),
         "roi": Node(
-            async_task=get_spatial_feature_group.validate()
+            async_task=get_spatial_features_group.validate()
             .set_task_instance_id("roi")
             .handle_errors()
             .with_tracing()
@@ -347,6 +351,22 @@ def main(params: Params):
                 "argvalues": DependsOn("split_roi_groups"),
             },
         ),
+        "merged_tile_layers": Node(
+            async_task=merge_tile_layers.validate()
+            .set_task_instance_id("merged_tile_layers")
+            .handle_errors()
+            .with_tracing()
+            .set_executor("lithops"),
+            partial={
+                "base_layers": DependsOn("base_maps"),
+            }
+            | (params_dict.get("merged_tile_layers") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["overlay"],
+                "argvalues": DependsOn("ndvi_tile"),
+            },
+        ),
         "ndvi_map_layers": Node(
             async_task=groupbykey.validate()
             .set_task_instance_id("ndvi_map_layers")
@@ -356,7 +376,7 @@ def main(params: Params):
             partial={
                 "iterables": [
                     DependsOn("roi_boundary_layer"),
-                    DependsOn("ndvi_tile"),
+                    DependsOn("merged_tile_layers"),
                 ],
             }
             | (params_dict.get("ndvi_map_layers") or {}),
@@ -369,7 +389,6 @@ def main(params: Params):
             .with_tracing()
             .set_executor("lithops"),
             partial={
-                "tile_layers": DependsOn("base_maps"),
                 "static": False,
                 "title": None,
                 "legend_style": None,
@@ -379,7 +398,7 @@ def main(params: Params):
             | (params_dict.get("ndvi_map") or {}),
             method="mapvalues",
             kwargs={
-                "argnames": ["geo_layers", "overlay_tile_layers"],
+                "argnames": ["geo_layers", "tile_layers"],
                 "argvalues": DependsOn("ndvi_map_layers"),
             },
         ),
