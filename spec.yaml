@@ -180,25 +180,32 @@ workflow:
     mapvalues:
       argnames: geodataframe
       argvalues: ${{ workflow.split_roi_groups.return }}
+  - name: Merge Tile Layers
+    id: merged_tile_layers
+    task: merge_tile_layers
+    partial:
+      base_layers: ${{ workflow.base_maps.return }}
+    mapvalues:
+      argnames: overlay
+      argvalues: ${{ workflow.ndvi_tile.return }}
   - name: Combine Map Layers
     id: ndvi_map_layers
     task: groupbykey
     partial:
       iterables:
         - ${{ workflow.roi_boundary_layer.return }}
-        - ${{ workflow.ndvi_tile.return }}
+        - ${{ workflow.merged_tile_layers.return }}
   - name: Draw NDVI Map
     id: ndvi_map
     task: draw_map
     partial:
-      tile_layers: ${{ workflow.base_maps.return }}
       static: false
       title: null
       legend_style: null
       max_zoom: 20
       view_state: null
     mapvalues:
-      argnames: [geo_layers, overlay_tile_layers]
+      argnames: [geo_layers, tile_layers]
       argvalues: ${{ workflow.ndvi_map_layers.return }}
   - name: Persist NDVI Map
     id: persist_ndvi_map
