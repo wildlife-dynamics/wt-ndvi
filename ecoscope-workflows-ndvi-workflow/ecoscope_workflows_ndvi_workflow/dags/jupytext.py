@@ -386,7 +386,7 @@ grouped_ndvi_widget = (
 
 
 # %% [markdown]
-# ## NDVI Map
+# ##
 
 # %%
 # parameters
@@ -409,7 +409,7 @@ base_maps = (
 
 
 # %% [markdown]
-# ## Create NDVI Tile Layer
+# ##
 
 # %%
 # parameters
@@ -524,7 +524,6 @@ ndvi_map_layers = (
 # parameters
 
 ndvi_map_params = dict(
-    overlay_tile_layers=...,
     widget_id=...,
 )
 

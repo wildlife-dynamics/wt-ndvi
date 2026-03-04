@@ -51,14 +51,14 @@ rjsf-overrides:
     ndvi_method.properties.var.default: "MODIS MYD13A1 16-Day Composite"
     ndvi_method.required: []
     persist_ndvi_data.properties.filetypes.default: ["geoparquet"]
-    ndvi_tile.properties.opacity.default: 0.7
+    NDVI Map.properties.ndvi_tile.properties.opacity.default: 0.7
     calculate_ndvi.title: "NDVI Trend"
-    base_maps.properties.base_maps.title: "Map Base Layers"
-    base_maps.properties.base_maps.default: [
+    NDVI Map.properties.base_maps.properties.base_maps.title: "Map Base Layers"
+    NDVI Map.properties.base_maps.properties.base_maps.default: [
       {"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", "opacity": 1, "max_zoom": 20},
     ]
   uiSchema:
-    base_maps.base_maps.items.ui:options.label: false
+    NDVI Map.base_maps.base_maps.items.ui:options.label: false
 
 workflow:
   - name: Set Workflow Details
@@ -153,24 +153,29 @@ workflow:
     task: merge_widget_views
     partial:
       widgets: ${{ workflow.ndvi_chart_widget.return }}
-  - name: NDVI Map
-    id: base_maps
-    task: set_base_maps_pydeck
-  - name: Create NDVI Tile Layer
-    id: ndvi_tile
-    task: create_ndvi_tile
-    partial:
-      client: ${{ workflow.gee_client.return }}
-      time_range: ${{ workflow.time_range.return }}
-      ndvi_method: ${{ workflow.ndvi_method.return }}
-      reducer: mean
-      palette: null
-      scale: 500
-      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
-      filename_prefix: ndvi_geotiff
-    mapvalues:
-      argnames: roi
-      argvalues: ${{ workflow.split_roi_groups.return }}
+  - title: NDVI Map
+    type: task-group
+    description: >-
+      Configure the NDVI map base layers and overlay settings.
+    tasks:
+      - name: ""
+        id: base_maps
+        task: set_base_maps_pydeck
+      - name: ""
+        id: ndvi_tile
+        task: create_ndvi_tile
+        partial:
+          client: ${{ workflow.gee_client.return }}
+          time_range: ${{ workflow.time_range.return }}
+          ndvi_method: ${{ workflow.ndvi_method.return }}
+          reducer: mean
+          palette: null
+          scale: 500
+          root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+          filename_prefix: ndvi_geotiff
+        mapvalues:
+          argnames: roi
+          argvalues: ${{ workflow.split_roi_groups.return }}
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
     task: create_polygon_layer_pydeck

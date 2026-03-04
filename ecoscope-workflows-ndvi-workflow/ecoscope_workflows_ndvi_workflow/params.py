@@ -373,5 +373,5 @@ class Params(BaseModel):
     ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")
     calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
     persist_ndvi_data: PersistNdviData | None = Field(None, title="Persist NDVI Data")
-    base_maps: BaseMaps | None = Field(None, title="NDVI Map")
-    ndvi_tile: NdviTile | None = Field(None, title="Create NDVI Tile Layer")
+    base_maps: BaseMaps | None = Field(None, title="")
+    ndvi_tile: NdviTile | None = Field(None, title="")

@@ -238,6 +238,11 @@ class NdviTile(BaseModel):
     )
 
 
+class NDVIMap(BaseModel):
+    base_maps: BaseMaps | None = Field(None, title="")
+    ndvi_tile: NdviTile | None = Field(None, title="")
+
+
 class GoogleEarthEngineConnection(BaseModel):
     name: str = Field(..., title="Data Source")
 
@@ -382,5 +387,8 @@ class FormData(BaseModel):
     ndvi_method: NdviMethod | None = Field(None, title="NDVI Method")
     calculate_ndvi: CalculateNdvi | None = Field(None, title="NDVI Trend")
     persist_ndvi_data: PersistNdviData | None = Field(None, title="Persist NDVI Data")
-    base_maps: BaseMaps | None = Field(None, title="NDVI Map")
-    ndvi_tile: NdviTile | None = Field(None, title="Create NDVI Tile Layer")
+    NDVI_Map: NDVIMap | None = Field(
+        None,
+        alias="NDVI Map",
+        description="Configure the NDVI map base layers and overlay settings.",
+    )
