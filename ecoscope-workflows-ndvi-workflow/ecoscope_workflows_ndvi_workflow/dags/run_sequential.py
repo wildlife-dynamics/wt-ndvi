@@ -40,7 +40,7 @@ from ecoscope_workflows_ext_ecoscope.tasks.io import (
     calculate_ndvi_range as calculate_ndvi_range,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.io import (
-    get_spatial_features_group as get_spatial_features_group,
+    load_spatial_features_group as load_spatial_features_group,
 )
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
@@ -91,7 +91,7 @@ def main(params: Params):
     )
 
     roi = (
-        get_spatial_features_group.validate()
+        load_spatial_features_group.validate()
         .set_task_instance_id("roi")
         .handle_errors()
         .with_tracing()

@@ -39,7 +39,7 @@ SNAPSHOT_DIFF_OUTPUT_DIRNAME = ARTIFACTS.parent / "__diff_output__"
 TEST_CASES_YAML = ARTIFACTS.parent / "test-cases.yaml"
 MATCHSPEC_OVERRIDE = "ecoscope-workflows-ndvi-workflow"
 IO_TASKS_IMPORTABLE_REFERENCES = [
-    "ecoscope_workflows_ext_ecoscope.tasks.io.get_spatial_features_group",
+    "ecoscope_workflows_ext_ecoscope.tasks.io.load_spatial_features_group",
     "ecoscope_workflows_ext_ecoscope.tasks.io.calculate_ndvi_range",
     "ecoscope_workflows_ext_custom.tasks.io.create_ndvi_tile",
 ]

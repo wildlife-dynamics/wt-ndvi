@@ -20,9 +20,9 @@ from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
 
-get_spatial_features_group = create_task_magicmock(  # 🧪
+load_spatial_features_group = create_task_magicmock(  # 🧪
     anchor="ecoscope_workflows_ext_ecoscope.tasks.io",  # 🧪
-    func_name="get_spatial_features_group",  # 🧪
+    func_name="load_spatial_features_group",  # 🧪
 )  # 🧪
 from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
@@ -151,7 +151,7 @@ def main(params: Params):
             method="call",
         ),
         "roi": Node(
-            async_task=get_spatial_features_group.validate()
+            async_task=load_spatial_features_group.validate()
             .set_task_instance_id("roi")
             .handle_errors()
             .with_tracing()
