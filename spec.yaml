@@ -37,6 +37,7 @@ rjsf-overrides:
     groupers.properties.groupers.default: [
       {"index_name": "name"},
     ]
+    time_range.description: "Choose the period of time to analyze. Please make sure you select a large enough time range to see results. We recommend at least 2 months, as the latest month's data may not be ready yet."
     roi.properties.config.anyOf: [
       {"$ref": "#/$defs/LocalFileSpatialFeatures"},
       {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
