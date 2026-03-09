@@ -168,7 +168,8 @@
             "enum": [
               "csv",
               "gpkg",
-              "geoparquet"
+              "geoparquet",
+              "parquet"
             ],
             "type": "string"
           },

@@ -52,8 +52,8 @@ precomputed:
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
-        name_column: "name"
+        file_path: "/Users/yunwu/Downloads/Altay.gpkg"
+        name_column: "NAME_3"
     ndvi_tile:
       opacity: 0.7
     persist_ndvi_data:

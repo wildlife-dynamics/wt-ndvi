@@ -88,7 +88,7 @@ workflow:
   - name: NDVI Method
     id: ndvi_method
     task: set_string_var
-  - name: NDVI Trend
+  - name: "NDVI Trend"
     id: calculate_ndvi
     task: calculate_ndvi_range
     partial:
