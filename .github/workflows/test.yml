@@ -132,7 +132,7 @@ jobs:
 
       - name: Write GEE key to file
         env:
-          EE_KEY_JSON: ${{ secrets.EE_KEY_JSON }}
+          EE_KEY_JSON: ${{ secrets.EE_PRIVATE_KEY }}
         if: env.EE_KEY_JSON != ''
         run: |
           echo ${{ secrets.EE_PRIVATE_KEY }} | base64 -d >> decoded_config.json
