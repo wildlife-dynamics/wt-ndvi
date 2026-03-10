@@ -22,6 +22,11 @@ from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_das
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
+from ecoscope_workflows_core.tasks.skip import (
+    any_dependency_skipped as any_dependency_skipped,
+)
+from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
+from ecoscope_workflows_core.tasks.skip import never as never
 from ecoscope_workflows_ext_custom.tasks.io import create_ndvi_tile as create_ndvi_tile
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
@@ -45,6 +50,9 @@ from ecoscope_workflows_ext_ecoscope.tasks.io import (
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
 )
+from ecoscope_workflows_ext_ecoscope.tasks.skip import (
+    all_geometry_are_none as all_geometry_are_none,
+)
 
 from ..params import Params
 
@@ -57,6 +65,13 @@ def main(params: Params):
         .set_task_instance_id("workflow_details")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(**(params_dict.get("workflow_details") or {}))
         .call()
     )
@@ -66,6 +81,13 @@ def main(params: Params):
         .set_task_instance_id("gee_client")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(**(params_dict.get("gee_client") or {}))
         .call()
     )
@@ -75,6 +97,13 @@ def main(params: Params):
         .set_task_instance_id("time_range")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             time_format="%d %b %Y %H:%M:%S %Z", **(params_dict.get("time_range") or {})
         )
@@ -86,6 +115,13 @@ def main(params: Params):
         .set_task_instance_id("groupers")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(**(params_dict.get("groupers") or {}))
         .call()
     )
@@ -95,6 +131,13 @@ def main(params: Params):
         .set_task_instance_id("roi")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(**(params_dict.get("roi") or {}))
         .call()
     )
@@ -104,6 +147,13 @@ def main(params: Params):
         .set_task_instance_id("split_roi_groups")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             df=roi, groupers=groupers, **(params_dict.get("split_roi_groups") or {})
         )
@@ -115,6 +165,13 @@ def main(params: Params):
         .set_task_instance_id("ndvi_method")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(**(params_dict.get("ndvi_method") or {}))
         .call()
     )
@@ -124,6 +181,13 @@ def main(params: Params):
         .set_task_instance_id("calculate_ndvi")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             client=gee_client,
             time_range=time_range,
@@ -140,6 +204,12 @@ def main(params: Params):
         .set_task_instance_id("persist_ndvi_data")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                never,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
             sanitize=True,
@@ -154,6 +224,13 @@ def main(params: Params):
         .set_task_instance_id("draw_ndvi")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             current_value_column="NDVI",
             current_value_title="NDVI",
@@ -181,6 +258,13 @@ def main(params: Params):
         .set_task_instance_id("persist_ndvi")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
             **(params_dict.get("persist_ndvi") or {}),
@@ -193,6 +277,12 @@ def main(params: Params):
         .set_task_instance_id("ndvi_chart_widget")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                never,
+            ],
+            unpack_depth=1,
+        )
         .partial(title="NDVI Trends", **(params_dict.get("ndvi_chart_widget") or {}))
         .map(argnames=["view", "data"], argvalues=persist_ndvi)
     )
@@ -202,6 +292,12 @@ def main(params: Params):
         .set_task_instance_id("grouped_ndvi_widget")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                never,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             widgets=ndvi_chart_widget, **(params_dict.get("grouped_ndvi_widget") or {})
         )
@@ -213,6 +309,13 @@ def main(params: Params):
         .set_task_instance_id("ndvi_tile")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             client=gee_client,
             time_range=time_range,
@@ -232,6 +335,13 @@ def main(params: Params):
         .set_task_instance_id("base_maps")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(**(params_dict.get("base_maps") or {}))
         .call()
     )
@@ -241,6 +351,14 @@ def main(params: Params):
         .set_task_instance_id("roi_boundary_layer")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+                all_geometry_are_none,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             layer_style={
                 "get_line_color": [0, 128, 0, 255],
@@ -261,6 +379,13 @@ def main(params: Params):
         .set_task_instance_id("merged_tile_layers")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(base_layers=base_maps, **(params_dict.get("merged_tile_layers") or {}))
         .mapvalues(argnames=["overlay"], argvalues=ndvi_tile)
     )
@@ -270,6 +395,13 @@ def main(params: Params):
         .set_task_instance_id("ndvi_map_layers")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             iterables=[roi_boundary_layer, merged_tile_layers],
             **(params_dict.get("ndvi_map_layers") or {}),
@@ -282,6 +414,13 @@ def main(params: Params):
         .set_task_instance_id("ndvi_map")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             static=False,
             title=None,
@@ -298,6 +437,13 @@ def main(params: Params):
         .set_task_instance_id("persist_ndvi_map")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
             **(params_dict.get("persist_ndvi_map") or {}),
@@ -310,6 +456,12 @@ def main(params: Params):
         .set_task_instance_id("ndvi_map_widget")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                never,
+            ],
+            unpack_depth=1,
+        )
         .partial(title="NDVI Map", **(params_dict.get("ndvi_map_widget") or {}))
         .map(argnames=["view", "data"], argvalues=persist_ndvi_map)
     )
@@ -319,6 +471,12 @@ def main(params: Params):
         .set_task_instance_id("grouped_ndvi_map_widget")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                never,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             widgets=ndvi_map_widget,
             **(params_dict.get("grouped_ndvi_map_widget") or {}),
@@ -331,6 +489,12 @@ def main(params: Params):
         .set_task_instance_id("ndvi_dashboard")
         .handle_errors()
         .with_tracing()
+        .skipif(
+            conditions=[
+                never,
+            ],
+            unpack_depth=1,
+        )
         .partial(
             details=workflow_details,
             widgets=[grouped_ndvi_widget, grouped_ndvi_map_widget],

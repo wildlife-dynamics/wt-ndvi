@@ -18,6 +18,10 @@ from ecoscope_workflows_core.tasks.config import (
 from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
+from ecoscope_workflows_core.tasks.skip import (
+    any_dependency_skipped as any_dependency_skipped,
+)
+from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
 from ecoscope_workflows_core.testing import create_task_magicmock  # 🧪
 
 load_spatial_features_group = create_task_magicmock(  # 🧪
@@ -38,6 +42,7 @@ from ecoscope_workflows_core.tasks.results import (
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
+from ecoscope_workflows_core.tasks.skip import never as never
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
 )
@@ -63,6 +68,9 @@ from ecoscope_workflows_ext_custom.tasks.results import (
 )
 from ecoscope_workflows_ext_custom.tasks.results import (
     set_base_maps_pydeck as set_base_maps_pydeck,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.skip import (
+    all_geometry_are_none as all_geometry_are_none,
 )
 
 from ..params import Params
@@ -116,6 +124,13 @@ def main(params: Params):
             .set_task_instance_id("workflow_details")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("workflow_details") or {}),
             method="call",
@@ -125,6 +140,13 @@ def main(params: Params):
             .set_task_instance_id("gee_client")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("gee_client") or {}),
             method="call",
@@ -134,6 +156,13 @@ def main(params: Params):
             .set_task_instance_id("time_range")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "time_format": "%d %b %Y %H:%M:%S %Z",
@@ -146,6 +175,13 @@ def main(params: Params):
             .set_task_instance_id("groupers")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("groupers") or {}),
             method="call",
@@ -155,6 +191,13 @@ def main(params: Params):
             .set_task_instance_id("roi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("roi") or {}),
             method="call",
@@ -164,6 +207,13 @@ def main(params: Params):
             .set_task_instance_id("split_roi_groups")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "df": DependsOn("roi"),
@@ -177,6 +227,13 @@ def main(params: Params):
             .set_task_instance_id("ndvi_method")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("ndvi_method") or {}),
             method="call",
@@ -186,6 +243,13 @@ def main(params: Params):
             .set_task_instance_id("calculate_ndvi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "client": DependsOn("gee_client"),
@@ -206,6 +270,12 @@ def main(params: Params):
             .set_task_instance_id("persist_ndvi_data")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
@@ -224,6 +294,13 @@ def main(params: Params):
             .set_task_instance_id("draw_ndvi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "current_value_column": "NDVI",
@@ -257,6 +334,13 @@ def main(params: Params):
             .set_task_instance_id("persist_ndvi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
@@ -273,6 +357,12 @@ def main(params: Params):
             .set_task_instance_id("ndvi_chart_widget")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "title": "NDVI Trends",
@@ -289,6 +379,12 @@ def main(params: Params):
             .set_task_instance_id("grouped_ndvi_widget")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "widgets": DependsOn("ndvi_chart_widget"),
@@ -301,6 +397,13 @@ def main(params: Params):
             .set_task_instance_id("ndvi_tile")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "client": DependsOn("gee_client"),
@@ -324,6 +427,13 @@ def main(params: Params):
             .set_task_instance_id("base_maps")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("base_maps") or {}),
             method="call",
@@ -333,6 +443,14 @@ def main(params: Params):
             .set_task_instance_id("roi_boundary_layer")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                    all_geometry_are_none,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "layer_style": {
@@ -362,6 +480,13 @@ def main(params: Params):
             .set_task_instance_id("merged_tile_layers")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "base_layers": DependsOn("base_maps"),
@@ -378,6 +503,13 @@ def main(params: Params):
             .set_task_instance_id("ndvi_map_layers")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "iterables": [
@@ -393,6 +525,13 @@ def main(params: Params):
             .set_task_instance_id("ndvi_map")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "static": False,
@@ -413,6 +552,13 @@ def main(params: Params):
             .set_task_instance_id("persist_ndvi_map")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
@@ -429,6 +575,12 @@ def main(params: Params):
             .set_task_instance_id("ndvi_map_widget")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "title": "NDVI Map",
@@ -445,6 +597,12 @@ def main(params: Params):
             .set_task_instance_id("grouped_ndvi_map_widget")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "widgets": DependsOn("ndvi_map_widget"),
@@ -457,6 +615,12 @@ def main(params: Params):
             .set_task_instance_id("ndvi_dashboard")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "details": DependsOn("workflow_details"),
