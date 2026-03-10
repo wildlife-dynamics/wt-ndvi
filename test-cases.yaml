@@ -52,8 +52,8 @@ precomputed:
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        file_path: "/Users/yunwu/Downloads/Altay.gpkg"
-        name_column: "NAME_3"
+        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+        name_column: "name"
     ndvi_tile:
       opacity: 0.7
     persist_ndvi_data:
@@ -87,33 +87,33 @@ earthranger:
       base_maps:
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
 
-local-file:
-  name: Local File ROI Test Case
-  mock_io: false
-  params:
-    workflow_details:
-      name: "NDVI Workflow"
-      description: "Normalized Difference Vegetation Index Workflow"
-    gee_client:
-      data_source:
-        name: "ecoscope_poc"
-    time_range:
-      since: "2025-01-01T00:00:00Z"
-      until: "2025-12-31T23:59:59Z"
-    groupers:
-      groupers:
-        - index_name: "name"
-    ndvi_method:
-      var: "MODIS MYD13A1 16-Day Composite"
-    calculate_ndvi:
-      grouping_unit: month
-    base_maps:
-      base_maps:
-        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-    roi:
-      config:
-        file_path: "/Users/yunwu/Downloads/Altay.gpkg"
-        name_column: "NAME_3"
+# local-file:
+#   name: Local File ROI Test Case
+#   mock_io: false
+#   params:
+#     workflow_details:
+#       name: "NDVI Workflow"
+#       description: "Normalized Difference Vegetation Index Workflow"
+#     gee_client:
+#       data_source:
+#         name: "ecoscope_poc"
+#     time_range:
+#       since: "2025-01-01T00:00:00Z"
+#       until: "2025-12-31T23:59:59Z"
+#     groupers:
+#       groupers:
+#         - index_name: "name"
+#     ndvi_method:
+#       var: "MODIS MYD13A1 16-Day Composite"
+#     calculate_ndvi:
+#       grouping_unit: month
+#     base_maps:
+#       base_maps:
+#         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+#     roi:
+#       config:
+#         file_path: "/Users/yunwu/Downloads/Altay.gpkg"
+#         name_column: "NAME_3"
 
 calculated:
   name: Calculated NDVI Test Case

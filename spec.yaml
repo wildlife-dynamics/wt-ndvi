@@ -25,7 +25,7 @@ rjsf-overrides:
     groupers.properties.groupers.default: [
       {"index_name": "name"},
     ]
-    time_range.description: "Choose the period of time to analyze. Please make sure you select a large enough time range to see results. We recommend at least 2 months, as the latest month's data may not be ready yet."
+    time_range.description: "Choose the period of time to analyze. Please make sure you select a large enough time range to see results, as the latest month's data may not be ready yet."
     roi.properties.config.anyOf: [
       {"$ref": "#/$defs/LocalFileSpatialFeatures"},
       {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
@@ -40,14 +40,13 @@ rjsf-overrides:
     ndvi_method.properties.var.default: "MODIS MYD13A1 16-Day Composite"
     ndvi_method.required: []
     persist_ndvi_data.properties.filetypes.default: ["parquet"]
+    persist_ndvi_data.properties.filetypes.items.enum: ["csv", "parquet"]
     NDVI Map.properties.ndvi_tile.properties.opacity.default: 0.7
     calculate_ndvi.title: "NDVI Trend"
     NDVI Map.properties.base_maps.properties.base_maps.title: "Map Base Layers"
     NDVI Map.properties.base_maps.properties.base_maps.default: [
       {"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", "opacity": 1, "max_zoom": 20},
     ]
-    persist_ndvi_data.properties.filetypes.default: ["parquet"]
-    persist_ndvi_data.properties.filetypes.items.enum: ["csv", "parquet"]
   uiSchema:
     NDVI Map.base_maps.base_maps.items.ui:options.label: false
 
