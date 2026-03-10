@@ -509,7 +509,7 @@ ndvi_tile = (
     .partial(
         client=gee_client,
         time_range=time_range,
-        ndvi_methodecoscope-workflows-ndvi-workflow/pixi.lock=ndvi_method,
+        ndvi_method=ndvi_method,
         reducer="mean",
         palette=None,
         scale=500,
