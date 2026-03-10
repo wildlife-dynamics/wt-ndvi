@@ -46,6 +46,8 @@ rjsf-overrides:
     NDVI Map.properties.base_maps.properties.base_maps.default: [
       {"url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}", "opacity": 1, "max_zoom": 20},
     ]
+    persist_ndvi_data.properties.filetypes.default: ["parquet"]
+    persist_ndvi_data.properties.filetypes.items.enum: ["csv", "parquet"]
   uiSchema:
     NDVI Map.base_maps.base_maps.items.ui:options.label: false
 
