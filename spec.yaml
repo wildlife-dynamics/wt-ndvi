@@ -1,25 +1,13 @@
 id: ndvi
 requirements:
-  # - name: ecoscope-workflows-core
-  #   version: 0.22.2
-  #   channel: https://repo.prefix.dev/ecoscope-workflows/
-  # - name: ecoscope-workflows-ext-ecoscope
-  #   version: 0.22.2
-  #   channel: https://repo.prefix.dev/ecoscope-workflows/
-  # - name: ecoscope-workflows-ext-custom
-  #   version: 0.0.28
-  #   channel: https://repo.prefix.dev/ecoscope-workflows-custom/
   - name: ecoscope-workflows-core
-    version: "*"
-    channel: file:///tmp/ecoscope-workflows/release/artifacts/
+    version: ">=0.22.16, <0.23.0"
+    channel: https://repo.prefix.dev/ecoscope-workflows/
   - name: ecoscope-workflows-ext-ecoscope
-    version: "*"
-    channel: file:///tmp/ecoscope-workflows/release/artifacts/
+    version: ">=0.22.16, <0.23.0"
+    channel: https://repo.prefix.dev/ecoscope-workflows/
   - name: ecoscope-workflows-ext-custom
-    version: "*"
-    channel: file:///tmp/ecoscope-workflows-custom/release/artifacts/
-  - name: pydeck
-    version: "*"
+    version: ">=0.0.35, <0.1.0"
     channel: https://repo.prefix.dev/ecoscope-workflows-custom/
 rjsf-overrides:
   $defs:
@@ -51,7 +39,7 @@ rjsf-overrides:
     ]
     ndvi_method.properties.var.default: "MODIS MYD13A1 16-Day Composite"
     ndvi_method.required: []
-    persist_ndvi_data.properties.filetypes.default: ["geoparquet"]
+    persist_ndvi_data.properties.filetypes.default: ["parquet"]
     NDVI Map.properties.ndvi_tile.properties.opacity.default: 0.7
     calculate_ndvi.title: "NDVI Trend"
     NDVI Map.properties.base_maps.properties.base_maps.title: "Map Base Layers"

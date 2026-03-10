@@ -57,7 +57,7 @@ precomputed:
     ndvi_tile:
       opacity: 0.7
     persist_ndvi_data:
-      filetypes: ["geoparquet", "csv"]
+      filetypes: ["parquet", "csv"]
 
 earthranger:
   name: EarthRanger Spatial Features Test Case

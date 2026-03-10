@@ -29,8 +29,8 @@ Before using this workflow, you need:
    - You'll need to know the name of your configured data source (e.g., "ecoscope_poc")
 
 3. **Region of Interest (ROI) data** available in one of these formats:
-   - A local GeoPackage (`.gpkg`) or GeoParquet (`.parquet`) file on your computer
-   - A remote URL pointing to a GeoPackage or GeoParquet file (e.g., Dropbox link)
+   - A local GeoPackage (`.gpkg`) or Parquet (`.parquet`) file on your computer
+   - A remote URL pointing to a GeoPackage or Parquet file (e.g., Dropbox link)
    - A spatial features group configured in EarthRanger
    - Each ROI must have a name column to identify individual regions
 
@@ -86,7 +86,7 @@ Organize your data into separate dashboard views based on Region of Interest.
 Specify where your Region of Interest boundaries come from. Choose one of three options:
 
 **Option A: Local File**
-- **File Path** (required): Path to a GeoPackage (`.gpkg`) or GeoParquet (`.parquet`) file on your computer
+- **File Path** (required): Path to a GeoPackage (`.gpkg`) or Parquet (`.parquet`) file on your computer
   - Example: `"/Users/yourname/Downloads/AOIs.gpkg"`
 - **Name Column** (required): Column in the file to use as region name
   - Default: `"name"`
@@ -94,7 +94,7 @@ Specify where your Region of Interest boundaries come from. Choose one of three 
 - **Layer** (optional, advanced): Layer name within a GeoPackage file if it contains multiple layers
 
 **Option B: Remote URL**
-- **URL** (required): URL to a GeoPackage or GeoParquet file hosted online
+- **URL** (required): URL to a GeoPackage or Parquet file hosted online
   - Example: `"https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"`
 - **Name Column** (required): Column to use as region name
   - Default: `"name"`
@@ -299,7 +299,7 @@ Here are some typical scenarios and how to configure the workflow for each:
 **Solutions**:
 - Verify the date range is correct (start date should be before end date)
 - Check that your ROI boundaries are valid geographic polygons
-- Ensure your ROI file is in a supported format (GeoPackage or GeoParquet)
+- Ensure your ROI file is in a supported format (GeoPackage or Parquet)
 - Verify the name column exists in your ROI file
 - Try a broader date range to confirm data availability
 
@@ -309,7 +309,7 @@ Here are some typical scenarios and how to configure the workflow for each:
 **Solutions**:
 - For local files: Verify the file path is correct and the file exists on your computer
 - For remote URLs: Ensure the URL is publicly accessible (for Dropbox, use `?dl=1` at the end)
-- Verify the file is a valid GeoPackage (`.gpkg`) or GeoParquet (`.parquet`) file
+- Verify the file is a valid GeoPackage (`.gpkg`) or Parquet (`.parquet`) file
 - Check that the name column specified exists in your file (default is `"name"`)
 
 #### Workflow runs very slowly
