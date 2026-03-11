@@ -134,8 +134,9 @@ jobs:
         env:
           EE_KEY_JSON: ${{ secrets.EE_PRIVATE_KEY }}
         if: env.EE_KEY_JSON != ''
+        shell: bash
         run: |
-          printf '%s' "$EE_KEY_JSON" | base64 -d > gee-key.json
+          python3 -c "import base64,os,sys; sys.stdout.buffer.write(base64.b64decode(os.environ['EE_KEY_JSON']))" > gee-key.json
 
       - name: Run all workflow test cases
         shell: bash
