@@ -80,6 +80,9 @@
               },
               {
                 "$ref": "#/$defs/TemporalGrouper"
+              },
+              {
+                "$ref": "#/$defs/SpatialGrouper"
               }
             ],
             "title": "Group by"
@@ -96,108 +99,311 @@
     "roi": {
       "additionalProperties": false,
       "properties": {
-        "url": {
-          "title": "Url",
-          "type": "string",
-          "description": "The path to ROI gpkg file"
-        },
-        "roi_column": {
+        "config": {
           "anyOf": [
             {
-              "type": "string"
+              "$ref": "#/$defs/LocalFileSpatialFeatures"
             },
             {
-              "type": "null"
-            }
-          ],
-          "default": "name",
-          "title": "Roi Column",
-          "description": "The column name of the ROI name"
-        },
-        "roi_name": {
-          "anyOf": [
-            {
-              "type": "string"
+              "$ref": "#/$defs/RemoteFileSpatialFeatures"
             },
             {
-              "type": "null"
+              "$ref": "#/$defs/EarthRangerSpatialFeatures"
             }
           ],
-          "default": null,
-          "title": "Roi Name",
-          "description": "The ROI name"
-        },
-        "layer_name": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Layer Name",
-          "description": "The layer name"
+          "title": "Spatial Feature Data Source"
         }
       },
       "required": [
-        "url"
+        "config"
       ],
       "type": "object",
-      "title": "Load ROI"
+      "title": "Load Region of Interest"
+    },
+    "ndvi_method": {
+      "additionalProperties": false,
+      "properties": {
+        "var": {
+          "title": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "var"
+      ],
+      "type": "object",
+      "title": "NDVI Method"
     },
     "calculate_ndvi": {
       "additionalProperties": false,
       "properties": {
-        "band": {
-          "default": "NDVI",
-          "title": "Band",
+        "grouping_unit": {
+          "default": "month",
+          "enum": [
+            "month",
+            "week",
+            "day_of_year",
+            "modis_16_day"
+          ],
+          "title": "Grouping Unit",
           "type": "string",
-          "description": "The band name"
-        },
-        "scale_factor": {
-          "default": 0.0001,
-          "title": "Scale Factor",
-          "type": "number",
-          "description": "The scale factor"
-        },
-        "analysis_scale": {
-          "default": 500.0,
-          "title": "Analysis Scale",
-          "type": "number",
-          "description": "The analysis scale"
+          "description": "Temporal unit for grouping historical data when calculating statistics. 'month': Compare against same calendar month (1-12). 'week': Compare against same ISO week number (1-53). 'day_of_year': Compare against same day of year (1-366). 'modis_16_day': Compare against same MODIS 16-day composite period (0-22)."
         }
       },
       "required": [],
       "type": "object",
-      "title": "Calculate NDVI"
+      "title": "NDVI Trend"
     },
-    "draw_ndvi": {
+    "persist_ndvi_data": {
       "additionalProperties": false,
       "properties": {
-        "historic_band_title": {
-          "default": "Historic Min-Max",
-          "title": "Historic Band Title",
-          "type": "string",
-          "description": "The title shown in the plot legend for historic band"
-        },
-        "historic_mean_title": {
-          "default": "Historic Mean",
-          "title": "Historic Mean Title",
-          "type": "string",
-          "description": "The title shown in the plot legend for historic mean values"
-        },
-        "time_column": {
-          "default": "img_date",
-          "title": "Time Column",
-          "type": "string",
-          "description": "The name of the dataframe column to pull historic max values from"
+        "filetypes": {
+          "default": [
+            "csv"
+          ],
+          "items": {
+            "enum": [
+              "csv",
+              "gpkg",
+              "geoparquet",
+              "parquet"
+            ],
+            "type": "string"
+          },
+          "title": "Filetypes",
+          "type": "array",
+          "description": "The output format",
+          "uniqueItems": true
         }
       },
       "required": [],
       "type": "object",
-      "title": "Draw NDVI"
+      "title": "Persist NDVI Data"
+    },
+    "ndvi_tile": {
+      "additionalProperties": false,
+      "properties": {
+        "opacity": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Opacity",
+          "type": "number",
+          "description": "Opacity of the NDVI tile layer (0.0 to 1.0)."
+        }
+      },
+      "required": [],
+      "type": "object",
+      "title": ""
+    },
+    "base_maps": {
+      "additionalProperties": false,
+      "properties": {
+        "base_maps": {
+          "default": [
+            {
+              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+              "opacity": 1,
+              "max_zoom": 20
+            },
+            {
+              "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+              "opacity": 0.5,
+              "max_zoom": 20
+            }
+          ],
+          "items": {
+            "title": "Base Layer",
+            "anyOf": [
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    "enum": [
+                      "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Open Street Map",
+                "type": "object"
+              },
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Roadmap",
+                "type": "object"
+              },
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Satellite",
+                "type": "object"
+              },
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "Terrain",
+                "type": "object"
+              },
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "LandDx",
+                "type": "object"
+              },
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+                    "title": "Preset Layer URL",
+                    "type": "string",
+                    "const": "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+                    "enum": [
+                      "https://server.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}"
+                    ]
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Layer Opacity",
+                    "type": "number"
+                  }
+                },
+                "title": "USGS Hillshade",
+                "type": "object"
+              },
+              {
+                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
+                "properties": {
+                  "url": {
+                    "default": "https://example.tiles.com/{z}/{x}/{y}.png",
+                    "description": "The URL of a publicly accessible tiled raster service.",
+                    "pattern": "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}([-a-zA-Z0-9()@:%_\\+.~#?&//=\\{\\}]*)",
+                    "title": "Custom Layer URL",
+                    "type": "string"
+                  },
+                  "opacity": {
+                    "default": 1,
+                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "Custom Layer Opacity",
+                    "type": "number"
+                  },
+                  "max_zoom": {
+                    "default": 20,
+                    "description": "Set the maximum zoom level to fetch tiles for.",
+                    "title": "Custom Layer Max Zoom",
+                    "type": "integer"
+                  },
+                  "min_zoom": {
+                    "default": 0,
+                    "description": "Set the minimum zoom level to fetch tiles for.",
+                    "title": "Custom Layer Min Zoom",
+                    "type": "integer"
+                  }
+                },
+                "title": "Custom Layer (Advanced)",
+                "type": "object"
+              }
+            ]
+          },
+          "title": " ",
+          "type": "array",
+          "description": "Select tile layers to use as base layers in map outputs. The first layer in the list will be the bottommost layer displayed.",
+          "ecoscope:advanced": true
+        }
+      },
+      "type": "object",
+      "required": [],
+      "title": ""
     }
   },
   "$defs": {
@@ -242,48 +448,153 @@
       "title": "TimezoneInfo",
       "type": "object"
     },
-    "TemporalGrouper": {
-      "oneOf": [
-        {
-          "const": "%Y",
-          "title": "Year (example: 2024)"
-        },
-        {
-          "const": "%B",
-          "title": "Month (example: September)"
-        },
-        {
-          "const": "%Y-%m",
-          "title": "Year and Month (example: 2023-01)"
-        },
-        {
-          "const": "%j",
-          "title": "Day of the year as a number (example: 365)"
-        },
-        {
-          "const": "%d",
-          "title": "Day of the month as a number (example: 31)"
-        },
-        {
-          "const": "%A",
-          "title": "Day of the week (example: Sunday)"
-        },
-        {
-          "const": "%H",
-          "title": "Hour (24-hour clock) as number (example: 22)"
-        },
-        {
-          "const": "%Y-%m-%d",
-          "title": "Date (example: 2025-01-31)"
+    "SpatialGrouper": {
+      "properties": {
+        "spatial_index_name": {
+          "title": "Spatial Regions",
+          "type": "string"
         }
+      },
+      "required": [
+        "spatial_index_name"
+      ],
+      "title": "Spatial",
+      "type": "object"
+    },
+    "TemporalGrouper": {
+      "properties": {
+        "temporal_index": {
+          "oneOf": [
+            {
+              "const": "%Y",
+              "title": "Year (example: 2024)"
+            },
+            {
+              "const": "%B",
+              "title": "Month (example: September)"
+            },
+            {
+              "const": "%Y-%m",
+              "title": "Year and Month (example: 2023-01)"
+            },
+            {
+              "const": "%j",
+              "title": "Day of the year as a number (example: 365)"
+            },
+            {
+              "const": "%d",
+              "title": "Day of the month as a number (example: 31)"
+            },
+            {
+              "const": "%A",
+              "title": "Day of the week (example: Sunday)"
+            },
+            {
+              "const": "%H",
+              "title": "Hour (24-hour clock) as number (example: 22)"
+            },
+            {
+              "const": "%Y-%m-%d",
+              "title": "Date (example: 2025-01-31)"
+            }
+          ],
+          "title": "Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "temporal_index"
       ],
       "title": "Time",
-      "type": "string"
+      "type": "object"
     },
     "ValueGrouper": {
-      "oneOf": [],
+      "properties": {
+        "index_name": {
+          "oneOf": [],
+          "title": "Category",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index_name"
+      ],
       "title": "Category",
-      "type": "string"
+      "type": "object"
+    },
+    "EarthRangerSpatialFeatures": {
+      "properties": {
+        "data_source": {
+          "description": "Select one of your configured EarthRanger data sources.",
+          "title": "Data Source",
+          "type": "string"
+        },
+        "spatial_features_group_name": {
+          "description": "Name of the spatial features group in EarthRanger",
+          "title": "Spatial Features Group Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "data_source",
+        "spatial_features_group_name"
+      ],
+      "title": "EarthRanger",
+      "type": "object"
+    },
+    "LocalFileSpatialFeatures": {
+      "properties": {
+        "file_path": {
+          "description": "Path to geoparquet (.parquet) or geopackage (.gpkg) file",
+          "title": "File Path",
+          "type": "string"
+        },
+        "name_column": {
+          "description": "Column to use as region name",
+          "title": "Name Column",
+          "type": "string"
+        },
+        "layer": {
+          "default": null,
+          "description": "Layer name (only applicable to geopackage files)",
+          "ecoscope:advanced": true,
+          "title": "Layer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "file_path",
+        "name_column"
+      ],
+      "title": "Local File",
+      "type": "object"
+    },
+    "RemoteFileSpatialFeatures": {
+      "properties": {
+        "url": {
+          "description": "URL to geoparquet (.parquet) or geopackage (.gpkg) file",
+          "title": "Url",
+          "type": "string"
+        },
+        "name_column": {
+          "description": "Column to use as region name",
+          "title": "Name Column",
+          "type": "string"
+        },
+        "layer": {
+          "default": null,
+          "description": "Layer name (only applicable for geopackage files)",
+          "ecoscope:advanced": true,
+          "title": "Layer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url",
+        "name_column"
+      ],
+      "title": "Remote URL",
+      "type": "object"
     }
   },
   "uiSchema": {
@@ -300,36 +611,17 @@
         "timezone"
       ]
     },
-    "roi": {
-      "ui:order": [
-        "url",
-        "roi_column",
-        "roi_name",
-        "layer_name"
-      ]
-    },
-    "calculate_ndvi": {
-      "ui:order": [
-        "band",
-        "scale_factor",
-        "analysis_scale"
-      ]
-    },
-    "draw_ndvi": {
-      "ui:order": [
-        "historic_band_title",
-        "historic_mean_title",
-        "time_column"
-      ]
-    },
     "ui:order": [
       "workflow_details",
       "gee_client",
       "time_range",
       "groupers",
       "roi",
+      "ndvi_method",
       "calculate_ndvi",
-      "draw_ndvi"
+      "persist_ndvi_data",
+      "ndvi_tile",
+      "base_maps"
     ]
   },
   "additionalProperties": false

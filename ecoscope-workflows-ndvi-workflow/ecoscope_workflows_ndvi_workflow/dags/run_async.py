@@ -3,14 +3,19 @@ import json
 import os
 
 from ecoscope_workflows_core.graph import DependsOn, Graph, Node
+from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
 from ecoscope_workflows_core.tasks.config import (
     set_workflow_details as set_workflow_details,
 )
 from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
+from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
 from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
 from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
 from ecoscope_workflows_core.tasks.io import persist_text as persist_text
 from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
+from ecoscope_workflows_core.tasks.results import (
+    create_map_widget_single_view as create_map_widget_single_view,
+)
 from ecoscope_workflows_core.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
 )
@@ -18,12 +23,36 @@ from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_das
 from ecoscope_workflows_core.tasks.results import (
     merge_widget_views as merge_widget_views,
 )
+from ecoscope_workflows_core.tasks.skip import (
+    any_dependency_skipped as any_dependency_skipped,
+)
+from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
+from ecoscope_workflows_core.tasks.skip import never as never
+from ecoscope_workflows_ext_custom.tasks.io import create_ndvi_tile as create_ndvi_tile
+from ecoscope_workflows_ext_custom.tasks.io import (
+    persist_df_wrapper as persist_df_wrapper,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    create_polygon_layer_pydeck as create_polygon_layer_pydeck,
+)
+from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
+from ecoscope_workflows_ext_custom.tasks.results import (
+    merge_tile_layers as merge_tile_layers,
+)
+from ecoscope_workflows_ext_custom.tasks.results import (
+    set_base_maps_pydeck as set_base_maps_pydeck,
+)
 from ecoscope_workflows_ext_ecoscope.tasks.io import (
     calculate_ndvi_range as calculate_ndvi_range,
 )
-from ecoscope_workflows_ext_ecoscope.tasks.io import download_roi as download_roi
+from ecoscope_workflows_ext_ecoscope.tasks.io import (
+    load_spatial_features_group as load_spatial_features_group,
+)
 from ecoscope_workflows_ext_ecoscope.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
+)
+from ecoscope_workflows_ext_ecoscope.tasks.skip import (
+    all_geometry_are_none as all_geometry_are_none,
 )
 
 from ..params import Params
@@ -39,14 +68,31 @@ def main(params: Params):
         "groupers": [],
         "roi": [],
         "split_roi_groups": ["roi", "groupers"],
-        "calculate_ndvi": ["gee_client", "time_range", "split_roi_groups"],
+        "ndvi_method": [],
+        "calculate_ndvi": [
+            "gee_client",
+            "time_range",
+            "ndvi_method",
+            "split_roi_groups",
+        ],
+        "persist_ndvi_data": ["calculate_ndvi"],
         "draw_ndvi": ["calculate_ndvi"],
         "persist_ndvi": ["draw_ndvi"],
         "ndvi_chart_widget": ["persist_ndvi"],
         "grouped_ndvi_widget": ["ndvi_chart_widget"],
+        "ndvi_tile": ["gee_client", "time_range", "ndvi_method", "split_roi_groups"],
+        "base_maps": [],
+        "roi_boundary_layer": ["split_roi_groups"],
+        "merged_tile_layers": ["base_maps", "ndvi_tile"],
+        "ndvi_map_layers": ["roi_boundary_layer", "merged_tile_layers"],
+        "ndvi_map": ["ndvi_map_layers"],
+        "persist_ndvi_map": ["ndvi_map"],
+        "ndvi_map_widget": ["persist_ndvi_map"],
+        "grouped_ndvi_map_widget": ["ndvi_map_widget"],
         "ndvi_dashboard": [
             "workflow_details",
             "grouped_ndvi_widget",
+            "grouped_ndvi_map_widget",
             "time_range",
             "groupers",
         ],
@@ -58,6 +104,13 @@ def main(params: Params):
             .set_task_instance_id("workflow_details")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("workflow_details") or {}),
             method="call",
@@ -67,6 +120,13 @@ def main(params: Params):
             .set_task_instance_id("gee_client")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("gee_client") or {}),
             method="call",
@@ -76,6 +136,13 @@ def main(params: Params):
             .set_task_instance_id("time_range")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "time_format": "%d %b %Y %H:%M:%S %Z",
@@ -88,15 +155,29 @@ def main(params: Params):
             .set_task_instance_id("groupers")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("groupers") or {}),
             method="call",
         ),
         "roi": Node(
-            async_task=download_roi.validate()
+            async_task=load_spatial_features_group.validate()
             .set_task_instance_id("roi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial=(params_dict.get("roi") or {}),
             method="call",
@@ -106,6 +187,13 @@ def main(params: Params):
             .set_task_instance_id("split_roi_groups")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "df": DependsOn("roi"),
@@ -114,16 +202,41 @@ def main(params: Params):
             | (params_dict.get("split_roi_groups") or {}),
             method="call",
         ),
+        "ndvi_method": Node(
+            async_task=set_string_var.validate()
+            .set_task_instance_id("ndvi_method")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial=(params_dict.get("ndvi_method") or {}),
+            method="call",
+        ),
         "calculate_ndvi": Node(
             async_task=calculate_ndvi_range.validate()
             .set_task_instance_id("calculate_ndvi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "client": DependsOn("gee_client"),
                 "time_range": DependsOn("time_range"),
-                "img_coll_name": "MODIS/061/MYD13A1",
+                "ndvi_method": DependsOn("ndvi_method"),
+                "baseline_time_range": None,
+                "image_size": 1000000000,
             }
             | (params_dict.get("calculate_ndvi") or {}),
             method="mapvalues",
@@ -132,11 +245,42 @@ def main(params: Params):
                 "argvalues": DependsOn("split_roi_groups"),
             },
         ),
+        "persist_ndvi_data": Node(
+            async_task=persist_df_wrapper.validate()
+            .set_task_instance_id("persist_ndvi_data")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+                "sanitize": True,
+                "filename_prefix": "ndvi",
+            }
+            | (params_dict.get("persist_ndvi_data") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["df"],
+                "argvalues": DependsOn("calculate_ndvi"),
+            },
+        ),
         "draw_ndvi": Node(
             async_task=draw_historic_timeseries.validate()
             .set_task_instance_id("draw_ndvi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "current_value_column": "NDVI",
@@ -144,10 +288,19 @@ def main(params: Params):
                 "historic_min_column": "min",
                 "historic_max_column": "max",
                 "historic_mean_column": "mean",
+                "historic_band_title": "Historic Min-Max",
+                "historic_mean_title": "Historic Mean",
                 "layout_style": None,
-                "upper_lower_band_style": None,
+                "upper_lower_band_style": {
+                    "mode": "lines",
+                    "line": {
+                        "color": "rgba(144, 238, 144, 0.8)",
+                    },
+                    "fillcolor": "rgba(144, 238, 144, 0.3)",
+                },
                 "historic_mean_style": None,
                 "current_value_style": None,
+                "time_column": "img_date",
             }
             | (params_dict.get("draw_ndvi") or {}),
             method="mapvalues",
@@ -161,6 +314,13 @@ def main(params: Params):
             .set_task_instance_id("persist_ndvi")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
@@ -177,6 +337,12 @@ def main(params: Params):
             .set_task_instance_id("ndvi_chart_widget")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "title": "NDVI Trends",
@@ -193,6 +359,12 @@ def main(params: Params):
             .set_task_instance_id("grouped_ndvi_widget")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "widgets": DependsOn("ndvi_chart_widget"),
@@ -200,16 +372,241 @@ def main(params: Params):
             | (params_dict.get("grouped_ndvi_widget") or {}),
             method="call",
         ),
+        "ndvi_tile": Node(
+            async_task=create_ndvi_tile.validate()
+            .set_task_instance_id("ndvi_tile")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "client": DependsOn("gee_client"),
+                "time_range": DependsOn("time_range"),
+                "ndvi_method": DependsOn("ndvi_method"),
+                "reducer": "mean",
+                "palette": None,
+                "scale": 500,
+                "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+                "filename_prefix": "ndvi_geotiff",
+            }
+            | (params_dict.get("ndvi_tile") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["roi"],
+                "argvalues": DependsOn("split_roi_groups"),
+            },
+        ),
+        "base_maps": Node(
+            async_task=set_base_maps_pydeck.validate()
+            .set_task_instance_id("base_maps")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial=(params_dict.get("base_maps") or {}),
+            method="call",
+        ),
+        "roi_boundary_layer": Node(
+            async_task=create_polygon_layer_pydeck.validate()
+            .set_task_instance_id("roi_boundary_layer")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                    all_geometry_are_none,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "layer_style": {
+                    "get_line_color": [
+                        0,
+                        128,
+                        0,
+                        255,
+                    ],
+                    "get_line_width": 2,
+                    "opacity": 1.0,
+                    "stroked": True,
+                    "filled": False,
+                    "line_width_units": "pixels",
+                },
+                "legend": None,
+            }
+            | (params_dict.get("roi_boundary_layer") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["geodataframe"],
+                "argvalues": DependsOn("split_roi_groups"),
+            },
+        ),
+        "merged_tile_layers": Node(
+            async_task=merge_tile_layers.validate()
+            .set_task_instance_id("merged_tile_layers")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "base_layers": DependsOn("base_maps"),
+            }
+            | (params_dict.get("merged_tile_layers") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["overlay"],
+                "argvalues": DependsOn("ndvi_tile"),
+            },
+        ),
+        "ndvi_map_layers": Node(
+            async_task=groupbykey.validate()
+            .set_task_instance_id("ndvi_map_layers")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "iterables": [
+                    DependsOn("roi_boundary_layer"),
+                    DependsOn("merged_tile_layers"),
+                ],
+            }
+            | (params_dict.get("ndvi_map_layers") or {}),
+            method="call",
+        ),
+        "ndvi_map": Node(
+            async_task=draw_map.validate()
+            .set_task_instance_id("ndvi_map")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "static": False,
+                "title": None,
+                "legend_style": None,
+                "max_zoom": 20,
+                "view_state": None,
+            }
+            | (params_dict.get("ndvi_map") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["geo_layers", "tile_layers"],
+                "argvalues": DependsOn("ndvi_map_layers"),
+            },
+        ),
+        "persist_ndvi_map": Node(
+            async_task=persist_text.validate()
+            .set_task_instance_id("persist_ndvi_map")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    any_is_empty_df,
+                    any_dependency_skipped,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "root_path": os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+            }
+            | (params_dict.get("persist_ndvi_map") or {}),
+            method="mapvalues",
+            kwargs={
+                "argnames": ["text"],
+                "argvalues": DependsOn("ndvi_map"),
+            },
+        ),
+        "ndvi_map_widget": Node(
+            async_task=create_map_widget_single_view.validate()
+            .set_task_instance_id("ndvi_map_widget")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "title": "NDVI Map",
+            }
+            | (params_dict.get("ndvi_map_widget") or {}),
+            method="map",
+            kwargs={
+                "argnames": ["view", "data"],
+                "argvalues": DependsOn("persist_ndvi_map"),
+            },
+        ),
+        "grouped_ndvi_map_widget": Node(
+            async_task=merge_widget_views.validate()
+            .set_task_instance_id("grouped_ndvi_map_widget")
+            .handle_errors()
+            .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
+            .set_executor("lithops"),
+            partial={
+                "widgets": DependsOn("ndvi_map_widget"),
+            }
+            | (params_dict.get("grouped_ndvi_map_widget") or {}),
+            method="call",
+        ),
         "ndvi_dashboard": Node(
             async_task=gather_dashboard.validate()
             .set_task_instance_id("ndvi_dashboard")
             .handle_errors()
             .with_tracing()
+            .skipif(
+                conditions=[
+                    never,
+                ],
+                unpack_depth=1,
+            )
             .set_executor("lithops"),
             partial={
                 "details": DependsOn("workflow_details"),
                 "widgets": [
                     DependsOn("grouped_ndvi_widget"),
+                    DependsOn("grouped_ndvi_map_widget"),
                 ],
                 "time_range": DependsOn("time_range"),
                 "groupers": DependsOn("groupers"),
