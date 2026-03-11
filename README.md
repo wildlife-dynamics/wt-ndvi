@@ -29,18 +29,16 @@ Before using this workflow, you need:
    - You'll need to know the name of your configured data source (e.g., "ecoscope_poc")
 
 3. **Region of Interest (ROI) data** available in one of these formats:
-   - A local GeoPackage (`.gpkg`) or Parquet (`.parquet`) file on your computer
-   - A remote URL pointing to a GeoPackage or Parquet file (e.g., Dropbox link)
-   - A spatial features group configured in EarthRanger
+   - A local GeoPackage (`.gpkg`) or GeoParquet (`.parquet`) file on your computer
+   - A remote URL pointing to a GeoPackage or GeoParquet file (e.g., Dropbox link)
    - Each ROI must have a name column to identify individual regions
 
 ## Installation
 
-1. Open Ecoscope Desktop
-2. Select "Workflow Templates"
-3. Click "Add Workflow Template"
-4. Copy and paste this URL https://github.com/wildlife-dynamics/wt-ndvi and wait for the workflow template to be downloaded and initialized
-5. The template will now appear in your available template list
+1. Select "Workflow Templates" tab
+2. Click "+ Add Template"
+3. Copy and paste this URL https://github.com/wildlife-dynamics/wt-ndvi and wait for the workflow template to be downloaded and initialized
+4. The template will now appear in your available template list
 
 ## Configuration Guide
 
@@ -83,10 +81,10 @@ Organize your data into separate dashboard views based on Region of Interest.
   - Default and highly recommended: Groups by Region of Interest
 
 #### 5. Load ROI
-Specify where your Region of Interest boundaries come from. Choose one of three options:
+Specify where your Region of Interest boundaries come from. Choose one of two options:
 
 **Option A: Local File**
-- **File Path** (required): Path to a GeoPackage (`.gpkg`) or Parquet (`.parquet`) file on your computer
+- **File Path** (required): Path to a GeoPackage (`.gpkg`) or GeoParquet (`.parquet`) file on your computer
   - Example: `"/Users/yourname/Downloads/AOIs.gpkg"`
 - **Name Column** (required): Column in the file to use as region name
   - Default: `"name"`
@@ -94,17 +92,11 @@ Specify where your Region of Interest boundaries come from. Choose one of three 
 - **Layer** (optional, advanced): Layer name within a GeoPackage file if it contains multiple layers
 
 **Option B: Remote URL**
-- **URL** (required): URL to a GeoPackage or Parquet file hosted online
+- **URL** (required): URL to a GeoPackage or GeoParquet file hosted online
   - Example: `"https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"`
 - **Name Column** (required): Column to use as region name
   - Default: `"name"`
 - **Layer** (optional, advanced): Layer name for multi-layer GeoPackage files
-
-**Option C: EarthRanger**
-- **Data Source** (required): Select one of your configured EarthRanger data sources
-  - Example: `"mep_dev"`
-- **Spatial Features Group Name** (required): Name of the spatial features group in EarthRanger
-  - Example: `"SpatialGrouperTest"`
 
 #### 6. NDVI Method
 Choose which MODIS satellite data product to use for NDVI calculation.
@@ -126,9 +118,24 @@ Configure how historical NDVI data is grouped for comparison.
     - `day_of_year`: Compare against the same day of year (1-366)
     - `modis_16_day`: Compare against the same MODIS 16-day composite period (0-22). Only applicable to "MODIS MYD13A1 16-Day Composite" NDVI method.
 
+#### 8. Persist NDVI Data
+Choose the output format(s) for your NDVI data files.
+
+- **Filetypes** (optional): Select one or more file formats to export the raw NDVI data
+  - Default: `parquet`
+  - Options:
+    - **CSV**: Quick review in spreadsheet software like Microsoft Excel or Google Sheets
+    - **Parquet**: Efficient for large datasets and programmatic analysis in Python or R
+
 ### Advanced Configuration
 
 These optional settings provide additional control over your workflow:
+
+#### NDVI Tile Opacity
+Control the transparency of the NDVI satellite overlay on the map.
+
+- **Opacity** (optional): Set the NDVI overlay transparency from 0.0 (fully transparent) to 1.0 (fully opaque)
+  - Default: `0.7`
 
 #### Map Base Layers
 Customize the base map layer displayed beneath the NDVI overlay.
@@ -162,6 +169,13 @@ Once you've configured all the settings:
 ## Understanding Your Results
 
 After the workflow completes successfully, you'll find your outputs in the designated output folder.
+
+### Data Outputs
+
+Your NDVI data will be saved in the format(s) you selected in the Persist NDVI Data configuration:
+
+- **CSV**: Opens in Microsoft Excel, Google Sheets, or any text editor. Best for quick data review and sharing.
+- **Parquet**: Opens in Python, R, or other data analysis tools. Best for large datasets and efficient storage.
 
 ### Visual Outputs (Dashboard)
 
@@ -260,25 +274,6 @@ Here are some typical scenarios and how to configure the workflow for each:
 - NDVI analysis using your custom region boundaries
 - Regions grouped by the values in the "region" column of your file
 
----
-
-### Example 4: Using EarthRanger Spatial Features
-**Goal**: Analyze NDVI for regions defined as spatial features in EarthRanger
-
-**Configuration**:
-- **Time Range**:
-  - Since: `2023-01-01T00:00:00`
-  - Until: `2023-12-31T23:59:59`
-- **GEE Data Source**: `"ecoscope_poc"`
-- **ROI**: EarthRanger
-  - Data Source: `"mep_dev"`
-  - Spatial Features Group Name: `"SpatialGrouperTest"`
-- **NDVI Method**: `"MODIS MYD13A1 16-Day Composite"`
-- **Grouping Unit**: `month`
-
-**Result**:
-- NDVI analysis using region boundaries from your EarthRanger system
-- Useful when your ROI boundaries are already managed in EarthRanger
 
 ## Troubleshooting
 
