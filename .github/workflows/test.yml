@@ -135,7 +135,7 @@ jobs:
           EE_KEY_JSON: ${{ secrets.EE_PRIVATE_KEY }}
         if: env.EE_KEY_JSON != ''
         run: |
-          printf '%s' "$EE_KEY_JSON" | base64 -d > gee-key.json
+          echo "${{ secrets.EE_PRIVATE_KEY }}" | base64 -d > gee-key.json
 
       - name: Run all workflow test cases
         shell: bash
