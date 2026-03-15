@@ -106,11 +106,7 @@
               "$ref": "#/$defs/RemoteFileSpatialFeatures"
             }
           ],
-          "title": "Spatial Feature Data Source",
-          "default": {
-            "file_path": "",
-            "name_column": ""
-          }
+          "title": "Spatial Feature Data Source"
         }
       },
       "required": [
