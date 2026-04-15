@@ -236,6 +236,15 @@ class BaseMaps(BaseModel):
     )
 
 
+class RoiBoundaryLayer(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    data_url: Optional[str] = Field(
+        None, description="URL to a GeoJSON file to visualize.", title="Data Url"
+    )
+
+
 class GoogleEarthEngineConnection(BaseModel):
     name: str = Field(..., title="Data Source")
 
@@ -368,3 +377,6 @@ class Params(BaseModel):
     )
     ndvi_tile: Optional[NdviTile] = Field(None, title="")
     base_maps: Optional[BaseMaps] = Field(None, title="")
+    roi_boundary_layer: Optional[RoiBoundaryLayer] = Field(
+        None, title="Create ROI Boundary Layer"
+    )
