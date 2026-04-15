@@ -2,31 +2,35 @@
 import json
 import os
 
-from ecoscope_workflows_core.tasks.config import set_string_var as set_string_var
-from ecoscope_workflows_core.tasks.config import (
-    set_workflow_details as set_workflow_details,
+from ecoscope.platform.tasks.config import set_string_var as set_string_var
+from ecoscope.platform.tasks.config import set_workflow_details as set_workflow_details
+from ecoscope.platform.tasks.filter import set_time_range as set_time_range
+from ecoscope.platform.tasks.groupby import groupbykey as groupbykey
+from ecoscope.platform.tasks.groupby import set_groupers as set_groupers
+from ecoscope.platform.tasks.groupby import split_groups as split_groups
+from ecoscope.platform.tasks.io import calculate_ndvi_range as calculate_ndvi_range
+from ecoscope.platform.tasks.io import (
+    load_spatial_features_group as load_spatial_features_group,
 )
-from ecoscope_workflows_core.tasks.filter import set_time_range as set_time_range
-from ecoscope_workflows_core.tasks.groupby import groupbykey as groupbykey
-from ecoscope_workflows_core.tasks.groupby import set_groupers as set_groupers
-from ecoscope_workflows_core.tasks.groupby import split_groups as split_groups
-from ecoscope_workflows_core.tasks.io import persist_text as persist_text
-from ecoscope_workflows_core.tasks.io import set_gee_connection as set_gee_connection
-from ecoscope_workflows_core.tasks.results import (
+from ecoscope.platform.tasks.io import persist_text as persist_text
+from ecoscope.platform.tasks.io import set_gee_connection as set_gee_connection
+from ecoscope.platform.tasks.results import (
     create_map_widget_single_view as create_map_widget_single_view,
 )
-from ecoscope_workflows_core.tasks.results import (
+from ecoscope.platform.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
 )
-from ecoscope_workflows_core.tasks.results import gather_dashboard as gather_dashboard
-from ecoscope_workflows_core.tasks.results import (
-    merge_widget_views as merge_widget_views,
+from ecoscope.platform.tasks.results import (
+    draw_historic_timeseries as draw_historic_timeseries,
 )
-from ecoscope_workflows_core.tasks.skip import (
+from ecoscope.platform.tasks.results import gather_dashboard as gather_dashboard
+from ecoscope.platform.tasks.results import merge_widget_views as merge_widget_views
+from ecoscope.platform.tasks.skip import all_geometry_are_none as all_geometry_are_none
+from ecoscope.platform.tasks.skip import (
     any_dependency_skipped as any_dependency_skipped,
 )
-from ecoscope_workflows_core.tasks.skip import any_is_empty_df as any_is_empty_df
-from ecoscope_workflows_core.tasks.skip import never as never
+from ecoscope.platform.tasks.skip import any_is_empty_df as any_is_empty_df
+from ecoscope.platform.tasks.skip import never as never
 from ecoscope_workflows_ext_custom.tasks.io import create_ndvi_tile as create_ndvi_tile
 from ecoscope_workflows_ext_custom.tasks.io import (
     persist_df_wrapper as persist_df_wrapper,
@@ -41,18 +45,7 @@ from ecoscope_workflows_ext_custom.tasks.results import (
 from ecoscope_workflows_ext_custom.tasks.results import (
     set_base_maps_pydeck as set_base_maps_pydeck,
 )
-from ecoscope_workflows_ext_ecoscope.tasks.io import (
-    calculate_ndvi_range as calculate_ndvi_range,
-)
-from ecoscope_workflows_ext_ecoscope.tasks.io import (
-    load_spatial_features_group as load_spatial_features_group,
-)
-from ecoscope_workflows_ext_ecoscope.tasks.results import (
-    draw_historic_timeseries as draw_historic_timeseries,
-)
-from ecoscope_workflows_ext_ecoscope.tasks.skip import (
-    all_geometry_are_none as all_geometry_are_none,
-)
+from wt_task import task
 
 from ..params import Params
 
@@ -61,7 +54,8 @@ def main(params: Params):
     params_dict = json.loads(params.model_dump_json(exclude_unset=True))
 
     workflow_details = (
-        set_workflow_details.validate()
+        task(set_workflow_details)
+        .validate()
         .set_task_instance_id("workflow_details")
         .handle_errors()
         .with_tracing()
@@ -77,7 +71,8 @@ def main(params: Params):
     )
 
     gee_client = (
-        set_gee_connection.validate()
+        task(set_gee_connection)
+        .validate()
         .set_task_instance_id("gee_client")
         .handle_errors()
         .with_tracing()
@@ -93,7 +88,8 @@ def main(params: Params):
     )
 
     time_range = (
-        set_time_range.validate()
+        task(set_time_range)
+        .validate()
         .set_task_instance_id("time_range")
         .handle_errors()
         .with_tracing()
@@ -111,7 +107,8 @@ def main(params: Params):
     )
 
     groupers = (
-        set_groupers.validate()
+        task(set_groupers)
+        .validate()
         .set_task_instance_id("groupers")
         .handle_errors()
         .with_tracing()
@@ -127,7 +124,8 @@ def main(params: Params):
     )
 
     roi = (
-        load_spatial_features_group.validate()
+        task(load_spatial_features_group)
+        .validate()
         .set_task_instance_id("roi")
         .handle_errors()
         .with_tracing()
@@ -143,7 +141,8 @@ def main(params: Params):
     )
 
     split_roi_groups = (
-        split_groups.validate()
+        task(split_groups)
+        .validate()
         .set_task_instance_id("split_roi_groups")
         .handle_errors()
         .with_tracing()
@@ -161,7 +160,8 @@ def main(params: Params):
     )
 
     ndvi_method = (
-        set_string_var.validate()
+        task(set_string_var)
+        .validate()
         .set_task_instance_id("ndvi_method")
         .handle_errors()
         .with_tracing()
@@ -177,7 +177,8 @@ def main(params: Params):
     )
 
     calculate_ndvi = (
-        calculate_ndvi_range.validate()
+        task(calculate_ndvi_range)
+        .validate()
         .set_task_instance_id("calculate_ndvi")
         .handle_errors()
         .with_tracing()
@@ -200,7 +201,8 @@ def main(params: Params):
     )
 
     persist_ndvi_data = (
-        persist_df_wrapper.validate()
+        task(persist_df_wrapper)
+        .validate()
         .set_task_instance_id("persist_ndvi_data")
         .handle_errors()
         .with_tracing()
@@ -220,7 +222,8 @@ def main(params: Params):
     )
 
     draw_ndvi = (
-        draw_historic_timeseries.validate()
+        task(draw_historic_timeseries)
+        .validate()
         .set_task_instance_id("draw_ndvi")
         .handle_errors()
         .with_tracing()
@@ -254,7 +257,8 @@ def main(params: Params):
     )
 
     persist_ndvi = (
-        persist_text.validate()
+        task(persist_text)
+        .validate()
         .set_task_instance_id("persist_ndvi")
         .handle_errors()
         .with_tracing()
@@ -273,7 +277,8 @@ def main(params: Params):
     )
 
     ndvi_chart_widget = (
-        create_plot_widget_single_view.validate()
+        task(create_plot_widget_single_view)
+        .validate()
         .set_task_instance_id("ndvi_chart_widget")
         .handle_errors()
         .with_tracing()
@@ -288,7 +293,8 @@ def main(params: Params):
     )
 
     grouped_ndvi_widget = (
-        merge_widget_views.validate()
+        task(merge_widget_views)
+        .validate()
         .set_task_instance_id("grouped_ndvi_widget")
         .handle_errors()
         .with_tracing()
@@ -305,7 +311,8 @@ def main(params: Params):
     )
 
     ndvi_tile = (
-        create_ndvi_tile.validate()
+        task(create_ndvi_tile)
+        .validate()
         .set_task_instance_id("ndvi_tile")
         .handle_errors()
         .with_tracing()
@@ -331,7 +338,8 @@ def main(params: Params):
     )
 
     base_maps = (
-        set_base_maps_pydeck.validate()
+        task(set_base_maps_pydeck)
+        .validate()
         .set_task_instance_id("base_maps")
         .handle_errors()
         .with_tracing()
@@ -347,7 +355,8 @@ def main(params: Params):
     )
 
     roi_boundary_layer = (
-        create_polygon_layer_pydeck.validate()
+        task(create_polygon_layer_pydeck)
+        .validate()
         .set_task_instance_id("roi_boundary_layer")
         .handle_errors()
         .with_tracing()
@@ -369,13 +378,15 @@ def main(params: Params):
                 "line_width_units": "pixels",
             },
             legend=None,
+            data_url=None,
             **(params_dict.get("roi_boundary_layer") or {}),
         )
         .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
     )
 
     merged_tile_layers = (
-        merge_tile_layers.validate()
+        task(merge_tile_layers)
+        .validate()
         .set_task_instance_id("merged_tile_layers")
         .handle_errors()
         .with_tracing()
@@ -391,7 +402,8 @@ def main(params: Params):
     )
 
     ndvi_map_layers = (
-        groupbykey.validate()
+        task(groupbykey)
+        .validate()
         .set_task_instance_id("ndvi_map_layers")
         .handle_errors()
         .with_tracing()
@@ -410,7 +422,8 @@ def main(params: Params):
     )
 
     ndvi_map = (
-        draw_map.validate()
+        task(draw_map)
+        .validate()
         .set_task_instance_id("ndvi_map")
         .handle_errors()
         .with_tracing()
@@ -433,7 +446,8 @@ def main(params: Params):
     )
 
     persist_ndvi_map = (
-        persist_text.validate()
+        task(persist_text)
+        .validate()
         .set_task_instance_id("persist_ndvi_map")
         .handle_errors()
         .with_tracing()
@@ -452,7 +466,8 @@ def main(params: Params):
     )
 
     ndvi_map_widget = (
-        create_map_widget_single_view.validate()
+        task(create_map_widget_single_view)
+        .validate()
         .set_task_instance_id("ndvi_map_widget")
         .handle_errors()
         .with_tracing()
@@ -467,7 +482,8 @@ def main(params: Params):
     )
 
     grouped_ndvi_map_widget = (
-        merge_widget_views.validate()
+        task(merge_widget_views)
+        .validate()
         .set_task_instance_id("grouped_ndvi_map_widget")
         .handle_errors()
         .with_tracing()
@@ -485,7 +501,8 @@ def main(params: Params):
     )
 
     ndvi_dashboard = (
-        gather_dashboard.validate()
+        task(gather_dashboard)
+        .validate()
         .set_task_instance_id("ndvi_dashboard")
         .handle_errors()
         .with_tracing()
