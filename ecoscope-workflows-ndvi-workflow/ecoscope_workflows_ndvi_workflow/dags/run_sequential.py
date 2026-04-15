@@ -378,6 +378,7 @@ def main(params: Params):
                 "line_width_units": "pixels",
             },
             legend=None,
+            data_url=None,
             **(params_dict.get("roi_boundary_layer") or {}),
         )
         .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)

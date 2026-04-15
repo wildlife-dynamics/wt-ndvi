@@ -403,20 +403,6 @@
           "title": ""
         }
       }
-    },
-    "roi_boundary_layer": {
-      "additionalProperties": false,
-      "properties": {
-        "data_url": {
-          "default": null,
-          "title": "Data Url",
-          "type": "string",
-          "description": "URL to a GeoJSON file to visualize."
-        }
-      },
-      "type": "object",
-      "required": [],
-      "title": "Create ROI Boundary Layer"
     }
   },
   "$defs": {
@@ -661,8 +647,7 @@
       "ndvi_method",
       "calculate_ndvi",
       "persist_ndvi_data",
-      "NDVI Map",
-      "roi_boundary_layer"
+      "NDVI Map"
     ]
   },
   "additionalProperties": false

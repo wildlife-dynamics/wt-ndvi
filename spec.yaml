@@ -194,6 +194,7 @@ workflow:
         filled: false
         line_width_units: pixels
       legend: null
+      data_url: null
     mapvalues:
       argnames: geodataframe
       argvalues: ${{ workflow.split_roi_groups.return }}
