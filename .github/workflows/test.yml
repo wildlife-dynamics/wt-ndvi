@@ -127,20 +127,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install yq
-        shell: bash
-        run: |
-          if ! command -v yq &> /dev/null; then
-            if [[ "$RUNNER_OS" == "Windows" ]]; then
-              choco install yq -y
-            elif [[ "$RUNNER_OS" == "macOS" ]]; then
-              brew install yq
-            else
-              sudo snap install yq || sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
-            fi
-          fi
-          yq --version
-
       - uses: prefix-dev/setup-pixi@v0.8.1
         with:
           pixi-version: v0.60.0
@@ -156,8 +142,8 @@ jobs:
       - name: Verify yq and test cases
         shell: bash
         run: |
-          yq --version
-          COUNT=$(yq 'keys | length' test-cases.yaml)
+          pixi run yq --version
+          COUNT=$(pixi run yq 'keys | length' test-cases.yaml)
           echo "Found $COUNT test case(s)"
           if [ "$COUNT" -eq 0 ]; then
             echo "ERROR: No test cases found in test-cases.yaml"
@@ -176,4 +162,4 @@ jobs:
           ECOSCOPE_WORKFLOWS__CONNECTIONS__EARTHRANGER__MEP_DEV__USERNAME: ${{ secrets.ER_USERNAME }}
         run: |
           chmod +x dev/pytest-cli.sh || true
-          bash dev/pytest-cli.sh ${{ needs.discover.outputs.workflow_id }} --all
+          pixi run bash dev/pytest-cli.sh ${{ needs.discover.outputs.workflow_id }} --all
