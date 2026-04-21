@@ -232,6 +232,11 @@ if [ "$run_all" = true ]; then
     # tr -d '\r' removes carriage returns for Windows compatibility
     test_cases=($(yq 'keys | .[]' "$test_cases_file" | tr -d '"\r'))
 
+    if [ ${#test_cases[@]} -eq 0 ]; then
+        echo "ERROR: Found 0 test cases in $test_cases_file. Is yq installed?"
+        exit 1
+    fi
+
     if [ "$quiet" = false ]; then
         echo ""
         echo "Found ${#test_cases[@]} test cases: ${test_cases[*]}"
