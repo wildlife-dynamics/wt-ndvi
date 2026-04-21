@@ -1,0 +1,24 @@
+phase: develop
+status: in-progress
+lastUpdated: '2026-04-21'
+notes: 'Bug fix: local ROI path with spaces fails on Windows'
+
+setup:
+  - name: Load context
+    status: completed
+  - name: Gather requirements
+    status: completed
+
+tasks:
+  - name: Add test data and local-file test case with spaced path
+    status: in-progress
+    type: implement
+  - name: Update CI to set up spaced-path test data
+    status: pending
+    type: implement
+
+wrapup:
+  - name: Self-check
+    status: pending
+  - name: Summary
+    status: pending

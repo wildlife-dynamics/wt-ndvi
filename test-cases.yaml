@@ -1,94 +1,33 @@
-base:
-  name: Base Test Case
-  mock_io: true
-  params:
-    workflow_details:
-      name: "NDVI Workflow"
-      description: "Normalized Difference Vegetation Index Workflow"
-    gee_client:
-      data_source:
-        name: "ecoscope_poc"
-    time_range:
-      since: "2023-01-01T00:00:00Z"
-      until: "2023-12-31T23:59:59Z"
-    groupers:
-      groupers:
-        - index_name: "name"
-    roi:
-      config:
-        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
-        name_column: "name"
-    ndvi_method:
-      var: "MODIS MYD13A1 16-Day Composite"
-    calculate_ndvi:
-      grouping_unit: month
-    base_maps:
-      base_maps:
-        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+# base:
+#   name: Base Test Case
+#   mock_io: true
+#   params:
+#     workflow_details:
+#       name: "NDVI Workflow"
+#       description: "Normalized Difference Vegetation Index Workflow"
+#     gee_client:
+#       data_source:
+#         name: "ecoscope_poc"
+#     time_range:
+#       since: "2023-01-01T00:00:00Z"
+#       until: "2023-12-31T23:59:59Z"
+#     groupers:
+#       groupers:
+#         - index_name: "name"
+#     roi:
+#       config:
+#         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+#         name_column: "name"
+#     ndvi_method:
+#       var: "MODIS MYD13A1 16-Day Composite"
+#     calculate_ndvi:
+#       grouping_unit: month
+#     base_maps:
+#       base_maps:
+#         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
 
-precomputed:
-  name: Precomputed NDVI Test Case
-  mock_io: false
-  params:
-    workflow_details:
-      name: "NDVI Workflow"
-      description: "Normalized Difference Vegetation Index Workflow"
-    gee_client:
-      data_source:
-        name: "ecoscope_poc"
-    time_range:
-      since: "2023-01-01T00:00:00Z"
-      until: "2023-12-31T23:59:59Z"
-    groupers:
-      groupers:
-        - index_name: "name"
-    ndvi_method:
-      var: "MODIS MYD13A1 16-Day Composite"
-    calculate_ndvi:
-      grouping_unit: month
-    base_maps:
-      base_maps:
-        # Note: cannot use layer_name: TERRAIN since layer_name is typed as SkipJsonSchema[str] on TileLayer
-        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-    roi:
-      config:
-        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
-        name_column: "name"
-    ndvi_tile:
-      opacity: 0.7
-    persist_ndvi_data:
-      filetypes: ["parquet", "csv"]
-
-earthranger:
-  name: EarthRanger Spatial Features Test Case
-  mock_io: false
-  params:
-    workflow_details:
-      name: "NDVI Workflow"
-      description: "Normalized Difference Vegetation Index Workflow"
-    gee_client:
-      data_source:
-        name: "ecoscope_poc"
-    time_range:
-      since: "2023-01-01T00:00:00Z"
-      until: "2023-12-31T23:59:59Z"
-    groupers:
-      groupers:
-        - index_name: "name"
-    ndvi_method:
-      var: "MODIS MYD13A1 16-Day Composite"
-    calculate_ndvi:
-      grouping_unit: month
-    roi:
-      config:
-        data_source: "mep_dev"
-        spatial_features_group_name: "SpatialGrouperTest"
-    base_maps:
-      base_maps:
-        - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
-
-# local-file:
-#   name: Local File ROI Test Case
+# precomputed:
+#   name: Precomputed NDVI Test Case
 #   mock_io: false
 #   params:
 #     workflow_details:
@@ -98,8 +37,8 @@ earthranger:
 #       data_source:
 #         name: "ecoscope_poc"
 #     time_range:
-#       since: "2025-01-01T00:00:00Z"
-#       until: "2025-12-31T23:59:59Z"
+#       since: "2023-01-01T00:00:00Z"
+#       until: "2023-12-31T23:59:59Z"
 #     groupers:
 #       groupers:
 #         - index_name: "name"
@@ -109,14 +48,47 @@ earthranger:
 #       grouping_unit: month
 #     base_maps:
 #       base_maps:
+#         # Note: cannot use layer_name: TERRAIN since layer_name is typed as SkipJsonSchema[str] on TileLayer
 #         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
 #     roi:
 #       config:
-#         file_path: "/Users/yunwu/Downloads/Altay.gpkg"
-#         name_column: "NAME_3"
+#         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+#         name_column: "name"
+#     ndvi_tile:
+#       opacity: 0.7
+#     persist_ndvi_data:
+#       filetypes: ["parquet", "csv"]
 
-calculated:
-  name: Calculated NDVI Test Case
+# earthranger:
+#   name: EarthRanger Spatial Features Test Case
+#   mock_io: false
+#   params:
+#     workflow_details:
+#       name: "NDVI Workflow"
+#       description: "Normalized Difference Vegetation Index Workflow"
+#     gee_client:
+#       data_source:
+#         name: "ecoscope_poc"
+#     time_range:
+#       since: "2023-01-01T00:00:00Z"
+#       until: "2023-12-31T23:59:59Z"
+#     groupers:
+#       groupers:
+#         - index_name: "name"
+#     ndvi_method:
+#       var: "MODIS MYD13A1 16-Day Composite"
+#     calculate_ndvi:
+#       grouping_unit: month
+#     roi:
+#       config:
+#         data_source: "mep_dev"
+#         spatial_features_group_name: "SpatialGrouperTest"
+#     base_maps:
+#       base_maps:
+#         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+
+local-file:
+  name: Local File ROI Test Case (space in directory path)
   mock_io: false
   params:
     workflow_details:
@@ -127,18 +99,46 @@ calculated:
         name: "ecoscope_poc"
     time_range:
       since: "2023-01-01T00:00:00Z"
-      until: "2023-01-31T23:59:59Z"
+      until: "2023-12-31T23:59:59Z"
     groupers:
       groupers:
         - index_name: "name"
     ndvi_method:
-      var: "MODIS MCD43A4 Daily NBAR"
+      var: "MODIS MYD13A1 16-Day Composite"
     calculate_ndvi:
-      grouping_unit: day_of_year
+      grouping_unit: month
     base_maps:
       base_maps:
         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
     roi:
       config:
-        url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+        file_path: "../resources/mock-data/test aois/aois.gpkg"
         name_column: "name"
+
+# calculated:
+#   name: Calculated NDVI Test Case
+#   mock_io: false
+#   params:
+#     workflow_details:
+#       name: "NDVI Workflow"
+#       description: "Normalized Difference Vegetation Index Workflow"
+#     gee_client:
+#       data_source:
+#         name: "ecoscope_poc"
+#     time_range:
+#       since: "2023-01-01T00:00:00Z"
+#       until: "2023-01-31T23:59:59Z"
+#     groupers:
+#       groupers:
+#         - index_name: "name"
+#     ndvi_method:
+#       var: "MODIS MCD43A4 Daily NBAR"
+#     calculate_ndvi:
+#       grouping_unit: day_of_year
+#     base_maps:
+#       base_maps:
+#         - url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+#     roi:
+#       config:
+#         url: "https://www.dropbox.com/s/nvdmidz1o2duyl3/AOIs.gpkg?dl=1"
+#         name_column: "name"

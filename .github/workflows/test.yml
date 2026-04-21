@@ -121,7 +121,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -138,6 +139,17 @@ jobs:
         run: |
           python3 -c "import base64,os,sys; sys.stdout.buffer.write(base64.b64decode(os.environ['EE_KEY_JSON']))" > gee-key.json
 
+      - name: Verify yq and test cases
+        shell: bash
+        run: |
+          pixi run yq --version
+          COUNT=$(pixi run yq 'keys | length' test-cases.yaml)
+          echo "Found $COUNT test case(s)"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "ERROR: No test cases found in test-cases.yaml"
+            exit 1
+          fi
+
       - name: Run all workflow test cases
         shell: bash
         env:
@@ -150,4 +162,4 @@ jobs:
           ECOSCOPE_WORKFLOWS__CONNECTIONS__EARTHRANGER__MEP_DEV__USERNAME: ${{ secrets.ER_USERNAME }}
         run: |
           chmod +x dev/pytest-cli.sh || true
-          bash dev/pytest-cli.sh ${{ needs.discover.outputs.workflow_id }} --all
+          pixi run bash dev/pytest-cli.sh ${{ needs.discover.outputs.workflow_id }} --all

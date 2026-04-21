@@ -6,3 +6,4 @@ platforms = ['linux-64', 'osx-arm64', 'win-64']
 [dependencies]
 wt-compiler = "0.5.0"
 graphviz = "*"
+go-yq = "*"
