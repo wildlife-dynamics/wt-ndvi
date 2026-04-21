@@ -138,6 +138,22 @@ jobs:
         run: |
           python3 -c "import base64,os,sys; sys.stdout.buffer.write(base64.b64decode(os.environ['EE_KEY_JSON']))" > gee-key.json
 
+      - name: Set up spaced-path test data
+        shell: bash
+        run: |
+          # Patch test-cases.yaml with the absolute path to the spaced-name geopackage
+          python3 -c "
+          import yaml, os
+          tc_path = 'test-cases.yaml'
+          with open(tc_path) as f:
+              data = yaml.safe_load(f)
+          spaced_file = os.path.join(os.getcwd(), 'resources', 'mock-data', 'test aois.gpkg')
+          data['local-file-spaced-path']['params']['roi']['config']['file_path'] = spaced_file
+          with open(tc_path, 'w') as f:
+              yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+          print(f'Patched file_path to: {spaced_file}')
+          "
+
       - name: Run all workflow test cases
         shell: bash
         env:
