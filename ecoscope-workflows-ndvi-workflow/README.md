@@ -15,7 +15,7 @@ installed_requirements:
   name: ecoscope-workflows-ext-custom
   version: {version: ==0.1.0rc2}
 params_sha256: 09b45690d190f0586ba8ca63467119e5b1fa2dc81df02eded0f7b3d7c67e0ec6
-spec_sha256: bfeb5306a1b5fcbbdc55c363bf69031de1b271a4fd6503ea4a0100e917f34c16
+spec_sha256: d80d8f8a0a2c663be96ce910819f353c6d58a5b0def40eadcb65f6494b70fea3
 
 ```
 
