@@ -7,9 +7,9 @@ Lines specific to the testing context are marked with a test tube emoji (🧪) t
 that they would not be included (or would be different) in the production version of this file.
 """
 
-import json
 import os
 import warnings  # 🧪
+from typing import Any
 
 from ecoscope.platform.tasks.config import set_workflow_details as set_workflow_details
 from ecoscope.platform.tasks.filter import set_time_range as set_time_range
@@ -19,8 +19,11 @@ from ecoscope.platform.tasks.skip import (
     any_dependency_skipped as any_dependency_skipped,
 )
 from ecoscope.platform.tasks.skip import any_is_empty_df as any_is_empty_df
+from wt_contracts import validate as _validate
 from wt_task import task
 from wt_task.testing import create_func_magicmock  # 🧪
+
+from .. import metadata as _metadata
 
 load_spatial_features_group = create_func_magicmock(  # 🧪
     anchor="ecoscope.platform.tasks.io",  # 🧪
@@ -43,7 +46,7 @@ from ecoscope.platform.tasks.results import (
 from ecoscope.platform.tasks.results import merge_widget_views as merge_widget_views
 from ecoscope.platform.tasks.skip import never as never
 from ecoscope_workflows_ext_custom.tasks.io import (
-    persist_df_wrapper as persist_df_wrapper,
+    persist_grouped_dfs_for_results_download as persist_grouped_dfs_for_results_download,
 )
 
 create_ndvi_tile = create_func_magicmock(  # 🧪
@@ -54,26 +57,21 @@ from ecoscope.platform.tasks.groupby import groupbykey as groupbykey
 from ecoscope.platform.tasks.results import (
     create_map_widget_single_view as create_map_widget_single_view,
 )
-from ecoscope.platform.tasks.results import gather_dashboard as gather_dashboard
-from ecoscope.platform.tasks.skip import all_geometry_are_none as all_geometry_are_none
-from ecoscope_workflows_ext_custom.tasks.results import (
+from ecoscope.platform.tasks.results import (
     create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
-from ecoscope_workflows_ext_custom.tasks.results import draw_map as draw_map
-from ecoscope_workflows_ext_custom.tasks.results import (
-    merge_tile_layers as merge_tile_layers,
-)
-from ecoscope_workflows_ext_custom.tasks.results import (
-    set_base_maps_pydeck as set_base_maps_pydeck,
-)
-
-from ..params import Params
+from ecoscope.platform.tasks.results import draw_map as draw_map
+from ecoscope.platform.tasks.results import gather_dashboard as gather_dashboard
+from ecoscope.platform.tasks.results import merge_tile_layers as merge_tile_layers
+from ecoscope.platform.tasks.results import set_base_maps as set_base_maps
+from ecoscope.platform.tasks.skip import all_geometry_are_none as all_geometry_are_none
 
 
-def main(params: Params):
+def main(params: dict[str, Any], validate_params_schema: bool = True):
     warnings.warn("This test script should not be used in production!")  # 🧪
 
-    params_dict = json.loads(params.model_dump_json(exclude_unset=True))
+    if validate_params_schema:
+        _validate(params, _metadata.load_params_schema())
 
     workflow_details = (
         task(set_workflow_details)
@@ -88,7 +86,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("workflow_details") or {}))
+        .partial(**(params.get("workflow_details") or {}))
         .call()
     )
 
@@ -105,7 +103,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("gee_client") or {}))
+        .partial(**(params.get("gee_client") or {}))
         .call()
     )
 
@@ -122,9 +120,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(
-            time_format="%d %b %Y %H:%M:%S %Z", **(params_dict.get("time_range") or {})
-        )
+        .partial(time_format="%d %b %Y %H:%M:%S %Z", **(params.get("time_range") or {}))
         .call()
     )
 
@@ -141,7 +137,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("groupers") or {}))
+        .partial(**(params.get("groupers") or {}))
         .call()
     )
 
@@ -158,7 +154,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("roi") or {}))
+        .partial(**(params.get("roi") or {}))
         .call()
     )
 
@@ -175,9 +171,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(
-            df=roi, groupers=groupers, **(params_dict.get("split_roi_groups") or {})
-        )
+        .partial(df=roi, groupers=groupers, **(params.get("split_roi_groups") or {}))
         .call()
     )
 
@@ -194,7 +188,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("ndvi_method") or {}))
+        .partial(**(params.get("ndvi_method") or {}))
         .call()
     )
 
@@ -217,13 +211,13 @@ def main(params: Params):
             ndvi_method=ndvi_method,
             baseline_time_range=None,
             image_size=1000000000,
-            **(params_dict.get("calculate_ndvi") or {}),
+            **(params.get("calculate_ndvi") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
     )
 
     persist_ndvi_data = (
-        task(persist_df_wrapper)
+        task(persist_grouped_dfs_for_results_download)
         .validate()
         .set_task_instance_id("persist_ndvi_data")
         .handle_errors()
@@ -235,12 +229,13 @@ def main(params: Params):
             unpack_depth=1,
         )
         .partial(
+            grouped_dfs=calculate_ndvi,
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
             sanitize=True,
             filename_prefix="ndvi",
-            **(params_dict.get("persist_ndvi_data") or {}),
+            **(params.get("persist_ndvi_data") or {}),
         )
-        .mapvalues(argnames=["df"], argvalues=calculate_ndvi)
+        .call()
     )
 
     draw_ndvi = (
@@ -273,7 +268,7 @@ def main(params: Params):
             historic_mean_style=None,
             current_value_style=None,
             time_column="img_date",
-            **(params_dict.get("draw_ndvi") or {}),
+            **(params.get("draw_ndvi") or {}),
         )
         .mapvalues(argnames=["dataframe"], argvalues=calculate_ndvi)
     )
@@ -293,7 +288,7 @@ def main(params: Params):
         )
         .partial(
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
-            **(params_dict.get("persist_ndvi") or {}),
+            **(params.get("persist_ndvi") or {}),
         )
         .mapvalues(argnames=["text"], argvalues=draw_ndvi)
     )
@@ -310,7 +305,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(title="NDVI Trends", **(params_dict.get("ndvi_chart_widget") or {}))
+        .partial(title="NDVI Trends", **(params.get("ndvi_chart_widget") or {}))
         .map(argnames=["view", "data"], argvalues=persist_ndvi)
     )
 
@@ -326,9 +321,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(
-            widgets=ndvi_chart_widget, **(params_dict.get("grouped_ndvi_widget") or {})
-        )
+        .partial(widgets=ndvi_chart_widget, **(params.get("grouped_ndvi_widget") or {}))
         .call()
     )
 
@@ -354,13 +347,13 @@ def main(params: Params):
             scale=500,
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
             filename_prefix="ndvi_geotiff",
-            **(params_dict.get("ndvi_tile") or {}),
+            **(params.get("ndvi_tile") or {}),
         )
         .mapvalues(argnames=["roi"], argvalues=split_roi_groups)
     )
 
     base_maps = (
-        task(set_base_maps_pydeck)
+        task(set_base_maps)
         .validate()
         .set_task_instance_id("base_maps")
         .handle_errors()
@@ -372,7 +365,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("base_maps") or {}))
+        .partial(**(params.get("base_maps") or {}))
         .call()
     )
 
@@ -401,7 +394,8 @@ def main(params: Params):
             },
             legend=None,
             data_url=None,
-            **(params_dict.get("roi_boundary_layer") or {}),
+            tooltip_columns=[],
+            **(params.get("roi_boundary_layer") or {}),
         )
         .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
     )
@@ -419,7 +413,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(base_layers=base_maps, **(params_dict.get("merged_tile_layers") or {}))
+        .partial(base_layers=base_maps, **(params.get("merged_tile_layers") or {}))
         .mapvalues(argnames=["overlay"], argvalues=ndvi_tile)
     )
 
@@ -438,7 +432,7 @@ def main(params: Params):
         )
         .partial(
             iterables=[roi_boundary_layer, merged_tile_layers],
-            **(params_dict.get("ndvi_map_layers") or {}),
+            **(params.get("ndvi_map_layers") or {}),
         )
         .call()
     )
@@ -462,7 +456,8 @@ def main(params: Params):
             legend_style=None,
             max_zoom=20,
             view_state=None,
-            **(params_dict.get("ndvi_map") or {}),
+            output_type="html",
+            **(params.get("ndvi_map") or {}),
         )
         .mapvalues(argnames=["geo_layers", "tile_layers"], argvalues=ndvi_map_layers)
     )
@@ -482,7 +477,7 @@ def main(params: Params):
         )
         .partial(
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
-            **(params_dict.get("persist_ndvi_map") or {}),
+            **(params.get("persist_ndvi_map") or {}),
         )
         .mapvalues(argnames=["text"], argvalues=ndvi_map)
     )
@@ -499,7 +494,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(title="NDVI Map", **(params_dict.get("ndvi_map_widget") or {}))
+        .partial(title="NDVI Map", **(params.get("ndvi_map_widget") or {}))
         .map(argnames=["view", "data"], argvalues=persist_ndvi_map)
     )
 
@@ -516,8 +511,7 @@ def main(params: Params):
             unpack_depth=1,
         )
         .partial(
-            widgets=ndvi_map_widget,
-            **(params_dict.get("grouped_ndvi_map_widget") or {}),
+            widgets=ndvi_map_widget, **(params.get("grouped_ndvi_map_widget") or {})
         )
         .call()
     )
@@ -539,7 +533,7 @@ def main(params: Params):
             widgets=[grouped_ndvi_widget, grouped_ndvi_map_widget],
             time_range=time_range,
             groupers=groupers,
-            **(params_dict.get("ndvi_dashboard") or {}),
+            **(params.get("ndvi_dashboard") or {}),
         )
         .call()
     )
