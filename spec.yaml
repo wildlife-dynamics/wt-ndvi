@@ -1,11 +1,14 @@
 id: ndvi
 requirements:
   - name: ecoscope-platform
-    version: "2.11.6"
+    version: "2.16.2"
     channel: https://repo.prefix.dev/ecoscope-workflows/
   - name: ecoscope-workflows-ext-custom
-    version: "0.1.0rc2"
+    version: "0.1.0rc17"
     channel: https://repo.prefix.dev/ecoscope-workflows-custom/
+  - name: pydeck
+    version: 0.9.2
+    channel: conda-forge
 rjsf-overrides:
   $defs:
     ValueGrouper.properties.index_name.oneOf: [
@@ -93,17 +96,15 @@ workflow:
       argvalues: ${{ workflow.split_roi_groups.return}}
   - name: Persist NDVI Data
     id: persist_ndvi_data
-    task: persist_df_wrapper
+    task: persist_grouped_dfs_for_results_download
     skipif:
       conditions:
         - never
     partial:
+      grouped_dfs: ${{ workflow.calculate_ndvi.return }}
       root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
       sanitize: true
       filename_prefix: ndvi
-    mapvalues:
-      argnames: df
-      argvalues: ${{ workflow.calculate_ndvi.return }}
   - name: Draw NDVI
     id: draw_ndvi
     task: draw_historic_timeseries
@@ -176,7 +177,7 @@ workflow:
           argvalues: ${{ workflow.split_roi_groups.return }}
       - name: ""
         id: base_maps
-        task: set_base_maps_pydeck
+        task: set_base_maps
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
     task: create_polygon_layer_pydeck
@@ -195,6 +196,7 @@ workflow:
         line_width_units: pixels
       legend: null
       data_url: null
+      tooltip_columns: []
     mapvalues:
       argnames: geodataframe
       argvalues: ${{ workflow.split_roi_groups.return }}
@@ -222,6 +224,7 @@ workflow:
       legend_style: null
       max_zoom: 20
       view_state: null
+      output_type: html
     mapvalues:
       argnames: [geo_layers, tile_layers]
       argvalues: ${{ workflow.ndvi_map_layers.return }}
