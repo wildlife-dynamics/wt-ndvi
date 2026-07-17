@@ -46,7 +46,7 @@ from ecoscope.platform.tasks.results import (
 from ecoscope.platform.tasks.results import merge_widget_views as merge_widget_views
 from ecoscope.platform.tasks.skip import never as never
 from ecoscope_workflows_ext_custom.tasks.io import (
-    persist_df_wrapper as persist_df_wrapper,
+    persist_grouped_dfs_for_results_download as persist_grouped_dfs_for_results_download,
 )
 
 create_ndvi_tile = create_func_magicmock(  # 🧪
@@ -217,7 +217,7 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
     )
 
     persist_ndvi_data = (
-        task(persist_df_wrapper)
+        task(persist_grouped_dfs_for_results_download)
         .validate()
         .set_task_instance_id("persist_ndvi_data")
         .handle_errors()
@@ -229,12 +229,13 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
             unpack_depth=1,
         )
         .partial(
+            grouped_dfs=calculate_ndvi,
             root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
             sanitize=True,
             filename_prefix="ndvi",
             **(params.get("persist_ndvi_data") or {}),
         )
-        .mapvalues(argnames=["df"], argvalues=calculate_ndvi)
+        .call()
     )
 
     draw_ndvi = (
