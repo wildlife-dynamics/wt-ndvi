@@ -96,17 +96,15 @@ workflow:
       argvalues: ${{ workflow.split_roi_groups.return}}
   - name: Persist NDVI Data
     id: persist_ndvi_data
-    task: persist_df_wrapper
+    task: persist_grouped_dfs_for_results_download
     skipif:
       conditions:
         - never
     partial:
+      grouped_dfs: ${{ workflow.calculate_ndvi.return }}
       root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
       sanitize: true
       filename_prefix: ndvi
-    mapvalues:
-      argnames: df
-      argvalues: ${{ workflow.calculate_ndvi.return }}
   - name: Draw NDVI
     id: draw_ndvi
     task: draw_historic_timeseries
