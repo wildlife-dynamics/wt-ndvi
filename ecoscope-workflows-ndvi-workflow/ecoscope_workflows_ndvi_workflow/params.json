@@ -210,12 +210,14 @@
             {
               "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
               "opacity": 1,
-              "max_zoom": 20
+              "max_zoom": 20,
+              "min_zoom": 0
             },
             {
               "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
               "opacity": 0.5,
-              "max_zoom": 20
+              "max_zoom": 20,
+              "min_zoom": 0
             }
           ],
           "items": {
@@ -236,6 +238,7 @@
                   "opacity": {
                     "default": 1,
                     "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "ecoscope:advanced": true,
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Layer Opacity",
@@ -260,6 +263,7 @@
                   "opacity": {
                     "default": 1,
                     "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "ecoscope:advanced": true,
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Layer Opacity",
@@ -284,6 +288,7 @@
                   "opacity": {
                     "default": 1,
                     "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "ecoscope:advanced": true,
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Layer Opacity",
@@ -308,6 +313,7 @@
                   "opacity": {
                     "default": 1,
                     "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "ecoscope:advanced": true,
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Layer Opacity",
@@ -315,30 +321,6 @@
                   }
                 },
                 "title": "Terrain",
-                "type": "object"
-              },
-              {
-                "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
-                "properties": {
-                  "url": {
-                    "default": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
-                    "title": "Preset Layer URL",
-                    "type": "string",
-                    "const": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
-                    "enum": [
-                      "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}"
-                    ]
-                  },
-                  "opacity": {
-                    "default": 1,
-                    "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
-                    "maximum": 1.0,
-                    "minimum": 0.0,
-                    "title": "Layer Opacity",
-                    "type": "number"
-                  }
-                },
-                "title": "LandDx",
                 "type": "object"
               },
               {
@@ -356,6 +338,7 @@
                   "opacity": {
                     "default": 1,
                     "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "ecoscope:advanced": true,
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Layer Opacity",
@@ -378,6 +361,7 @@
                   "opacity": {
                     "default": 1,
                     "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                    "ecoscope:advanced": true,
                     "maximum": 1.0,
                     "minimum": 0.0,
                     "title": "Custom Layer Opacity",
@@ -530,7 +514,6 @@
     "ValueGrouper": {
       "properties": {
         "index_name": {
-          "oneOf": [],
           "title": "Category",
           "type": "string"
         }
