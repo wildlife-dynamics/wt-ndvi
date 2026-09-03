@@ -10,9 +10,10 @@ from ecoscope.platform.tasks.groupby import set_groupers as set_groupers
 from ecoscope.platform.tasks.groupby import split_groups as split_groups
 from ecoscope.platform.tasks.io import calculate_ndvi_range as calculate_ndvi_range
 from ecoscope.platform.tasks.io import (
-    load_spatial_features_group as load_spatial_features_group,
+    get_spatial_features_group as get_spatial_features_group,
 )
 from ecoscope.platform.tasks.io import persist_text as persist_text
+from ecoscope.platform.tasks.io import set_er_connection as set_er_connection
 from ecoscope.platform.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope.platform.tasks.results import (
     create_map_widget_single_view as create_map_widget_single_view,
@@ -87,6 +88,23 @@ def main(params: Params):
         .call()
     )
 
+    er_client_name = (
+        task(set_er_connection)
+        .validate()
+        .set_task_instance_id("er_client_name")
+        .handle_errors()
+        .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
+        .partial(**(params_dict.get("er_client_name") or {}))
+        .call()
+    )
+
     time_range = (
         task(set_time_range)
         .validate()
@@ -124,7 +142,7 @@ def main(params: Params):
     )
 
     roi = (
-        task(load_spatial_features_group)
+        task(get_spatial_features_group)
         .validate()
         .set_task_instance_id("roi")
         .handle_errors()
@@ -136,7 +154,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("roi") or {}))
+        .partial(client=er_client_name, **(params_dict.get("roi") or {}))
         .call()
     )
 

@@ -35,6 +35,21 @@
       "type": "object",
       "title": "Select Google Earth Engine Data Source"
     },
+    "er_client_name": {
+      "additionalProperties": false,
+      "properties": {
+        "data_source": {
+          "$ref": "#/$defs/EarthRangerConnection",
+          "title": "",
+          "description": "Select one of your configured data sources."
+        }
+      },
+      "required": [
+        "data_source"
+      ],
+      "type": "object",
+      "title": "Select EarthRanger Data Source"
+    },
     "time_range": {
       "additionalProperties": false,
       "properties": {
@@ -99,23 +114,14 @@
     "roi": {
       "additionalProperties": false,
       "properties": {
-        "config": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/LocalFileSpatialFeatures"
-            },
-            {
-              "$ref": "#/$defs/RemoteFileSpatialFeatures"
-            },
-            {
-              "$ref": "#/$defs/EarthRangerSpatialFeatures"
-            }
-          ],
-          "title": "Spatial Feature Data Source"
+        "spatial_features_group_name": {
+          "title": "Spatial Features Group Name",
+          "type": "string",
+          "description": "The name of the group to fetch"
         }
       },
       "required": [
-        "config"
+        "spatial_features_group_name"
       ],
       "type": "object",
       "title": "Load Region of Interest"
@@ -420,6 +426,19 @@
       "title": "GoogleEarthEngineConnection",
       "type": "object"
     },
+    "EarthRangerConnection": {
+      "properties": {
+        "name": {
+          "title": "Data Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "EarthRangerConnection",
+      "type": "object"
+    },
     "TimezoneInfo": {
       "properties": {
         "label": {
@@ -521,80 +540,6 @@
       ],
       "title": "Category",
       "type": "object"
-    },
-    "EarthRangerSpatialFeatures": {
-      "properties": {
-        "data_source": {
-          "description": "Select one of your configured EarthRanger data sources.",
-          "title": "Data Source",
-          "type": "string"
-        },
-        "spatial_features_group_name": {
-          "description": "Name of the spatial features group in EarthRanger",
-          "title": "Spatial Features Group Name",
-          "type": "string"
-        }
-      },
-      "required": [
-        "data_source",
-        "spatial_features_group_name"
-      ],
-      "title": "EarthRanger",
-      "type": "object"
-    },
-    "LocalFileSpatialFeatures": {
-      "properties": {
-        "file_path": {
-          "description": "Path to geoparquet (.parquet) or geopackage (.gpkg) file",
-          "title": "File Path",
-          "type": "string"
-        },
-        "name_column": {
-          "description": "Column to use as region name",
-          "title": "Name Column",
-          "type": "string"
-        },
-        "layer": {
-          "default": null,
-          "description": "Layer name (only applicable to geopackage files)",
-          "ecoscope:advanced": true,
-          "title": "Layer",
-          "type": "string"
-        }
-      },
-      "required": [
-        "file_path",
-        "name_column"
-      ],
-      "title": "Local File",
-      "type": "object"
-    },
-    "RemoteFileSpatialFeatures": {
-      "properties": {
-        "url": {
-          "description": "URL to geoparquet (.parquet) or geopackage (.gpkg) file",
-          "title": "Url",
-          "type": "string"
-        },
-        "name_column": {
-          "description": "Column to use as region name",
-          "title": "Name Column",
-          "type": "string"
-        },
-        "layer": {
-          "default": null,
-          "description": "Layer name (only applicable for geopackage files)",
-          "ecoscope:advanced": true,
-          "title": "Layer",
-          "type": "string"
-        }
-      },
-      "required": [
-        "url",
-        "name_column"
-      ],
-      "title": "Remote URL",
-      "type": "object"
     }
   },
   "uiSchema": {
@@ -614,6 +559,7 @@
     "ui:order": [
       "workflow_details",
       "gee_client",
+      "er_client_name",
       "time_range",
       "groupers",
       "roi",

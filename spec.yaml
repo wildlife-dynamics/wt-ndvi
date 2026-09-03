@@ -11,10 +11,6 @@ rjsf-overrides:
     ValueGrouper.properties.index_name.oneOf: [
       {"const": "name", "title": "Region of Interest"},
     ]
-    LocalFileSpatialFeatures.properties.file_path.default: ""
-    LocalFileSpatialFeatures.properties.layer.type: ["string", "null"]
-    RemoteFileSpatialFeatures.properties.url.default: ""
-    RemoteFileSpatialFeatures.properties.layer.type: ["string", "null"]
   properties:
     groupers.properties.groupers.items.anyOf: [
       {"$ref": "#/$defs/ValueGrouper"},
@@ -23,10 +19,13 @@ rjsf-overrides:
       {"index_name": "name"},
     ]
     time_range.description: "Choose the period of time to analyze. Please make sure you select a large enough time range to see results, as the latest month's data may not be ready yet."
-    roi.properties.config.anyOf: [
-      {"$ref": "#/$defs/LocalFileSpatialFeatures"},
-      {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
-    ]
+    roi.properties.spatial_features_group_name.title: "Spatial Features Group"
+    roi.properties.spatial_features_group_name.description: "Name of the spatial features group in EarthRanger whose polygons define the regions of interest."
+    roi.properties.spatial_features_group_name.ecoscope:transform:
+      - transformer: EarthRangerEnumResolver
+        transformer_kws:
+          type: spatial_feature_group
+          depends_on: properties.er_client_name.properties.data_source.properties.name
     ndvi_method.properties.var.title: " "
     ndvi_method.properties.var.description: "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
     ndvi_method.properties.var.enum: [
@@ -59,6 +58,9 @@ workflow:
   - name: Select Google Earth Engine Data Source
     id: gee_client
     task: set_gee_connection
+  - name: Select EarthRanger Data Source
+    id: er_client_name
+    task: set_er_connection
   - name: Time Range
     id: time_range
     task: set_time_range
@@ -69,7 +71,9 @@ workflow:
     task: set_groupers
   - name: Load Region of Interest
     id: roi
-    task: load_spatial_features_group
+    task: get_spatial_features_group
+    partial:
+      client: ${{ workflow.er_client_name.return }}
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups

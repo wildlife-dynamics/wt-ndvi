@@ -14,6 +14,7 @@ import warnings  # 🧪
 from ecoscope.platform.tasks.config import set_workflow_details as set_workflow_details
 from ecoscope.platform.tasks.filter import set_time_range as set_time_range
 from ecoscope.platform.tasks.groupby import set_groupers as set_groupers
+from ecoscope.platform.tasks.io import set_er_connection as set_er_connection
 from ecoscope.platform.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope.platform.tasks.skip import (
     any_dependency_skipped as any_dependency_skipped,
@@ -22,9 +23,9 @@ from ecoscope.platform.tasks.skip import any_is_empty_df as any_is_empty_df
 from wt_task import task
 from wt_task.testing import create_func_magicmock  # 🧪
 
-load_spatial_features_group = create_func_magicmock(  # 🧪
+get_spatial_features_group = create_func_magicmock(  # 🧪
     anchor="ecoscope.platform.tasks.io",  # 🧪
-    func_name="load_spatial_features_group",  # 🧪
+    func_name="get_spatial_features_group",  # 🧪
 )  # 🧪
 from ecoscope.platform.tasks.config import set_string_var as set_string_var
 from ecoscope.platform.tasks.groupby import split_groups as split_groups
@@ -109,6 +110,23 @@ def main(params: Params):
         .call()
     )
 
+    er_client_name = (
+        task(set_er_connection)
+        .validate()
+        .set_task_instance_id("er_client_name")
+        .handle_errors()
+        .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
+        .partial(**(params_dict.get("er_client_name") or {}))
+        .call()
+    )
+
     time_range = (
         task(set_time_range)
         .validate()
@@ -146,7 +164,7 @@ def main(params: Params):
     )
 
     roi = (
-        task(load_spatial_features_group)
+        task(get_spatial_features_group)
         # 🧪 validation omitted for mocked IO task (returns pre-loaded example data)
         .set_task_instance_id("roi")
         .handle_errors()
@@ -158,7 +176,7 @@ def main(params: Params):
             ],
             unpack_depth=1,
         )
-        .partial(**(params_dict.get("roi") or {}))
+        .partial(client=er_client_name, **(params_dict.get("roi") or {}))
         .call()
     )
 

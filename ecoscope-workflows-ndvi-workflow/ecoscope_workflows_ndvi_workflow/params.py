@@ -18,6 +18,17 @@ class WorkflowDetails(BaseModel):
     description: Optional[str] = Field("", title="Workflow Description")
 
 
+class Roi(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    spatial_features_group_name: str = Field(
+        ...,
+        description="The name of the group to fetch",
+        title="Spatial Features Group Name",
+    )
+
+
 class NdviMethod(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -240,6 +251,10 @@ class GoogleEarthEngineConnection(BaseModel):
     name: str = Field(..., title="Data Source")
 
 
+class EarthRangerConnection(BaseModel):
+    name: str = Field(..., title="Data Source")
+
+
 class TimezoneInfo(BaseModel):
     label: str = Field(..., title="Label")
     tzCode: str = Field(..., title="Tzcode")
@@ -259,56 +274,20 @@ class ValueGrouper(BaseModel):
     index_name: str = Field(..., title="Category")
 
 
-class EarthRangerSpatialFeatures(BaseModel):
-    data_source: str = Field(
-        ...,
-        description="Select one of your configured EarthRanger data sources.",
-        title="Data Source",
-    )
-    spatial_features_group_name: str = Field(
-        ...,
-        description="Name of the spatial features group in EarthRanger",
-        title="Spatial Features Group Name",
-    )
-
-
-class LocalFileSpatialFeatures(BaseModel):
-    file_path: str = Field(
-        ...,
-        description="Path to geoparquet (.parquet) or geopackage (.gpkg) file",
-        title="File Path",
-    )
-    name_column: str = Field(
-        ..., description="Column to use as region name", title="Name Column"
-    )
-    layer: Optional[str] = Field(
-        None,
-        description="Layer name (only applicable to geopackage files)",
-        title="Layer",
-    )
-
-
-class RemoteFileSpatialFeatures(BaseModel):
-    url: str = Field(
-        ...,
-        description="URL to geoparquet (.parquet) or geopackage (.gpkg) file",
-        title="Url",
-    )
-    name_column: str = Field(
-        ..., description="Column to use as region name", title="Name Column"
-    )
-    layer: Optional[str] = Field(
-        None,
-        description="Layer name (only applicable for geopackage files)",
-        title="Layer",
-    )
-
-
 class GeeClient(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
     )
     data_source: GoogleEarthEngineConnection = Field(
+        ..., description="Select one of your configured data sources.", title=""
+    )
+
+
+class ErClientName(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+    data_source: EarthRangerConnection = Field(
         ..., description="Select one of your configured data sources.", title=""
     )
 
@@ -335,15 +314,6 @@ class Groupers(BaseModel):
     )
 
 
-class Roi(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-    )
-    config: Union[
-        LocalFileSpatialFeatures, RemoteFileSpatialFeatures, EarthRangerSpatialFeatures
-    ] = Field(..., title="Spatial Feature Data Source")
-
-
 class Params(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
@@ -355,6 +325,9 @@ class Params(BaseModel):
     )
     gee_client: Optional[GeeClient] = Field(
         None, title="Select Google Earth Engine Data Source"
+    )
+    er_client_name: Optional[ErClientName] = Field(
+        None, title="Select EarthRanger Data Source"
     )
     time_range: Optional[TimeRange] = Field(
         None, description="Choose the period of time to analyze.", title="Time Range"
