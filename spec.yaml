@@ -1,7 +1,7 @@
 id: ndvi
 requirements:
   - name: ecoscope-platform
-    version: ">=2.19.0, <2.20.0"
+    version: ">=2.20.0, <2.21.0"
     channel: https://repo.prefix.dev/ecoscope-workflows/
   # ecoscope-platform already declares this exact pydeck dependency. it is
   # re-stated here as a workaround for a known issue. for further detail, see:
@@ -187,9 +187,44 @@ workflow:
       - name: ""
         id: base_maps
         task: set_base_maps
+  # EarthRanger spatial features carry no CRS guarantee and the pydeck data_url
+  # path does no reprojection, so pin the ROI to EPSG:4326 before persisting.
+  - name: Convert ROI CRS
+    id: roi_crs
+    task: convert_crs
+    partial:
+      crs: "EPSG:4326"
+    mapvalues:
+      argnames: df
+      argvalues: ${{ workflow.split_roi_groups.return }}
+  - name: Persist ROI to Parquet
+    id: persist_roi_parquet
+    task: persist_geoarrow_for_pydeck
+    skipif:
+      conditions:
+        - any_is_empty_df
+        - any_dependency_skipped
+        - all_geometry_are_none
+    partial:
+      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+      filename: null
+    mapvalues:
+      argnames: gdf
+      argvalues: ${{ workflow.roi_crs.return }}
+  - name: Combine ROI and Data URL
+    id: combine_roi_gdf_and_url
+    task: groupbykey
+    skipif:
+      conditions:
+        - any_keyed_iterables_are_skips
+      unpack_depth: 1
+    partial:
+      iterables:
+        - ${{ workflow.roi_crs.return }}
+        - ${{ workflow.persist_roi_parquet.return }}
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
-    task: create_polygon_layer_pydeck
+    task: create_geoarrow_polygon_layer
     skipif:
       conditions:
         - any_is_empty_df
@@ -204,11 +239,11 @@ workflow:
         filled: false
         line_width_units: pixels
       legend: null
-      data_url: null
+      zoom: false
       tooltip_columns: null
     mapvalues:
-      argnames: geodataframe
-      argvalues: ${{ workflow.split_roi_groups.return }}
+      argnames: [geodataframe, data_url]
+      argvalues: ${{ workflow.combine_roi_gdf_and_url.return }}
   - name: Merge Tile Layers
     id: merged_tile_layers
     task: merge_tile_layers
@@ -233,21 +268,13 @@ workflow:
       legend_style: null
       max_zoom: 20
       view_state: null
-      output_type: html
+      output_type: json
     mapvalues:
       argnames: [geo_layers, tile_layers]
       argvalues: ${{ workflow.ndvi_map_layers.return }}
-  - name: Persist NDVI Map
-    id: persist_ndvi_map
-    task: persist_text
-    partial:
-      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
-    mapvalues:
-      argnames: text
-      argvalues: ${{ workflow.ndvi_map.return }}
   - name: Create NDVI Map Widget
     id: ndvi_map_widget
-    task: create_map_widget_single_view
+    task: create_map_v2_widget_single_view
     skipif:
       conditions:
         - never
@@ -255,7 +282,7 @@ workflow:
       title: "NDVI Map"
     map:
       argnames: [view, data]
-      argvalues: ${{ workflow.persist_ndvi_map.return }}
+      argvalues: ${{ workflow.ndvi_map.return }}
   - name: Merge NDVI Map Widget Views
     id: grouped_ndvi_map_widget
     task: merge_widget_views

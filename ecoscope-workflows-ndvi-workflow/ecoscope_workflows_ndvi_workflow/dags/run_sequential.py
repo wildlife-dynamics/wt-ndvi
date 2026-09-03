@@ -17,13 +17,10 @@ from ecoscope.platform.tasks.io import persist_text as persist_text
 from ecoscope.platform.tasks.io import set_er_connection as set_er_connection
 from ecoscope.platform.tasks.io import set_gee_connection as set_gee_connection
 from ecoscope.platform.tasks.results import (
-    create_map_widget_single_view as create_map_widget_single_view,
+    create_map_v2_widget_single_view as create_map_v2_widget_single_view,
 )
 from ecoscope.platform.tasks.results import (
     create_plot_widget_single_view as create_plot_widget_single_view,
-)
-from ecoscope.platform.tasks.results import (
-    create_polygon_layer_pydeck as create_polygon_layer_pydeck,
 )
 from ecoscope.platform.tasks.results import (
     draw_historic_timeseries as draw_historic_timeseries,
@@ -32,13 +29,23 @@ from ecoscope.platform.tasks.results import draw_map as draw_map
 from ecoscope.platform.tasks.results import gather_dashboard as gather_dashboard
 from ecoscope.platform.tasks.results import merge_tile_layers as merge_tile_layers
 from ecoscope.platform.tasks.results import merge_widget_views as merge_widget_views
+from ecoscope.platform.tasks.results import (
+    persist_geoarrow_for_pydeck as persist_geoarrow_for_pydeck,
+)
 from ecoscope.platform.tasks.results import set_base_maps as set_base_maps
+from ecoscope.platform.tasks.results._pydeck import (
+    create_geoarrow_polygon_layer as create_geoarrow_polygon_layer,
+)
 from ecoscope.platform.tasks.skip import all_geometry_are_none as all_geometry_are_none
 from ecoscope.platform.tasks.skip import (
     any_dependency_skipped as any_dependency_skipped,
 )
 from ecoscope.platform.tasks.skip import any_is_empty_df as any_is_empty_df
+from ecoscope.platform.tasks.skip import (
+    any_keyed_iterables_are_skips as any_keyed_iterables_are_skips,
+)
 from ecoscope.platform.tasks.skip import never as never
+from ecoscope.platform.tasks.transformation import convert_crs as convert_crs
 from ecoscope_workflows_ext_custom.tasks.io import create_ndvi_tile as create_ndvi_tile
 from wt_contracts import validate as _validate
 from wt_task import task
@@ -362,8 +369,66 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
         .call()
     )
 
+    roi_crs = (
+        task(convert_crs)
+        .validate()
+        .set_task_instance_id("roi_crs")
+        .handle_errors()
+        .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+            ],
+            unpack_depth=1,
+        )
+        .partial(crs="EPSG:4326", **(params.get("roi_crs") or {}))
+        .mapvalues(argnames=["df"], argvalues=split_roi_groups)
+    )
+
+    persist_roi_parquet = (
+        task(persist_geoarrow_for_pydeck)
+        .validate()
+        .set_task_instance_id("persist_roi_parquet")
+        .handle_errors()
+        .with_tracing()
+        .skipif(
+            conditions=[
+                any_is_empty_df,
+                any_dependency_skipped,
+                all_geometry_are_none,
+            ],
+            unpack_depth=1,
+        )
+        .partial(
+            root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
+            filename=None,
+            **(params.get("persist_roi_parquet") or {}),
+        )
+        .mapvalues(argnames=["gdf"], argvalues=roi_crs)
+    )
+
+    combine_roi_gdf_and_url = (
+        task(groupbykey)
+        .validate()
+        .set_task_instance_id("combine_roi_gdf_and_url")
+        .handle_errors()
+        .with_tracing()
+        .skipif(
+            conditions=[
+                any_keyed_iterables_are_skips,
+            ],
+            unpack_depth=1,
+        )
+        .partial(
+            iterables=[roi_crs, persist_roi_parquet],
+            **(params.get("combine_roi_gdf_and_url") or {}),
+        )
+        .call()
+    )
+
     roi_boundary_layer = (
-        task(create_polygon_layer_pydeck)
+        task(create_geoarrow_polygon_layer)
         .validate()
         .set_task_instance_id("roi_boundary_layer")
         .handle_errors()
@@ -386,11 +451,13 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
                 "line_width_units": "pixels",
             },
             legend=None,
-            data_url=None,
+            zoom=False,
             tooltip_columns=None,
             **(params.get("roi_boundary_layer") or {}),
         )
-        .mapvalues(argnames=["geodataframe"], argvalues=split_roi_groups)
+        .mapvalues(
+            argnames=["geodataframe", "data_url"], argvalues=combine_roi_gdf_and_url
+        )
     )
 
     merged_tile_layers = (
@@ -449,34 +516,14 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
             legend_style=None,
             max_zoom=20,
             view_state=None,
-            output_type="html",
+            output_type="json",
             **(params.get("ndvi_map") or {}),
         )
         .mapvalues(argnames=["geo_layers", "tile_layers"], argvalues=ndvi_map_layers)
     )
 
-    persist_ndvi_map = (
-        task(persist_text)
-        .validate()
-        .set_task_instance_id("persist_ndvi_map")
-        .handle_errors()
-        .with_tracing()
-        .skipif(
-            conditions=[
-                any_is_empty_df,
-                any_dependency_skipped,
-            ],
-            unpack_depth=1,
-        )
-        .partial(
-            root_path=os.environ["ECOSCOPE_WORKFLOWS_RESULTS"],
-            **(params.get("persist_ndvi_map") or {}),
-        )
-        .mapvalues(argnames=["text"], argvalues=ndvi_map)
-    )
-
     ndvi_map_widget = (
-        task(create_map_widget_single_view)
+        task(create_map_v2_widget_single_view)
         .validate()
         .set_task_instance_id("ndvi_map_widget")
         .handle_errors()
@@ -488,7 +535,7 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
             unpack_depth=1,
         )
         .partial(title="NDVI Map", **(params.get("ndvi_map_widget") or {}))
-        .map(argnames=["view", "data"], argvalues=persist_ndvi_map)
+        .map(argnames=["view", "data"], argvalues=ndvi_map)
     )
 
     grouped_ndvi_map_widget = (
