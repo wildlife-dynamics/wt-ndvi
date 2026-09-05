@@ -1,20 +1,42 @@
 id: ndvi
+metadata:
+  name: NDVI Workflow
+  description: >-
+    Monitor vegetation health using satellite-derived NDVI (Normalized Difference
+    Vegetation Index) data: track greenness trends over time, compare current
+    conditions against historical baselines, and identify areas of vegetation
+    change across your regions of interest.
+  maintainers:
+    - name: Yun Wu
+      email: yun@wildlifedynamics.com
+      role: owner
+    - name: Alex Morling
+      email: alexm@earthranger.com
+      role: reviewer
+  license: BSD-3-Clause
+  repository: https://github.com/wildlife-dynamics/wt-ndvi
+  documentation: https://github.com/wildlife-dynamics/wt-ndvi#readme
+  readme: README.md
+  keywords: [ndvi, vegetation, gee, earthranger, raster]
+  thumbnail: resources/thumbnail.png
 requirements:
   - name: ecoscope-platform
-    version: "2.11.6"
+    version: ">=2.20.0, <2.21.0"
     channel: https://repo.prefix.dev/ecoscope-workflows/
+  # ecoscope-platform already declares this exact pydeck dependency. it is
+  # re-stated here as a workaround for a known issue. for further detail, see:
+  # https://github.com/wildlife-dynamics/wt/issues/167#issuecomment-4451993697
+  - name: pydeck
+    version: 0.9.2
+    channel: conda-forge
   - name: ecoscope-workflows-ext-custom
-    version: "0.1.0rc2"
+    version: "0.1.0"
     channel: https://repo.prefix.dev/ecoscope-workflows-custom/
 rjsf-overrides:
   $defs:
     ValueGrouper.properties.index_name.oneOf: [
       {"const": "name", "title": "Region of Interest"},
     ]
-    LocalFileSpatialFeatures.properties.file_path.default: ""
-    LocalFileSpatialFeatures.properties.layer.type: ["string", "null"]
-    RemoteFileSpatialFeatures.properties.url.default: ""
-    RemoteFileSpatialFeatures.properties.layer.type: ["string", "null"]
   properties:
     groupers.properties.groupers.items.anyOf: [
       {"$ref": "#/$defs/ValueGrouper"},
@@ -23,10 +45,13 @@ rjsf-overrides:
       {"index_name": "name"},
     ]
     time_range.description: "Choose the period of time to analyze. Please make sure you select a large enough time range to see results, as the latest month's data may not be ready yet."
-    roi.properties.config.anyOf: [
-      {"$ref": "#/$defs/LocalFileSpatialFeatures"},
-      {"$ref": "#/$defs/RemoteFileSpatialFeatures"},
-    ]
+    roi.properties.spatial_features_group_name.title: "Spatial Features Group"
+    roi.properties.spatial_features_group_name.description: "Name of the spatial features group in EarthRanger whose polygons define the regions of interest."
+    roi.properties.spatial_features_group_name.ecoscope:transform:
+      - transformer: EarthRangerEnumResolver
+        transformer_kws:
+          type: spatial_feature_group
+          depends_on: properties.er_client_name.properties.data_source.properties.name
     ndvi_method.properties.var.title: " "
     ndvi_method.properties.var.description: "Method to obtain NDVI values. 'MODIS MYD13A1 16-Day Composite': Uses pre-calculated NDVI from 16-day composites. Provides quality-filtered 'best pixel' values at 500m resolution with ~0.025 accuracy. Better for phenology studies but may saturate in dense canopies. 'MODIS MCD43A4 Daily NBAR': Uses daily nadir BRDF-adjusted reflectance. Computes NDVI from NIR/Red bands with view-angle correction for consistent measurements. Higher temporal resolution but more susceptible to cloud gaps."
     ndvi_method.properties.var.enum: [
@@ -59,6 +84,9 @@ workflow:
   - name: Select Google Earth Engine Data Source
     id: gee_client
     task: set_gee_connection
+  - name: Select EarthRanger Data Source
+    id: er_client_name
+    task: set_er_connection
   - name: Time Range
     id: time_range
     task: set_time_range
@@ -69,7 +97,9 @@ workflow:
     task: set_groupers
   - name: Load Region of Interest
     id: roi
-    task: load_spatial_features_group
+    task: get_spatial_features_group
+    partial:
+      client: ${{ workflow.er_client_name.return }}
   - name: Split ROIs by Group
     id: split_roi_groups
     task: split_groups
@@ -121,8 +151,8 @@ workflow:
         line:
           color: "rgba(144, 238, 144, 0.8)"
         fillcolor: "rgba(144, 238, 144, 0.3)"
-      historic_mean_style: null
-      current_value_style: null
+      historic_mean_style: {mode: "lines+markers", line: {color: green, dash: dot}}
+      current_value_style: {mode: "lines+markers", line: {color: navy}}
       time_column: img_date
     mapvalues:
       argnames: dataframe
@@ -176,10 +206,45 @@ workflow:
           argvalues: ${{ workflow.split_roi_groups.return }}
       - name: ""
         id: base_maps
-        task: set_base_maps_pydeck
+        task: set_base_maps
+  # EarthRanger spatial features carry no CRS guarantee and the pydeck data_url
+  # path does no reprojection, so pin the ROI to EPSG:4326 before persisting.
+  - name: Convert ROI CRS
+    id: roi_crs
+    task: convert_crs
+    partial:
+      crs: "EPSG:4326"
+    mapvalues:
+      argnames: df
+      argvalues: ${{ workflow.split_roi_groups.return }}
+  - name: Persist ROI to Parquet
+    id: persist_roi_parquet
+    task: persist_geoarrow_for_pydeck
+    skipif:
+      conditions:
+        - any_is_empty_df
+        - any_dependency_skipped
+        - all_geometry_are_none
+    partial:
+      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
+      filename: null
+    mapvalues:
+      argnames: gdf
+      argvalues: ${{ workflow.roi_crs.return }}
+  - name: Combine ROI and Data URL
+    id: combine_roi_gdf_and_url
+    task: groupbykey
+    skipif:
+      conditions:
+        - any_keyed_iterables_are_skips
+      unpack_depth: 1
+    partial:
+      iterables:
+        - ${{ workflow.roi_crs.return }}
+        - ${{ workflow.persist_roi_parquet.return }}
   - name: Create ROI Boundary Layer
     id: roi_boundary_layer
-    task: create_polygon_layer_pydeck
+    task: create_geoarrow_polygon_layer
     skipif:
       conditions:
         - any_is_empty_df
@@ -194,10 +259,11 @@ workflow:
         filled: false
         line_width_units: pixels
       legend: null
-      data_url: null
+      zoom: false
+      tooltip_columns: null
     mapvalues:
-      argnames: geodataframe
-      argvalues: ${{ workflow.split_roi_groups.return }}
+      argnames: [geodataframe, data_url]
+      argvalues: ${{ workflow.combine_roi_gdf_and_url.return }}
   - name: Merge Tile Layers
     id: merged_tile_layers
     task: merge_tile_layers
@@ -222,20 +288,13 @@ workflow:
       legend_style: null
       max_zoom: 20
       view_state: null
+      output_type: json
     mapvalues:
       argnames: [geo_layers, tile_layers]
       argvalues: ${{ workflow.ndvi_map_layers.return }}
-  - name: Persist NDVI Map
-    id: persist_ndvi_map
-    task: persist_text
-    partial:
-      root_path: ${{ env.ECOSCOPE_WORKFLOWS_RESULTS }}
-    mapvalues:
-      argnames: text
-      argvalues: ${{ workflow.ndvi_map.return }}
   - name: Create NDVI Map Widget
     id: ndvi_map_widget
-    task: create_map_widget_single_view
+    task: create_map_v2_widget_single_view
     skipif:
       conditions:
         - never
@@ -243,7 +302,7 @@ workflow:
       title: "NDVI Map"
     map:
       argnames: [view, data]
-      argvalues: ${{ workflow.persist_ndvi_map.return }}
+      argvalues: ${{ workflow.ndvi_map.return }}
   - name: Merge NDVI Map Widget Views
     id: grouped_ndvi_map_widget
     task: merge_widget_views

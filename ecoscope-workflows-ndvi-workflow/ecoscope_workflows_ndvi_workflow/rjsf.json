@@ -35,6 +35,21 @@
       "type": "object",
       "title": "Select Google Earth Engine Data Source"
     },
+    "er_client_name": {
+      "additionalProperties": false,
+      "properties": {
+        "data_source": {
+          "$ref": "#/$defs/EarthRangerConnection",
+          "title": "",
+          "description": "Select one of your configured data sources."
+        }
+      },
+      "required": [
+        "data_source"
+      ],
+      "type": "object",
+      "title": "Select EarthRanger Data Source"
+    },
     "time_range": {
       "additionalProperties": false,
       "properties": {
@@ -97,20 +112,23 @@
     "roi": {
       "additionalProperties": false,
       "properties": {
-        "config": {
-          "anyOf": [
+        "spatial_features_group_name": {
+          "title": "Spatial Features Group",
+          "type": "string",
+          "description": "Name of the spatial features group in EarthRanger whose polygons define the regions of interest.",
+          "ecoscope:transform": [
             {
-              "$ref": "#/$defs/LocalFileSpatialFeatures"
-            },
-            {
-              "$ref": "#/$defs/RemoteFileSpatialFeatures"
+              "transformer": "EarthRangerEnumResolver",
+              "transformer_kws": {
+                "type": "spatial_feature_group",
+                "depends_on": "properties.er_client_name.properties.data_source.properties.name"
+              }
             }
-          ],
-          "title": "Spatial Feature Data Source"
+          ]
         }
       },
       "required": [
-        "config"
+        "spatial_features_group_name"
       ],
       "type": "object",
       "title": "Load Region of Interest"
@@ -227,6 +245,7 @@
                       "opacity": {
                         "default": 1,
                         "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                        "ecoscope:advanced": true,
                         "maximum": 1.0,
                         "minimum": 0.0,
                         "title": "Layer Opacity",
@@ -251,6 +270,7 @@
                       "opacity": {
                         "default": 1,
                         "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                        "ecoscope:advanced": true,
                         "maximum": 1.0,
                         "minimum": 0.0,
                         "title": "Layer Opacity",
@@ -275,6 +295,7 @@
                       "opacity": {
                         "default": 1,
                         "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                        "ecoscope:advanced": true,
                         "maximum": 1.0,
                         "minimum": 0.0,
                         "title": "Layer Opacity",
@@ -299,6 +320,7 @@
                       "opacity": {
                         "default": 1,
                         "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                        "ecoscope:advanced": true,
                         "maximum": 1.0,
                         "minimum": 0.0,
                         "title": "Layer Opacity",
@@ -306,30 +328,6 @@
                       }
                     },
                     "title": "Terrain",
-                    "type": "object"
-                  },
-                  {
-                    "description": "A tiled raster layer loaded on-demand from a URL template (e.g., base maps).",
-                    "properties": {
-                      "url": {
-                        "default": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
-                        "title": "Preset Layer URL",
-                        "type": "string",
-                        "const": "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}",
-                        "enum": [
-                          "https://tiles.arcgis.com/tiles/POUcpLYXNckpLjnY/arcgis/rest/services/landDx_basemap_tiles_mapservice/MapServer/tile/{z}/{y}/{x}"
-                        ]
-                      },
-                      "opacity": {
-                        "default": 1,
-                        "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
-                        "maximum": 1.0,
-                        "minimum": 0.0,
-                        "title": "Layer Opacity",
-                        "type": "number"
-                      }
-                    },
-                    "title": "LandDx",
                     "type": "object"
                   },
                   {
@@ -347,6 +345,7 @@
                       "opacity": {
                         "default": 1,
                         "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                        "ecoscope:advanced": true,
                         "maximum": 1.0,
                         "minimum": 0.0,
                         "title": "Layer Opacity",
@@ -369,6 +368,7 @@
                       "opacity": {
                         "default": 1,
                         "description": "Set layer transparency from 1 (fully visible) to 0 (hidden).",
+                        "ecoscope:advanced": true,
                         "maximum": 1.0,
                         "minimum": 0.0,
                         "title": "Custom Layer Opacity",
@@ -417,6 +417,19 @@
         "name"
       ],
       "title": "GoogleEarthEngineConnection",
+      "type": "object"
+    },
+    "EarthRangerConnection": {
+      "properties": {
+        "name": {
+          "title": "Data Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "EarthRangerConnection",
       "type": "object"
     },
     "TimezoneInfo": {
@@ -510,102 +523,20 @@
     "ValueGrouper": {
       "properties": {
         "index_name": {
+          "title": "Category",
+          "type": "string",
           "oneOf": [
             {
               "const": "name",
               "title": "Region of Interest"
             }
-          ],
-          "title": "Category",
-          "type": "string"
+          ]
         }
       },
       "required": [
         "index_name"
       ],
       "title": "Category",
-      "type": "object"
-    },
-    "EarthRangerSpatialFeatures": {
-      "properties": {
-        "data_source": {
-          "description": "Select one of your configured EarthRanger data sources.",
-          "title": "Data Source",
-          "type": "string"
-        },
-        "spatial_features_group_name": {
-          "description": "Name of the spatial features group in EarthRanger",
-          "title": "Spatial Features Group Name",
-          "type": "string"
-        }
-      },
-      "required": [
-        "data_source",
-        "spatial_features_group_name"
-      ],
-      "title": "EarthRanger",
-      "type": "object"
-    },
-    "LocalFileSpatialFeatures": {
-      "properties": {
-        "file_path": {
-          "description": "Path to geoparquet (.parquet) or geopackage (.gpkg) file",
-          "title": "File Path",
-          "type": "string",
-          "default": ""
-        },
-        "name_column": {
-          "description": "Column to use as region name",
-          "title": "Name Column",
-          "type": "string"
-        },
-        "layer": {
-          "default": null,
-          "description": "Layer name (only applicable to geopackage files)",
-          "ecoscope:advanced": true,
-          "title": "Layer",
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "file_path",
-        "name_column"
-      ],
-      "title": "Local File",
-      "type": "object"
-    },
-    "RemoteFileSpatialFeatures": {
-      "properties": {
-        "url": {
-          "description": "URL to geoparquet (.parquet) or geopackage (.gpkg) file",
-          "title": "Url",
-          "type": "string",
-          "default": ""
-        },
-        "name_column": {
-          "description": "Column to use as region name",
-          "title": "Name Column",
-          "type": "string"
-        },
-        "layer": {
-          "default": null,
-          "description": "Layer name (only applicable for geopackage files)",
-          "ecoscope:advanced": true,
-          "title": "Layer",
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "required": [
-        "url",
-        "name_column"
-      ],
-      "title": "Remote URL",
       "type": "object"
     }
   },
@@ -641,6 +572,7 @@
     "ui:order": [
       "workflow_details",
       "gee_client",
+      "er_client_name",
       "time_range",
       "groupers",
       "roi",

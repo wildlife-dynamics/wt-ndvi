@@ -34,7 +34,7 @@ jobs:
 
       - uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          pixi-version: v0.60.0
+          pixi-version: v0.70.2
 
       - name: Clean pixi cache
         if: inputs.download-artifacts
@@ -48,7 +48,8 @@ jobs:
             --pkg-name-prefix=ecoscope-workflows \
             --results-env-var=ECOSCOPE_WORKFLOWS_RESULTS \
             --no-progress \
-            --clobber --update
+            --clobber --update \
+            --variant=gcp
 
       - name: Check for differences in generated files
         run: |
