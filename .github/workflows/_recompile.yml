@@ -48,7 +48,8 @@ jobs:
             --pkg-name-prefix=ecoscope-workflows \
             --results-env-var=ECOSCOPE_WORKFLOWS_RESULTS \
             --no-progress \
-            --clobber --update
+            --clobber --update \
+            --variant=gcp
 
       - name: Check for differences in generated files
         run: |
