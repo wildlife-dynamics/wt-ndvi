@@ -1,4 +1,24 @@
 id: ndvi
+metadata:
+  name: NDVI Workflow
+  description: >-
+    Monitor vegetation health using satellite-derived NDVI (Normalized Difference
+    Vegetation Index) data: track greenness trends over time, compare current
+    conditions against historical baselines, and identify areas of vegetation
+    change across your regions of interest.
+  maintainers:
+    - name: Yun Wu
+      email: yun@wildlifedynamics.com
+      role: owner
+    - name: Alex Morling
+      email: alexm@earthranger.com
+      role: reviewer
+  license: BSD-3-Clause
+  repository: https://github.com/wildlife-dynamics/wt-ndvi
+  documentation: https://github.com/wildlife-dynamics/wt-ndvi#readme
+  readme: README.md
+  keywords: [ndvi, vegetation, gee, earthranger, raster]
+  thumbnail: resources/thumbnail.png
 requirements:
   - name: ecoscope-platform
     version: ">=2.20.0, <2.21.0"
