@@ -286,8 +286,11 @@ def main(params: dict[str, Any], validate_params_schema: bool = True):
                 "line": {"color": "rgba(144, 238, 144, 0.8)"},
                 "fillcolor": "rgba(144, 238, 144, 0.3)",
             },
-            historic_mean_style=None,
-            current_value_style=None,
+            historic_mean_style={
+                "mode": "lines+markers",
+                "line": {"color": "green", "dash": "dot"},
+            },
+            current_value_style={"mode": "lines+markers", "line": {"color": "navy"}},
             time_column="img_date",
             **(params.get("draw_ndvi") or {}),
         )

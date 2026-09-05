@@ -1,7 +1,7 @@
 [workspace]
 name = "wt-ndvi"
 channels = ['https://repo.prefix.dev/ecoscope-workflows/', 'conda-forge']
-platforms = ['linux-64', 'osx-arm64', 'win-64']
+platforms = ['linux-64', 'osx-arm64']
 
 [tool.wt]
 # When true, PRs to `main` must come from `staging` or `patch-*` (enforced by
